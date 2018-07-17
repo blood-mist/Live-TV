@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@color/color_black"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/label_sign_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="@string/sign_in"
+        android:textColor="@color/text_color_heading"
+        android:textSize="25sp"
+        android:layout_margin="10dp"/>
+
+
+        <TextView
+            android:id="@+id/label_userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/username"
+            android:layout_below="@+id/label_sign_in"
+            android:layout_alignStart="@+id/label_sign_in"
+            android:textColor="@color/signup_form_text_color"
+            android:textSize="20sp"
+            android:padding="10dp"
+            android:layout_alignLeft="@+id/label_sign_in" />
+
+
+        <TextView
+            android:id="@+id/userNamePS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:padding="10dp"
+            android:layout_toEndOf="@+id/label_userName"
+            android:layout_alignTop="@+id/label_userName"
+            android:textColor="@color/signup_form_text_color"
+            android:textSize="20sp"
+            android:layout_toRightOf="@+id/label_userName" />
+
+
+        <TextView
+            android:id="@+id/loginPasswordLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_below="@+id/label_userName"
+            android:layout_alignStart="@id/label_sign_in"
+            android:text="@string/label_password"
+            android:textColor="@color/signup_form_text_color"
+            android:textSize="20sp"
+            android:layout_alignLeft="@id/label_userName" />
+
+        <EditText
+            android:id="@+id/passWordPS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/loginPasswordLabel"
+            android:layout_alignTop="@+id/loginPasswordLabel"
+            android:background="@drawable/edittext_selector"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:ems="10"
+            android:singleLine="true"
+            android:textColor="@color/signup_form_text_color"
+            android:textColorHint="@color/color_text_silver"
+            android:textSize="20sp"
+            android:layout_toRightOf="@+id/loginPasswordLabel" />
+
+        <Button
+            android:id="@+id/loginButtonPS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/login_button_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/loginPasswordLabel"
+            android:layout_alignStart="@+id/loginPasswordLabel"
+            android:text="@string/btn_login"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@drawable/selector_text_parent_category"
+            android:layout_alignLeft="@+id/loginPasswordLabel" />
+
+
+</RelativeLayout>

@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">AndroidTV LiveTV</string>
+    <string name="loading_app">Loading . . .</string>
+    <string name="label_version">Version:</string>
+    <string name="app_icon">For App Icon</string>
+
+    <string name="err_unexpected">An unexpected error occurred. Please try again.</string>
+    <string name="empty_text" />
+    <string name="negative">negative</string>
+    <string name="neutral">neutral</string>
+    <string name="positive">positive</string>
+    <string name="app_version">App Version:</string>
+    <string name="mac_address">Mac Address:</string>
+    <string name="error">ERROR</string>
+    <string name="btn_reconnect">Re-connect</string>
+    <string name="no_internet_title">No Connection</string>
+    <string name="no_internet_body">Couldn\'t connect to the server. Please try again.</string>
+    <string name="btn_settings">ettings</string>
+
+
+
+    <string name="msg_feature_not_available">This feature is not available.</string>
+    <string name="err_json_exception">Could not fetch the required datas. Please contact your service provider!!!</string>
+    <string name="user_not_registered">Your user id has not been registered into our system.\nPlease sign up first to use our services.</string>
+    <string name="user_not_active">Your account has not been activated  yet.\nPlease contact your service provider to resolve  this issue.</string>
+    <string name="user_not_approved">Your user account has not been approved .Please contact your service provider.</string>
+    <string name="mac_not_registered">Your device has not been registered into our system.\nPlease contact your service provider and register device mac address to use our services</string>
+    <string name="register_success_message">You have successfully registered to our system. Please check your email and click the activation link to complete your registration. \\n\\nYou can login to the system only after our team reviews your request once your have activated your account. This process might take time so you are requested to wait our email confirmation of your Registration approval.\\nIf you did not receive any email or face any other issue regarding registration process, please email us at info@artemisiaiofcaria.com</string>
+    <string name="request_permissions"><![CDATA[AndroidTV LiveTV needs an access to your <b>Extenal Storage</b>.]]></string>
+    <string name="msg_update">A new version of AndroidTV LiveTV is available.\n Download Now.</string>
+    <string name="btn_update">Update</string>
+    <string name="downloading">Downloading...</string>
+    <string name="update">Update Found</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="download">download</string>
+    <string name="download_complete">File Download Completed</string>
+    <string name="myaccount">AndroidTV MyAccount</string>
+    <string name="download_account_header">Download AndroidTV MyAccount</string>
+    <string name="download_myaccount">Download ANdroidTV MyAccount</string>
+    <string name="sign_in">Sign In</string>
+    <string name="label_password">Password: </string>
+    <string name="username">Username:</string>
+    <string name="hint_password">Enter Password</string>
+    <string name="btn_login">Sign In</string>
+</resources>

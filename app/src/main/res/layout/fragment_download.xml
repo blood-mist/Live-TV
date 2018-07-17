@@ -1,0 +1,85 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/white_background">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/color_black"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragment_header_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/update"
+            android:padding="10dp"
+            android:textColor="@color/text_color_heading"/>
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/downloadTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color"
+            android:text="@string/downloading"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:id="@+id/download_or_update_layout"
+            android:visibility="visible"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_download"
+                android:layout_margin="5dp"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/login_button_selector"
+                android:textColor="@color/text_color"
+                android:text="@string/download"/>
+
+            <Button
+                android:id="@+id/btn_dismiss"
+                android:layout_margin="5dp"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/login_button_selector"
+                android:textColor="@color/text_color"
+                android:text="@string/dismiss"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:padding="5dp"
+            android:id="@+id/progress_download"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="700sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="visible"
+            android:maxWidth="700sp"
+           />
+        <TextView
+            android:id="@+id/download_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:padding="5dp"
+            android:layout_gravity="end"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/text_color"
+            android:layout_marginBottom="8dp"
+            android:visibility="visible"
+            android:layout_marginEnd="10dp" />
+
+    </LinearLayout>
+
+
+</FrameLayout>
