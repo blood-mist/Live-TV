@@ -5,37 +5,64 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.provider.MediaStore;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.AppVersionInfo;
+import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
+import androidtv.livetv.stb.entity.Login;
+import androidtv.livetv.stb.entity.LoginSessionInfo;
 import androidtv.livetv.stb.entity.MacInfo;
 import androidtv.livetv.stb.entity.UserCheckInfo;
+import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
+import androidtv.livetv.stb.ui.login.LoginDao;
 import androidtv.livetv.stb.utils.ApiManager;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class SplashRepository{
+import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
+
+public class SplashRepository {
     private static SplashRepository sInstance;
     private MediatorLiveData<MacInfo> macInfoMediatorLiveData;
-    private MediatorLiveData<GeoAccessInfo>geoAccessLiveData;
-    private MediatorLiveData<List<AppVersionInfo>>appInfoLiveData;
+    private MediatorLiveData<GeoAccessInfo> geoAccessLiveData;
+    private MediatorLiveData<List<AppVersionInfo>> appInfoLiveData;
     private SplashApiInterface splashApiInterface;
-     private MediatorLiveData<UserCheckInfo> userCheckLiveData;
-
+    private MediatorLiveData<UserCheckInfo> userCheckLiveData;
+    private MediatorLiveData<Login> userCredentialData;
+    private MediatorLiveData<Integer> rowCountData;
+    private MediatorLiveData<CatChannelInfo> catChannelData;
+    private LoginDao mLoginDao;
+    private CatChannelDao catChannelDao;
 
 
     SplashRepository(Application application) {
+        AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         Retrofit retrofitInstance = ApiManager.getAdapter();
-       splashApiInterface  = retrofitInstance.create(SplashApiInterface.class);
+        mLoginDao = db.loginDao();
+        catChannelDao=db.catChannelDao();
+        userCredentialData=new MediatorLiveData<>();
+        userCredentialData.setValue(null);
+
+        rowCountData=new MediatorLiveData<>();
+        rowCountData.setValue(null);
+        splashApiInterface = retrofitInstance.create(SplashApiInterface.class);
 
     }
+
     public static SplashRepository getInstance(final Application application) {
         if (sInstance == null) {
             synchronized (SplashRepository.class) {
@@ -46,10 +73,11 @@ public class SplashRepository{
         }
         return sInstance;
     }
+
     public LiveData<MacInfo> isMacRegistered(String macAddress) {
-        macInfoMediatorLiveData=new MediatorLiveData<>();
+        macInfoMediatorLiveData = new MediatorLiveData<>();
         macInfoMediatorLiveData.setValue(null);
-        Observable<Response<MacInfo>> macObserver=splashApiInterface.checkMacValidation(macAddress);
+        Observable<Response<MacInfo>> macObserver = splashApiInterface.checkMacValidation(macAddress);
         macObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<MacInfo>>() {
                     @Override
@@ -59,10 +87,9 @@ public class SplashRepository{
 
                     @Override
                     public void onNext(Response<MacInfo> macInfoResponse) {
-                        if(macInfoResponse.code()==200) {
+                        if (macInfoResponse.code() == 200) {
                             MacInfo macInfo = macInfoResponse.body();
-                            macInfo.setResponseCode(String.valueOf(macInfoResponse.code()));
-
+                            macInfo.setResponseCode(macInfoResponse.code());
                             macInfoMediatorLiveData.postValue(macInfo);
                         }
                     }
@@ -70,11 +97,14 @@ public class SplashRepository{
                     @Override
                     public void onError(Throwable e) {
                         MacInfo macInfo = new MacInfo();
-                        macInfo.setResponseCode("selferror");
-                        macInfo.setMacExists("false");
+                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
+                            macInfo.setResponseCode(NO_CONNECTION);
+                        } else {
+                            macInfo.setResponseCode(0);
+                        }
+                        macInfo.setMacExists("");
+                        macInfo.setMessage(e.getMessage());
                         macInfoMediatorLiveData.postValue(macInfo);
-
-
 
                     }
 
@@ -88,9 +118,9 @@ public class SplashRepository{
     }
 
     public LiveData<GeoAccessInfo> isGeoAccessEnabled() {
-        geoAccessLiveData=new MediatorLiveData<>();
+        geoAccessLiveData = new MediatorLiveData<>();
         geoAccessLiveData.setValue(null);
-        Observable<Response<GeoAccessInfo>> geoAccess=splashApiInterface.checkGeoAccess();
+        Observable<Response<GeoAccessInfo>> geoAccess = splashApiInterface.checkGeoAccess();
         geoAccess.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<GeoAccessInfo>>() {
                     @Override
@@ -100,9 +130,9 @@ public class SplashRepository{
 
                     @Override
                     public void onNext(Response<GeoAccessInfo> geoAccessInfoResponse) {
-                        if(geoAccessInfoResponse.code()==200) {
+                        if (geoAccessInfoResponse.code() == 200) {
                             GeoAccessInfo geoAccessInfo = geoAccessInfoResponse.body();
-                            geoAccessInfo.setResponseCode(String.valueOf(geoAccessInfoResponse.code()));
+                            geoAccessInfo.setResponseCode(geoAccessInfoResponse.code());
 
                             geoAccessLiveData.postValue(geoAccessInfo);
                         }
@@ -111,7 +141,11 @@ public class SplashRepository{
                     @Override
                     public void onError(Throwable e) {
                         GeoAccessInfo geoAccessInfo = new GeoAccessInfo();
-                        geoAccessInfo.setResponseCode("selferror");
+                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
+                            geoAccessInfo.setResponseCode(NO_CONNECTION);
+                        } else {
+                            geoAccessInfo.setResponseCode(0);
+                        }
                         geoAccessInfo.getAllow().setAllow("false");
                         geoAccessLiveData.postValue(geoAccessInfo);
 
@@ -127,10 +161,10 @@ public class SplashRepository{
 
 
     public LiveData<List<AppVersionInfo>> isNewVersionAvailable(String macAddress, int versionCode, String versionName, String applicationId) {
-        appInfoLiveData=new MediatorLiveData<>();
+        appInfoLiveData = new MediatorLiveData<>();
         appInfoLiveData.setValue(null);
-        List<AppVersionInfo> appVersionInfoList=new ArrayList<>();
-        Observable<Response<List<AppVersionInfo>>> checkVersion=splashApiInterface.checkForAppVersion(macAddress,versionCode,versionName,applicationId);
+        List<AppVersionInfo> appVersionInfoList = new ArrayList<>();
+        Observable<Response<List<AppVersionInfo>>> checkVersion = splashApiInterface.checkForAppVersion(macAddress, versionCode, versionName, applicationId);
         checkVersion.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<List<AppVersionInfo>>>() {
                     @Override
@@ -140,7 +174,7 @@ public class SplashRepository{
 
                     @Override
                     public void onNext(Response<List<AppVersionInfo>> versionInfoResponse) {
-                        if(versionInfoResponse.code()==200) {
+                        if (versionInfoResponse.code() == 200) {
                             appVersionInfoList.addAll(versionInfoResponse.body());
                             appInfoLiveData.postValue(appVersionInfoList);
                         }
@@ -148,11 +182,11 @@ public class SplashRepository{
 
                     @Override
                     public void onError(Throwable e) {
-                       AppVersionInfo versionInfo=new AppVersionInfo();
-                       versionInfo.setErrorCode("ERR_001");
-                       versionInfo.setErrorMessage(e.getLocalizedMessage());
-                       appVersionInfoList.add(versionInfo);
-                       appInfoLiveData.postValue(appVersionInfoList);
+                        AppVersionInfo versionInfo = new AppVersionInfo();
+                        versionInfo.setErrorCode("ERR_001");
+                        versionInfo.setErrorMessage(e.getLocalizedMessage());
+                        appVersionInfoList.add(versionInfo);
+                        appInfoLiveData.postValue(appVersionInfoList);
 
                     }
 
@@ -165,9 +199,9 @@ public class SplashRepository{
     }
 
     public LiveData<UserCheckInfo> isUserRegistered(String macAddress) {
-        userCheckLiveData=new MediatorLiveData<>();
+        userCheckLiveData = new MediatorLiveData<>();
         userCheckLiveData.setValue(null);
-        Observable<Response<UserCheckInfo>> userCheckObserver=splashApiInterface.checkUserStatus(macAddress);
+        Observable<Response<UserCheckInfo>> userCheckObserver = splashApiInterface.checkUserStatus(macAddress);
         userCheckObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<UserCheckInfo>>() {
                     @Override
@@ -177,8 +211,8 @@ public class SplashRepository{
 
                     @Override
                     public void onNext(Response<UserCheckInfo> userCheckInfoResponse) {
-                        if(userCheckInfoResponse.code()==200) {
-                           //setExtra codes here for error handeling
+                        if (userCheckInfoResponse.code() == 200) {
+                            //setExtra codes here for error handeling
 
                             userCheckLiveData.postValue(userCheckInfoResponse.body());
                         }
@@ -187,10 +221,14 @@ public class SplashRepository{
                     @Override
                     public void onError(Throwable e) {
                         //set Extra Code for error Handeling
-                        UserCheckInfo userCheckInfo=new UserCheckInfo();
+                        UserCheckInfo userCheckInfo = new UserCheckInfo();
+                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
+                            userCheckInfo.setResponseCode(NO_CONNECTION);
+                        } else {
+                            userCheckInfo.setResponseCode(0);
+                        }
                         userCheckInfo.getData().setActivationStatus(-1);
                         userCheckLiveData.postValue(userCheckInfo);
-
 
 
                     }
@@ -201,6 +239,59 @@ public class SplashRepository{
                     }
                 });
         return userCheckLiveData;
+
+    }
+
+    public LiveData<Login> getData() {
+        userCredentialData.addSource(mLoginDao.getLoginData(), login -> userCredentialData.postValue(login));
+        return  userCredentialData;
+    }
+
+    public LiveData<CatChannelInfo> getChannels(String token,String utc,String userId ,String hashValue) {
+    catChannelData=new MediatorLiveData<>();
+    catChannelData.setValue(null);
+        Observable<Response<CatChannelInfo>> catChannel = splashApiInterface.getCatChannel(token, Long.parseLong(utc),userId,hashValue);
+        catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<Response<CatChannelInfo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response<CatChannelInfo> catChannelInfoResponse) {
+                        if (catChannelInfoResponse.code() == 200) {
+                            CatChannelInfo catChannelInfo = catChannelInfoResponse.body();
+                            if(catChannelInfo!=null) {
+                                catChannelDao.insertCategory(catChannelInfo.getCategory());
+                                catChannelDao.insertChannels(catChannelInfo.getChannel());
+                            }
+                            catChannelData.postValue(catChannelInfo);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        CatChannelInfo catChannelInfo = new CatChannelInfo();
+                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
+                            catChannelInfo.setCategory(catChannelDao.getCategories());
+                        }
+                        catChannelData.postValue(catChannelInfo);
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return catChannelData;
+
+    }
+
+    public LiveData<Integer> getRowCount() {
+        rowCountData.addSource(mLoginDao.getTableSize(),integer -> rowCountData.postValue(integer));
+        return rowCountData;
 
     }
 }

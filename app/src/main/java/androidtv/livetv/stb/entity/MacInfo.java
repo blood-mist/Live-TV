@@ -6,14 +6,14 @@ import com.google.gson.annotations.SerializedName;
 @Generated("com.robohorse.robopojogenerator")
 public class MacInfo{
 
-	String responseCode;
+	int responseCode;
 	String error;
 
-	public String getResponseCode() {
+	public int getResponseCode() {
 		return responseCode;
 	}
 
-	public void setResponseCode(String responseCode) {
+	public void setResponseCode(int responseCode) {
 		this.responseCode = responseCode;
 	}
 

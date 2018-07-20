@@ -5,15 +5,22 @@ import android.arch.lifecycle.LiveData;
 import java.util.List;
 
 import androidtv.livetv.stb.entity.AppVersionInfo;
+import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
+import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.entity.MacInfo;
+import androidtv.livetv.stb.entity.TimeStampEntity;
 import androidtv.livetv.stb.entity.UserCheckInfo;
 import androidtv.livetv.stb.utils.LinkConfig;
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
@@ -33,4 +40,14 @@ public interface SplashApiInterface {
 
     @GET(LinkConfig.CHECK_VALIDITY_ACTIVATION_APPROVAL)
     Observable<Response<UserCheckInfo>> checkUserStatus(@Query("boxId") String macAddress);
+
+    @POST(LinkConfig.LOGIN_BUTTON_CLICK)
+    @FormUrlEncoded
+    Observable<Response<LoginInfo>> signIn(@Field("uname") String userEmail, @Field("pswd") String userPassword, @Field("boxId") String boxId);
+
+    @GET(LinkConfig.CATEGORY_URL)
+    Observable<Response<CatChannelInfo>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);
+
+    @GET(LinkConfig.GET_UTC)
+    Observable<Response<TimeStampEntity>> getTimestamp();
 }

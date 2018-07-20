@@ -2,12 +2,10 @@ package androidtv.livetv.stb.ui.splash;
 
 import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,13 +19,16 @@ import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.UserLoginData;
 import androidtv.livetv.stb.ui.login.LoginActivity;
 import androidtv.livetv.stb.ui.unauthorized.UnauthorizedAccess;
+import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.CustomDialogManager;
 import androidtv.livetv.stb.utils.DeviceUtils;
+import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.PackageUtils;
 import androidtv.livetv.stb.utils.PermissionUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 import static androidtv.livetv.stb.utils.LinkConfig.ACCOUNT_PACKAGE;
 import static androidtv.livetv.stb.utils.LinkConfig.DOWNLOAD_FRAGMENT;
@@ -37,6 +38,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.DOWNLOAD_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_ERROR_CODE;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_ERROR_MESSAGE;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_IP;
+import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
 import static androidtv.livetv.stb.utils.LinkConfig.USER_EMAIL;
 import static androidtv.livetv.stb.utils.LinkConfig.USER_PASSWORD;
 
@@ -73,24 +75,60 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         super.onStart();
         appVersion.setText(BuildConfig.VERSION_NAME);
         splashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
-        checkForValidMacAddress();
+        checkIfLoginDetailsAvailable();
+
     }
 
+    private void checkIfLoginDetailsAvailable() {
+        splashViewModel.checkIfDataExists().observe(this, integer -> {
+            if (integer != null) {
+                Timber.d(integer + "");
+                //TODO fetch channel details if valid credentials
+                if (integer > 0)
+                    splashViewModel.checkDatainDb().observe(this, login -> {
+                        if (login != null) {
+                            long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                            fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
+                        }
+                    });
+                else
+                    checkForValidMacAddress();
+
+            }
+        });
+    }
+
+
+    private void fetchChannelDetails(String token, long utc, int id, String hashCode) {
+        splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelInfo -> {
+            if (catChannelInfo != null)
+                Timber.d(catChannelInfo.getCategory().size() + "");
+        });
+    }
+
+    /**
+     * check if the device is registered or not, if no connection found check d for offline
+     */
     private void checkForValidMacAddress() {
         splashViewModel.checkIfValidMacAddress(macAddress).observe(this, macInfo -> {
             if (macInfo != null)
-                switch (macInfo.getMacExists()) {
-                    case MAC_REGISTERED:
-                        checkGeoAccessibility();
-                        break;
-                    case MAC_NOT_REGISTERED:
-                        loadUnauthorized(macInfo.getCode(), macInfo.getMessage(), "N/A");
-                        break;
-                    default:
-                        CustomDialogManager.dataNotFetched(this);
-                        break;
+                if (macInfo.getResponseCode() != NO_CONNECTION)
+                    switch (macInfo.getMacExists()) {
+                        case MAC_REGISTERED:
+                            checkGeoAccessibility();
+                            break;
+                        case MAC_NOT_REGISTERED:
+                            loadUnauthorized(macInfo.getCode(), macInfo.getMessage(), "N/A");
+                            break;
+                        default:
+                            CustomDialogManager.dataNotFetched(this);
+                            break;
 
-                }
+                    }
+                else
+                    CustomDialogManager.ReUsedCustomDialogs.noInternet(this);
+
+
         });
     }
 
@@ -135,7 +173,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         if (appVersionInfo.getUpdate()) {
             permissionutils.check_permission(permissions, getString(R.string.request_permissions), UPDATE_ID);
         } else {
-//          versionPresenter.checkMacDetails(macAddress);
+            checkValidUser();
         }
     }
 
@@ -187,7 +225,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                     if (fetchTokenAndLoginCredentialsFromProvider() != null) {
                         //getSession using userEmail and boxID
                     } else {
-                        showLogin("", "");
+                        showLogin(userCheckInfo.getData().getUserName(), "");
                     }
                 } else {
                     if (userCheckInfo.getStatus() == 401 || userCheckInfo.getStatus() == 402) {
@@ -212,14 +250,12 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void showLogin(String userEmail, String userPassword) {
-
         Intent loginIntent = new Intent(this, LoginActivity.class);
-        if (!userEmail.isEmpty() || !userPassword.isEmpty()) {
-            loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            loginIntent.putExtra(USER_EMAIL, userEmail);
-            loginIntent.putExtra(USER_PASSWORD, userPassword);
-            startActivity(loginIntent);
-        }
+
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        loginIntent.putExtra(USER_EMAIL, userEmail);
+        loginIntent.putExtra(USER_PASSWORD, userPassword);
+        startActivity(loginIntent);
 
     }
 

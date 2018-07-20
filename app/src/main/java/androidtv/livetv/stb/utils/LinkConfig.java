@@ -23,7 +23,7 @@ public class LinkConfig {
     public static final String ALLOW_COUNTRY ="api/v1/other/geoblock";
     public static final String GET_SESSION = "api/v1/session/update";
     public static final String CATEGORY_URL = "api/v1/livetv";
-    public static final String GET_UTC =  "other/utc";
+    public static final String GET_UTC =  "api/v1/other/utc";
     public static final String GROUP_DATA = "api/v1/user/group_json";
     public static final String MAC_EXISTS ="api/v1/mac/exists";
     public static final String LINK_SEVER_APKs = "market_app_info/api/market_app_info.php";
@@ -45,7 +45,11 @@ public class LinkConfig {
     public static final String DOWNLOAD_FRAGMENT="download_fragment";
     public static final String USER_EMAIL="user_email";
     public static  final String USER_PASSWORD="user_password";
-
+    public static final String DATABASE_NAME="androidtv_db";
+    public static final String LOGIN_TABLE="login_table";
+    public static final String CHANNEL_TABLE="channel_table";
+    public static final String CATEGORY_TABLE="category_table";
+    public  static final int  NO_CONNECTION=404;
     public static String getHashCode(String utc) {
       /*  String sessionId = null;
         try {
@@ -79,7 +83,12 @@ public class LinkConfig {
         }*/
       return null;
     }
-
+public static String getHashCode(String userId,String utc,String sessionId){
+    String SecretKey = "123456789";
+    String stringToMD5 = SecretKey + sessionId
+            + userId + "" + utc;
+    return md5(stringToMD5);
+}
     private static final String md5(final String s) {
         try {
             // Create MD5 Hash
