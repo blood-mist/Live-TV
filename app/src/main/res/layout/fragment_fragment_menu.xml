@@ -1,0 +1,375 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#40000000"
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="100dp"
+        android:layout_weight="2"
+        android:importantForAccessibility="no"
+        android:background="@color/transp"
+        android:orientation="vertical"
+        android:layout_marginStart="100dp">
+
+        <TextView
+            android:id="@+id/currentcategory"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:padding="5dp"
+            android:focusable="false"
+            android:text="@string/txt_empty"
+            android:textAllCaps="true"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/gv_channels"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="auto"
+            android:animationCache="false"
+            android:choiceMode="singleChoice"
+            android:focusableInTouchMode="true"
+            android:listSelector="@drawable/main_channel_list_selector"
+            android:nextFocusUp="@+id/categoryList"
+            android:numColumns="1"
+            android:scrollingCache="false"
+            android:smoothScrollbar="true" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:importantForAccessibility="no"
+        android:orientation="vertical"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:importantForAccessibility="no"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/img_open_categories"
+                android:layout_width="29dp"
+                android:layout_height="match_parent"
+                android:background="#000"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:focusableInTouchMode="false"
+                android:nextFocusDown="@id/gv_channels"
+                android:paddingBottom="8dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="8dp"
+                android:src="@drawable/right_arrow" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/categoryList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="yes"
+                    android:background="@color/transp"
+                    android:nextFocusDown="@id/gv_channels"
+                    android:nextFocusLeft="@id/gv_channels"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <FrameLayout
+            android:id="@+id/container_error"
+            android:layout_width="500dp"
+            android:layout_height="0dip"
+            android:layout_gravity="center"
+            android:layout_weight="6"
+            android:gravity="center">
+
+        </FrameLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:background="@color/transp"
+            android:orientation="horizontal">
+
+            <!--  <View
+                  android:layout_width="5dip"
+                  android:layout_height="match_parent"
+                  android:background="@color/category_selected_background_color"/>
+  -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:weightSum="4"
+                android:paddingStart="20dp"
+                tools:ignore="RtlSymmetry">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1.2"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                        android:id="@+id/txt_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:maxLines="1"
+                        android:maxWidth="200dp"
+                        app:fontAssetName="@string/font_exo_Light"
+                        android:text="@string/txt_empty"
+                        android:textColor="@color/color_white"
+                        android:textSize="25sp" />
+
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                        android:id="@+id/amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/rectangle_grey"
+                        android:padding="5dp"
+                        app:fontAssetName="@string/font_exo_semi_bold"
+                        android:text="@string/txt_empty"
+                        android:textSize="12sp" />
+
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                        android:id="@+id/channelNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:padding="3dp"
+                        app:fontAssetName="@string/font_exo_Bold"
+                        android:text="@string/txt_empty"
+                        android:textColor="@color/red_selector"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                    android:id="@+id/ChannelDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dip"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1.8"
+                    android:maxLines="4"
+                    app:fontAssetName="@string/font_exo_Light"
+                    android:paddingBottom="5dp"
+                    android:textSize="17sp" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    android:weightSum="11">
+
+
+                    <!-- <LinearLayout
+
+                         android:layout_width="0dp"
+                         android:layout_height="match_parent"
+                         android:layout_weight="2.3"
+                         android:gravity="center"
+                         android:orientation="horizontal">
+
+                         <ImageView
+                             android:id="@+id/dvr"
+                             android:layout_width="20dp"
+                             android:layout_height="20dp"
+                             android:layout_marginLeft="10dp"
+                             android:background="@drawable/main_dvr_selector"
+                             android:focusable="true"
+                             android:nextFocusUp="@+id/categoryList"
+                             android:nextFocusDown="@+id/fav"
+                             />
+
+                         <TextView
+                             android:id="@+id/txt_dvr"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_gravity="center"
+                             android:layout_marginLeft="15dp"
+                             android:gravity="center_vertical"
+                             android:singleLine="true"
+                             android:text="DVR"
+                             android:textSize="15sp"/>
+
+                     </LinearLayout>-->
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/epg"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:focusable="true"
+                            android:nextFocusDown="@+id/fav"
+                            android:nextFocusUp="@+id/categoryList"
+                            android:src="@drawable/epg" />
+
+                        <TextView
+                            android:id="@+id/txt_epg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="EPG"
+                            android:textSize="15sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/dvr"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:focusable="true"
+                            android:nextFocusDown="@+id/fav"
+                            android:nextFocusUp="@+id/categoryList"
+                            android:src="@drawable/epg" />
+
+                        <TextView
+                            android:id="@+id/txt_dvr"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="DVR"
+                            android:textSize="15sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2.4"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/fav"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:focusable="true"
+                            android:nextFocusDown="@id/gv_channels"
+                            android:src="@drawable/set_fav" />
+
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                            android:id="@+id/txt_fav_unfav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="Set Fav"
+                            app:fontAssetName="@string/font_exo_regular"
+                            android:textAllCaps="true"
+                            android:textSize="15sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2.4"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/bought"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/main_epg_selector"
+                            android:focusable="true"
+                            android:nextFocusDown="@+id/fav"
+
+                            android:nextFocusUp="@+id/categoryList" />
+
+                        <TextView
+                            android:id="@+id/txt_bought"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="BOUGHT"
+                            android:textSize="15sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
+

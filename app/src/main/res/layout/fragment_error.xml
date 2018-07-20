@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/layout_error"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="20dp"
+    android:background="@drawable/round_shape_error"
+    android:gravity="center"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+        android:text="ERROR"
+        android:gravity="center_horizontal"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:id="@+id/error"
+        app:fontAssetName="@string/font_exo_Bold"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:background="@color/view_line"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_height="1dp"/>
+
+    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+        android:id="@+id/txt_error_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/white"
+        android:gravity="center_vertical|center_horizontal"
+        android:padding="20dp"
+        app:fontAssetName="@string/font_exo_regular"
+        android:text="sadsadjsdfhsajdfhjksdahfkjsa"
+        android:textSize="18sp"
+        android:visibility="visible"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="@color/view_line"/>
+    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+        android:id="@+id/txt_error_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:fontAssetName="@string/font_exo_regular"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal"
+        android:text="ERROR CODE 98978"/>
+
+    <LinearLayout
+        android:id="@+id/layout_err_btns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_positive"
+            android:layout_width="0dip"
+            android:layout_height="40dp"
+            android:textColor="@color/color_black"
+            android:background="@drawable/button_round_shape"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:text="SETTINGS"/>
+
+        <Button
+            android:layout_marginLeft="20dp"
+            android:id="@+id/btn_negative"
+            android:layout_width="0dip"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="negative"
+            android:textColor="@color/color_black"
+            android:background="@drawable/button_round_shape"/>
+    </LinearLayout>
+
+</LinearLayout>

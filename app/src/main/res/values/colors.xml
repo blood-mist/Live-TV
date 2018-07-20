@@ -12,4 +12,31 @@
     <color name="text_color">#cdcdcd</color>
     <color name="signup_form_text_color">#CCCCCC</color>
     <color name="color_text_silver">#a9a9a9</color>
+
+
+    <color name="transp">#cc000000</color>
+    <color name="no_color">#00000000</color>
+    <color name="text_background">#80000000</color>
+
+    <color name="color_preloader_start">#707070</color>
+    <color name="color_preloader_center">#B0B0B0</color>
+    <color name="color_preloader_end">#FFFFFF</color>
+
+    <color name="prev_next_selected">#fc8801</color>
+    <color name="prev_next_clicked">#feac6a</color>
+    <!--<color name="red_selector">#9e1e27</color>-->
+    <color name="package_dailog_background">#111111</color>
+    <!--<color name="red_selector">#d12b30</color>-->
+
+    <color name="view">#80444849</color>
+    <color name="color_white">#FEFEFE</color>
+
+    <color name="category_selected_background_color">#4d9b75</color>
+    <color name="dvr_transp">#40232526</color>
+    <color name="epg_transp">#8055595e</color>
+    <color name="date_defocused">#929091</color>
+    <color name="epg_prgm_name_defocused">#aeb0af</color>
+    <color name="dvr_text_color">#9b9b9b</color>
+
+
 </resources>

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -78,5 +79,16 @@ public class SplashViewModel extends AndroidViewModel {
 
     private LiveData<UserCheckInfo> checkUserActivation(String macAddress) {
         return splashRepository.isUserRegistered(macAddress);
+    }
+
+    private void  insertData(MacInfo macInfo){
+
+    }
+
+    private class MySyn extends AsyncTask<Object,Object,Object >{
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            return null;
+        }
     }
 }

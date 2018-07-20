@@ -18,7 +18,6 @@
     <string name="btn_settings">ettings</string>
 
 
-
     <string name="msg_feature_not_available">This feature is not available.</string>
     <string name="err_json_exception">Could not fetch the required datas. Please contact your service provider!!!</string>
     <string name="user_not_registered">Your user id has not been registered into our system.\nPlease sign up first to use our services.</string>
@@ -42,4 +41,125 @@
     <string name="username">Username:</string>
     <string name="hint_password">Enter Password</string>
     <string name="btn_login">Sign In</string>
+    <string name="login_btn_click_url">user/login</string>
+    <string name="get_session_url">session/update</string>
+    <string name="category_channel_url">livetv</string>
+    <string name="group_data">user/group_json</string>
+    <string name="check_login">user/checklogin</string>
+    <string name="allow_country_url">other/geoblock</string>
+    <string name="link_server_apk_url">https://middleware.yourman.info/market_app_info/api/market_app_info.php</string>
+    <string name="channel_link_url">livetv/getchannels</string>
+    <string name="preview_link">livetv/channel/preview</string>
+    <string name="epg_url">epg</string>
+    <string name="dvr_url">dvr/getdvr</string>
+    <string name="set_fav_url">livetv/favorite/addfavorite</string>
+    <string name="fav_channel_list">livetv/favorite/list</string>
+    <string name="mac_exists">mac/exists</string>
+
+
+    <!--Buttons, Labels, Hints-->
+
+    <string name="btn_register">REGISTER</string>
+
+    <string name="btn_topup">TOPUP NOW</string>
+    <string name="btn_watch">WATCH</string>
+    <string name="btn_retry">RETRY</string>
+    <string name="btn_dismiss">Dismiss</string>
+
+    <string name="label_retry">Retry</string>
+    <string name="label_username">Username :</string>
+    <string name="hint_username">Your Email</string>
+    <string name="label_current_balance">Account Balance :\t\t</string>
+    <string name="label_channel_price_per_month">Channel Price per month :</string>
+    <string name="label_time_to_buy">Time period for your buy :</string>
+    <string name="label_total_price">Total Price :\t\t</string>
+    <string name="label_mac">Mac Address: </string>
+    <string name="txt_loading">Loading&#8230;</string>
+
+
+    <!-- Live TV Screen -->
+    <string name="all_category">My Purchase</string>
+    <string name="category">Category</string>
+    <string name="label_language">Language :</string>
+    <string name="label_country">Country :</string>
+    <string name="label_description">Description :</string>
+    <string name="txt_language">language</string>
+    <string name="txt_country">country</string>
+    <string name="txt_description">description</string>
+    <string name="banner_content_description">banner</string>
+
+
+    <!-- Messages -->
+    <string name="msg_register_success">You have successfully registered to our system. Please check your email and click the activation link to complete your registration. \n\nYou can login to the system only after our team reviews your request once your have activated your account. This process might take time so you are requested to wait our email confirmation of your Registration approval.\nIf you did not receive any email or face any other issue regarding registration process, please email us at support@totalcable.c</string>
+    <string name="msg_thank_you">Thank You.</string>
+    <string name="msg_no_channels">Sorry, no channels found for this category</string>
+    <string name="msg_multi_login">Multiple Login Detected -</string>
+
+
+    <string name="err_file_data_does_not_match">Could not fetch the required datas. Please re-login</string>
+    <string name="err_no_channels">Sorry you do not have access to any channels. Please buy channels From MyAccount App.</string>
+    <string name="err_doublelogin"> is already logged in - \nPlease Exit to Close it and Open new App.\n</string>
+    <string name="err_inactive_user">Your registration has not been approved. Please try loggin in after you got confirmation from us.</string>
+    <string name="err_unauthorized_access">You are not authorized to access this service.\nPlease contact your service provider.</string>
+    <string name="err_no_internet">ErrorCode: E 024 \nCould not connect with your Network, check your Network settings and try again later.</string>
+    <string name="err_low_balance">You do not have sufficient balance \nPlease recharge and try again</string>
+
+    <string name="war_code_buy_before_watch">WAR_03_BUY</string>
+    <string name="war_buy_before_watch">Please buy this channel to watch</string>
+
+    <string name="war_code_upgrade_before_watch">WAR_04_BUY</string>
+    <string name="war_upgrade_before_watch">Please upgrade this channelTemp to watch</string>
+
+    <string name="err_code_server_unreachable">ERR_SETTINGS_02</string>
+
+    <string name="err_code_json_exception">ERR_JSON_01</string>
+    <string name="uner_maintainence">Sorry! Server is under Maintenance!!! \nPlease try again later. \nIf this message is continuously seen, Please contact your Service Provider</string>
+
+    <string name="err_server_unreachable">No Network access or Server Issue \n Please Check your network connectivity \n and contact server administrator</string>
+
+    <string name="war_code_playback_idle">WAR_05_IDLE</string>
+    <string name="war_playback_idle">The system detected that the playback has paused for some time. Please OK Button <!--press any key in your remote-->
+        to disable automatic exit and continue.\n Else, the playback will stop shortly.</string>
+
+    <string name="war_code_no_channels_in_db">WAR_06_SELECT_CHANNEL</string>
+    <string name="war_no_channels_in_db">Please choose any channel to Play! Press Home to exit</string>
+
+    <string name="err_code_media_error">MEDIA_ERROR</string>
+    <string name="err_media_error">Couldnt play the requested channel. Your network issue or it was down from the source itself, Please try again later </string>
+
+    <string name="update_message">An update of this version of App available. Please press OK button in your remote to update your app now.</string>
+    <string name="extra_link_url">livetv/internet</string>
+
+
+    <string-array name="loading">
+        <item>Loading</item>
+    </string-array>
+
+
+    <string name="txt_empty" />
+
+
+    <!--EPG ERROR-->
+
+    <string name="err_code_epg_not_found">ERR_07_NO_EPG</string>
+    <string name="err_code_dvr_not_found">ERR_07_NO_DVR</string>
+    <string name="err_epg_not_found">Sorry, EPG of requested channel is not available</string>
+
+    <string name="err_dvr_not_found">Sorry, DVR of requested channel is not available</string>
+
+    <string name="btn_ok">OK</string>
+    <string name="dvr_time_text">\u0020:\u0020</string>
+    <string name="message_permissions"><![CDATA[AndroidTV LiveTV needs an access to your <b>Extenal Storage</b>.]]></string>
+    <string name="channel_logo">Contains link to channel images</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="font_exo_semi_bold">Exo2-SemiBold.otf</string>
+    <string name="font_exo_regular">Exo2-Regular_0.otf</string>
+    <string name="font_exo_medium">Exo2-Medium.otf</string>
+    <string name="font_exo_Light">Exo2-Light.otf</string>
+    <string name="font_exo_Bold">Exo2-Bold.otf</string>
+
+
 </resources>
