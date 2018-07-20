@@ -5,6 +5,17 @@ import com.google.gson.annotations.SerializedName;
 
 @Generated("com.robohorse.robopojogenerator")
 public class UserCheckInfo{
+
+	private int responseCode;
+
+	public int getResponseCode() {
+		return responseCode;
+	}
+
+	public void setResponseCode(int responseCode) {
+		this.responseCode = responseCode;
+	}
+
 	public String getErrror() {
 		return errror;
 	}

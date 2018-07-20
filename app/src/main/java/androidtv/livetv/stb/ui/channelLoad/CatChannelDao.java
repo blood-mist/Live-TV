@@ -1,0 +1,35 @@
+package androidtv.livetv.stb.ui.channelLoad;
+
+import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
+
+import java.util.List;
+
+import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Login;
+
+@Dao
+public interface CatChannelDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertCategory(List<CategoryItem> categoryItemList);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertChannels(List<ChannelItem> channelItemList);
+
+    @Query("SELECT * FROM CATEGORY_TABLE")
+    List<CategoryItem> getCategories();
+
+
+    @Query("SELECT * FROM CHANNEL_TABLE")
+    List<ChannelItem> getChannels();
+
+    @Query("SELECT count(*)FROM CATEGORY_TABLE")
+    LiveData<Integer> getCatTableSize();
+
+    @Query("SELECT count(*)FROM CATEGORY_TABLE")
+    LiveData<Integer> getChannelTableSize();
+}

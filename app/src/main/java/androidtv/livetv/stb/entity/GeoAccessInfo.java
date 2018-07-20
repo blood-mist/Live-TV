@@ -7,11 +7,11 @@ import com.google.gson.annotations.SerializedName;
 @Generated("com.robohorse.robopojogenerator")
 public class GeoAccessInfo {
 
-    public String getResponseCode() {
+    public int getResponseCode() {
         return responseCode;
     }
 
-    public void setResponseCode(String responseCode) {
+    public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
     }
 
@@ -23,7 +23,7 @@ public class GeoAccessInfo {
         this.error = error;
     }
 
-    String responseCode;
+    int responseCode;
     String error;
 
 
