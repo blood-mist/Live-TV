@@ -23,8 +23,7 @@
         </activity>
 
         <activity android:name=".ui.unauthorized.UnauthorizedAccess" />
-
-        <activity android:name=".ui.login.LoginActivity"/>
+        <activity android:name=".ui.login.LoginActivity" />
 
 
         <service android:name=".downloads.DownloadService" />
@@ -40,6 +39,7 @@
         </provider>
 
         <activity android:name=".ui.videoplay.VideoPlayActivity"></activity>
+        <activity android:name=".ui.channelLoad.ChannelLoadActivity"></activity>
     </application>
 
 </manifest>

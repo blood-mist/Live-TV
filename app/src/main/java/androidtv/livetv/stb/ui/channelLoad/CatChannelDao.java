@@ -20,11 +20,11 @@ public interface CatChannelDao {
     void insertChannels(List<ChannelItem> channelItemList);
 
     @Query("SELECT * FROM CATEGORY_TABLE")
-    List<CategoryItem> getCategories();
+    LiveData<List<CategoryItem>> getCategories();
 
 
     @Query("SELECT * FROM CHANNEL_TABLE WHERE category_id=:category_id")
-    List<ChannelItem> getChannels(int category_id);
+   LiveData <List<ChannelItem>> getChannels(int category_id);
 
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
     LiveData<Integer> getCatTableSize();

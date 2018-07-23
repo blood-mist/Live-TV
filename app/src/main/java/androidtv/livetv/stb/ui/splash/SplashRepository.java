@@ -274,7 +274,7 @@ public class SplashRepository {
                     public void onError(Throwable e) {
                         CatChannelInfo catChannelInfo = new CatChannelInfo();
                         if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
-                            catChannelInfo.setCategory(catChannelDao.getCategories());
+                            catChannelInfo.setCategory(catChannelDao.getCategories().getValue());
                         }
                         catChannelData.postValue(catChannelInfo);
 
