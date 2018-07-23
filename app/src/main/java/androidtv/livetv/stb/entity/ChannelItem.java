@@ -25,6 +25,17 @@ public class ChannelItem {
     @SerializedName("is_content_allow")
     private String isContentAllow;
 
+    public int getIs_fav() {
+        return is_fav;
+    }
+
+    public void setIs_fav(int is_fav) {
+        this.is_fav = is_fav;
+    }
+
+    @ColumnInfo(name = "is_fav")
+    private int is_fav=0;
+
     @Ignore
     @SerializedName("mobile_ad_url")
     private String mobileAdUrl;
