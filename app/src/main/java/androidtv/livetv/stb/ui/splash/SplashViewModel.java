@@ -96,28 +96,22 @@ public class SplashViewModel extends AndroidViewModel {
     }
 
 
-    private class MySyn extends AsyncTask<Object, Object, Object> {
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            return null;
-        }
-
-        public LiveData<Login> checkDatainDb() {
-            userCredentialData.addSource(splashRepository.getData(), login -> userCredentialData.setValue(login));
-            return userCredentialData;
-        }
-
-        public LiveData<CatChannelInfo> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
-            catChannelData.addSource(splashRepository.getChannels(token, utc, userId, hashValue), catChannelInfo -> catChannelData.setValue(catChannelInfo));
-            return catChannelData;
-
-        }
-
-        public LiveData<Integer> checkIfDataExists() {
-            tableCountData.addSource(splashRepository.getRowCount(), integer -> tableCountData.setValue(integer));
-            return tableCountData;
-
-
-        }
+    public LiveData<Login> checkDatainDb() {
+        userCredentialData.addSource(splashRepository.getData(), login -> userCredentialData.setValue(login));
+        return userCredentialData;
     }
+
+    public LiveData<CatChannelInfo> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
+        catChannelData.addSource(splashRepository.getChannels(token, utc, userId, hashValue), catChannelInfo -> catChannelData.setValue(catChannelInfo));
+        return catChannelData;
+
+    }
+
+    public LiveData<Integer> checkIfDataExists() {
+        tableCountData.addSource(splashRepository.getRowCount(), integer -> tableCountData.setValue(integer));
+        return tableCountData;
+
+
+    }
+
 }

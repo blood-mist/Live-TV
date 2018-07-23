@@ -59,6 +59,7 @@ public class VideoPlayActivity extends AppCompatActivity {
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
 
+
     }
 
     private void randomDisplayMacAddress() {
