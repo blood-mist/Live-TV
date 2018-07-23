@@ -10,7 +10,6 @@ import java.util.List;
 
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.entity.Login;
 
 @Dao
 public interface CatChannelDao {
