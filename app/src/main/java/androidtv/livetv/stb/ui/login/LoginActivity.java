@@ -74,6 +74,7 @@ public class LoginActivity  extends AppCompatActivity{
                loginViewModel.getLoginInfoFromDB().observe(this,login1 -> {
                    if(login1!=null)
                    Toast.makeText(this,"userNamewhenOffline is"+login1.getEmail(),Toast.LENGTH_LONG).show();
+
                });
             }
         });
