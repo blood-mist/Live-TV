@@ -95,6 +95,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         Log.d("frag","view created");
         if(mListCategories != null){
             setUpRecylerViewCategory(mListCategories);
+        }else{
+
         }
         if(mListChannels != null){
             setUpRecylerView(mListChannels);

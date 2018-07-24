@@ -24,7 +24,7 @@ public interface CatChannelDao {
 
 
     @Query("SELECT * FROM CHANNEL_TABLE WHERE category_id=:category_id")
-   LiveData <List<ChannelItem>> getChannels(int category_id);
+    LiveData<List<ChannelItem>> getChannels(int category_id);
 
     @Query("SELECT * FROM CHANNEL_TABLE ")
     LiveData <List<ChannelItem>> getChannels();
@@ -34,4 +34,9 @@ public interface CatChannelDao {
 
     @Query("SELECT count(*)FROM CHANNEL_TABLE")
     LiveData<Integer> getChannelTableSize();
+
+    @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
+    int updateFav(int is_fav, int channel_id);
+
+
 }
