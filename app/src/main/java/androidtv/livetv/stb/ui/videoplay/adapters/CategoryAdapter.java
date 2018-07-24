@@ -19,25 +19,23 @@ import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolde
 /**
  * Category Adapter
  */
-public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
+public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> {
+    private final LayoutInflater mInflater;
+
     private List<CategoryItem> categoryItemList;
-    private Context mContext;
     private OnListClickListener mListener;
     private int selectedPos;
 
     /**
      * Constructer
+     *
      * @param context
-     * @param items
      */
-    public CategoryAdapter(Context context,List<CategoryItem> items ,OnListClickListener lis){
-        this.categoryItemList = items;
-        this.mContext = context;
-        this.mListener = lis;
+    public CategoryAdapter(Context context) {
+        mInflater = LayoutInflater.from(context);
     }
 
     /**
-     *
      * @param parent
      * @param viewType
      * @return
@@ -45,12 +43,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
     @NonNull
     @Override
     public MyCategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.category_list_row, parent, false);
+        View v = mInflater.inflate(R.layout.category_list_row, parent, false);
         return new MyCategoryViewHolder(v);
     }
 
     /**
      * To handle key event from remote
+     *
      * @param recyclerView
      */
     @Override
@@ -76,8 +75,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
 
     }
 
+    public void setCategory(List<CategoryItem> categoryItems) {
+        categoryItemList = categoryItems;
+        notifyDataSetChanged();
+    }
+
     /**
-     *
      * @param lm
      * @param direction
      * @return
@@ -86,7 +89,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
         int nextSelectItem = selectedPos + direction;
 
         // If still within valid bounds, move the selection, notify to redraw, and scroll
-        if (nextSelectItem == 0 && nextSelectItem <getItemCount()) {
+        if (nextSelectItem == 0 && nextSelectItem < getItemCount()) {
             notifyItemChanged(selectedPos);
             selectedPos = nextSelectItem;
             notifyItemChanged(selectedPos);
@@ -100,6 +103,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
 
     /**
      * bind view and data
+     *
      * @param holder
      * @param position
      */
@@ -111,15 +115,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
          * if position is 0 the created a category called ALl with
          * id = -1;
          */
-        if(position == 0) {
+        if (position == 0) {
             categoryItem = new CategoryItem();
             categoryItem.setId(-1);
             categoryItem.setTitle("ALL");
-        }else{
-            categoryItem = categoryItemList.get(position-1);
+        } else {
+            if (categoryItemList != null) {
+                categoryItem = categoryItemList.get(position - 1);
+                holder.mTitleView.setText(categoryItem.getTitle());
+            } else {
+                holder.mTitleView.setText("No Categories Found");
+            }
         }
 
-        holder.mTitleView.setText(categoryItem.getTitle());
+
         /**
          * final object created.
          */
@@ -138,10 +147,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
         holder.mCategoryLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
+                if (hasFocus) {
                     holder.mTitleView.setSelected(true);
                     holder.mCategoryLayout.setScaleY(1.02f);
-                }else{
+                } else {
                     holder.mTitleView.setSelected(false);
                     holder.mCategoryLayout.setScaleX(1.0f);
                 }
@@ -152,18 +161,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder>{
     }
 
     /**
-     *
      * @return list count
      */
     @Override
     public int getItemCount() {
-        return categoryItemList.size()+1;
+        if (categoryItemList != null)
+            return categoryItemList.size() + 1;
+        else
+            return 0;
     }
 
     /**
      * interface for  clicklistener
      */
-    public interface  OnListClickListener{
+    public interface OnListClickListener {
         void onClickCategory(CategoryItem categoryItem);
     }
 

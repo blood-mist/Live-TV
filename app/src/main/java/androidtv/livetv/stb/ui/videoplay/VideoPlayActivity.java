@@ -151,16 +151,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-    @Override
-    public List<CategoryItem> getCategory() {
-        if(mCategoryList != null)
-        return mCategoryList;
-    }
-
-    @Override
-    public List<ChannelItem> loadChannels(int id) {
-       return mChannelList;
-    }
 
     @Override
     public void playChannel(ChannelItem item) {

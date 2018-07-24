@@ -3,6 +3,8 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,7 +36,7 @@ import butterknife.ButterKnife;
  */
 public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener {
 
-
+    private MenuViewModel menuViewModel;
     private ChannelListAdapter adapterChannels;
     private FragmentMenuInteraction mListener;
     private List<CategoryItem> mListCategories;
@@ -59,26 +61,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.gv_channels) RecyclerView gvChannelsList;
 
 
-    private MediatorLiveData<List<ChannelItem>> channelListLiveData;
-    private MediatorLiveData<List<CategoryItem>> categoryListLiveData;
-    private int categoryId;
-    private int position = -1 ;
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,8 +74,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        menuViewModel= ViewModelProviders.of(this).get(MenuViewModel.class);
         Log.d("frag","view created");
-
+        setUpRecylerViewCategory();
 
 
     }
@@ -102,25 +85,18 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
 
 
-    private void setUpRecylerViewCategory(List<CategoryItem> categoryItems) {
+    private void setUpRecylerViewCategory() {
         Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
         Log.d("frag","recycle view created");
-        CategoryAdapter adapter = new CategoryAdapter(getActivity(),categoryItems,this);
+        CategoryAdapter adapter = new CategoryAdapter(getActivity());
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
         categoryList.setAdapter(adapter);
+        menuViewModel.getCategoryData().observe(this, adapter::setCategory);
 
 
     }
 
 
-    private void setUpRecylerView(List<ChannelItem> value) {
-        Toast.makeText(getActivity(), "Setting recycleing view for channellist", Toast.LENGTH_SHORT).show();
-        Log.d("frag","channel list view created");
-         adapterChannels = new ChannelListAdapter(getActivity(),value,this);
-         gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        gvChannelsList.setAdapter(adapterChannels);
-
-    }
 
     @Override
     public void onClickCategory(CategoryItem categoryItem) {
@@ -143,7 +119,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onAttach(context);
         if (context instanceof FragmentMenuInteraction) {
             mListener = (FragmentMenuInteraction) context;
-            setUpCategories();
 
         } else {
             throw new RuntimeException(context.toString()
@@ -151,17 +126,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         }
     }
 
-    private void setUpCategories() {
-     mListCategories = mListener.getCategory();
-     mListChannels = mListener.loadChannels(categoryId);
-
-    }
-
-
 
     public interface FragmentMenuInteraction{
-        List<CategoryItem> getCategory();
-        List<ChannelItem> loadChannels(int id);
         void playChannel(ChannelItem item);
     }
 

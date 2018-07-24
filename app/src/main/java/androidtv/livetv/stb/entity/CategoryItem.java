@@ -3,6 +3,7 @@ package androidtv.livetv.stb.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import javax.annotation.Generated;
@@ -11,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_TABLE;
 
 @Generated("com.robohorse.robopojogenerator")
-@Entity(tableName = CATEGORY_TABLE)
+@Entity(tableName = CATEGORY_TABLE	,indices = {@Index("category_id")})
 public class CategoryItem{
 
 	@Ignore

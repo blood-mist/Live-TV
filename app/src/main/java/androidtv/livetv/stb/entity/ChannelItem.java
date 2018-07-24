@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import javax.annotation.Generated;
@@ -14,7 +15,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_TABLE;
 
 @Generated("com.robohorse.robopojogenerator")
-@Entity(tableName = CHANNEL_TABLE, foreignKeys = @ForeignKey(entity = CategoryItem.class, parentColumns = "category_id", childColumns = "category_id", onDelete = CASCADE))
+@Entity(tableName = CHANNEL_TABLE, foreignKeys = @ForeignKey(entity = CategoryItem.class, parentColumns = "category_id", childColumns = "category_id", onDelete = CASCADE),indices = {@Index("channel_id")})
 public class ChannelItem {
 
     @ColumnInfo(name = "channel_logo")
@@ -34,7 +35,7 @@ public class ChannelItem {
     }
 
     @ColumnInfo(name = "is_fav")
-    private int is_fav=0;
+    private int is_fav = 0;
 
     @Ignore
     @SerializedName("mobile_ad_url")

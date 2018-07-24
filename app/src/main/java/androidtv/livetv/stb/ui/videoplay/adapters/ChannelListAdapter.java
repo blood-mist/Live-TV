@@ -48,7 +48,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<MyChannelListViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyChannelListViewHolder holder, int position) {
+    public void onBindViewHolder( MyChannelListViewHolder holder, int position) {
         ChannelItem item = mList.get(position);
         GlideApp.with(mContext).load(item.getChannelLogo())
                 .placeholder(R.drawable.placeholder_logo)
