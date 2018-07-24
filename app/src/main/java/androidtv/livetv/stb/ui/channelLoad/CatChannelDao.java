@@ -26,6 +26,9 @@ public interface CatChannelDao {
     @Query("SELECT * FROM CHANNEL_TABLE WHERE category_id=:category_id")
    LiveData <List<ChannelItem>> getChannels(int category_id);
 
+    @Query("SELECT * FROM CHANNEL_TABLE ")
+    LiveData <List<ChannelItem>> getChannels();
+
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
     LiveData<Integer> getCatTableSize();
 

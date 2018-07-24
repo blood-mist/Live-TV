@@ -1,9 +1,14 @@
 package androidtv.livetv.stb.ui.videoplay;
 
+import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,18 +20,23 @@ import android.widget.VideoView;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DeviceUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class VideoPlayActivity extends AppCompatActivity {
+public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction {
 
     @BindView(R.id.videoSurface)SurfaceView videoSurface;
-    @BindView(R.id.videoView) VideoView videoView;
+    //@BindView(R.id.videoView) VideoView videoView;
     @BindView(R.id.video_frame) RelativeLayout videoFrame;
     @BindView(R.id.img_play_pause) ImageView playPauseStatus;
     @BindView(R.id.videoStatus) ImageView recordedStatus;
@@ -44,6 +54,12 @@ public class VideoPlayActivity extends AppCompatActivity {
     private Handler handlerToHideMac;
     private Runnable runnableToHideMac;
     private Runnable runnableToShowMac;
+    private FragmentMenu menuFragment;
+    private Fragment currentFragment;
+    private List<CategoryItem> mCategoryList = new ArrayList<>();
+    private List<ChannelItem> mChannelList = new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +68,46 @@ public class VideoPlayActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         txtRandomDisplayBoxId.setText( AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
 
+        menuFragment = new FragmentMenu();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
+        videoPlayViewModel.getCatChannelData().observe(this, new Observer<List<CategoryItem>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoryItem> categoryItems) {
+                mCategoryList = categoryItems;
+            }
+        });
+
+
+        videoPlayViewModel.getChannelList(-1).observe(this, new Observer<List<ChannelItem>>() {
+            @Override
+            public void onChanged(@Nullable List<ChannelItem> channelItems) {
+                mChannelList = channelItems;
+            }
+        });
+        openFragment(menuFragment);
+    }
+
+    private void openFragment(Fragment fragment) {
+        Log.d("frag","called from activity");
+        currentFragment = fragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player,currentFragment).commit();
+
 
 
     }
+
+    private void openFragmentWithBackStack(Fragment fragment,String tag) {
+        currentFragment = fragment;
+        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player,fragment).addToBackStack(tag).commit();
+
+    }
+
 
     private void randomDisplayMacAddress() {
         final Random random = new Random();
@@ -102,5 +149,20 @@ public class VideoPlayActivity extends AppCompatActivity {
 
         handlerToShowMac.postDelayed(runnableToShowMac, 7 * 1000 * 1);
 
+    }
+
+    @Override
+    public List<CategoryItem> getCategory() {
+        return mCategoryList;
+    }
+
+    @Override
+    public List<ChannelItem> loadChannels(int id) {
+       return mChannelList;
+    }
+
+    @Override
+    public void playChannel(ChannelItem item) {
+        //TODO play Channels
     }
 }

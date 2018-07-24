@@ -17,10 +17,10 @@ import androidtv.livetv.stb.downloads.DownloadFragment;
 import androidtv.livetv.stb.downloads.DownloadService;
 import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.UserLoginData;
-import androidtv.livetv.stb.ui.channelLoad.ChannelLoadActivity;
 import androidtv.livetv.stb.ui.login.LoginActivity;
 import androidtv.livetv.stb.ui.unauthorized.UnauthorizedAccess;
 import androidtv.livetv.stb.ui.utc.GetUtc;
+import androidtv.livetv.stb.ui.videoplay.VideoPlayActivity;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.CustomDialogManager;
 import androidtv.livetv.stb.utils.DeviceUtils;
@@ -102,15 +102,16 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void fetchChannelDetails(String token, long utc, int id, String hashCode) {
         splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelInfo -> {
-            if (catChannelInfo != null)
+            if (catChannelInfo != null) {
                 Timber.d(catChannelInfo.getCategory().size() + "");
-            loadChannelActivity();
+                loadChannelActivity();
+            }
 
         });
     }
 
     private void loadChannelActivity() {
-        Intent channelLoadIntent= new Intent(this,ChannelLoadActivity.class);
+        Intent channelLoadIntent= new Intent(this,VideoPlayActivity.class);
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(channelLoadIntent);
     }
