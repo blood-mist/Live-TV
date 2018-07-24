@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -15,6 +16,7 @@ import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginSessionInfo;
@@ -23,6 +25,7 @@ import androidtv.livetv.stb.entity.UserCheckInfo;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.login.LoginDao;
 import androidtv.livetv.stb.utils.ApiManager;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
@@ -263,8 +266,8 @@ public class SplashRepository {
                         if (catChannelInfoResponse.code() == 200) {
                             CatChannelInfo catChannelInfo = catChannelInfoResponse.body();
                             if(catChannelInfo!=null) {
-                                catChannelDao.insertCategory(catChannelInfo.getCategory());
-                                catChannelDao.insertChannels(catChannelInfo.getChannel());
+                               insertCategoryIntoDatabase(catChannelInfo.getCategory());
+                               insertChannelsintoDatabase(catChannelInfo.getChannel());
                             }
                             catChannelData.postValue(catChannelInfo);
                         }
@@ -274,10 +277,11 @@ public class SplashRepository {
                     public void onError(Throwable e) {
                         CatChannelInfo catChannelInfo = new CatChannelInfo();
                         if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
-                            catChannelInfo.setCategory(catChannelDao.getCategories().getValue());
+                           catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
+                                catChannelInfo.setCategory(categoryItems);
+                                catChannelData.postValue(catChannelInfo);
+                            });
                         }
-                        catChannelData.postValue(catChannelInfo);
-
                     }
 
                     @Override
@@ -288,6 +292,14 @@ public class SplashRepository {
         return catChannelData;
 
     }
+
+    private void insertChannelsintoDatabase(List<ChannelItem> channel) {
+        Completable.fromRunnable(() -> catChannelDao.insertChannels(channel)).subscribeOn(Schedulers.io()).subscribe();
+    }
+
+    private void insertCategoryIntoDatabase(List<CategoryItem> category) {
+        Completable.fromRunnable(() -> catChannelDao.insertCategory(category)).subscribeOn(Schedulers.io()).subscribe();
+}
 
     public LiveData<Integer> getRowCount() {
         rowCountData.addSource(mLoginDao.getTableSize(),integer -> rowCountData.postValue(integer));

@@ -102,9 +102,10 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void fetchChannelDetails(String token, long utc, int id, String hashCode) {
         splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelInfo -> {
-            if (catChannelInfo != null)
+            if (catChannelInfo != null) {
                 Timber.d(catChannelInfo.getCategory().size() + "");
-            loadChannelActivity();
+                loadChannelActivity();
+            }
 
         });
     }
