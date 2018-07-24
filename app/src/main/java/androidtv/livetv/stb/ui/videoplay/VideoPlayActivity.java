@@ -153,6 +153,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     public List<CategoryItem> getCategory() {
+        if(mCategoryList != null)
         return mCategoryList;
     }
 

@@ -93,14 +93,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag","view created");
-        if(mListCategories != null){
-            setUpRecylerViewCategory(mListCategories);
-        }else{
 
-        }
-        if(mListChannels != null){
-            setUpRecylerView(mListChannels);
-        }
 
 
     }
