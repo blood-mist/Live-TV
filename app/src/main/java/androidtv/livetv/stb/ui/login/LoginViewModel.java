@@ -8,6 +8,7 @@ import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginInfo;
 
@@ -15,13 +16,17 @@ public class LoginViewModel extends AndroidViewModel {
     private  LoginRepository loginRepository;
     private MediatorLiveData<LoginInfo> loginLiveData;
     private MediatorLiveData<Login> loginData;
+    private MediatorLiveData<CatChannelInfo> catChannelData;
+
     public LoginViewModel(@NonNull Application application) {
         super(application);
         loginRepository=LoginRepository.getInstance(application);
         loginLiveData=new MediatorLiveData<>();
+        catChannelData=new MediatorLiveData<>();
         loginData=new MediatorLiveData<>();
         loginData.setValue(null);
         loginLiveData.setValue(null);
+        catChannelData.setValue(null);
 
     }
     public LiveData<LoginInfo> performLogin(String userEmail,String userPassword,String macAddress) {
@@ -38,6 +43,10 @@ public class LoginViewModel extends AndroidViewModel {
         loginData.addSource(loginRepository.getData(), login -> loginData.setValue(login));
         return  loginData;
     }
+    public LiveData<CatChannelInfo> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
+        catChannelData.addSource(loginRepository.getChannels(token, utc, userId, hashValue), catChannelInfo -> catChannelData.setValue(catChannelInfo));
+        return catChannelData;
 
+    }
 
 }

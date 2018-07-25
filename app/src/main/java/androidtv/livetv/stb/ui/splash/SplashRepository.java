@@ -251,8 +251,8 @@ public class SplashRepository {
     }
 
     public LiveData<CatChannelInfo> getChannels(String token,String utc,String userId ,String hashValue) {
-    catChannelData=new MediatorLiveData<>();
-    catChannelData.setValue(null);
+        catChannelData=new MediatorLiveData<>();
+        catChannelData.setValue(null);
         Observable<Response<CatChannelInfo>> catChannel = splashApiInterface.getCatChannel(token, Long.parseLong(utc),userId,hashValue);
         catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<CatChannelInfo>>() {
@@ -266,8 +266,8 @@ public class SplashRepository {
                         if (catChannelInfoResponse.code() == 200) {
                             CatChannelInfo catChannelInfo = catChannelInfoResponse.body();
                             if(catChannelInfo!=null) {
-                               insertCategoryIntoDatabase(catChannelInfo.getCategory());
-                               insertChannelsintoDatabase(catChannelInfo.getChannel());
+                                insertCategoryIntoDatabase(catChannelInfo.getCategory());
+                                insertChannelsintoDatabase(catChannelInfo.getChannel());
                             }
                             catChannelData.postValue(catChannelInfo);
                         }
@@ -277,7 +277,7 @@ public class SplashRepository {
                     public void onError(Throwable e) {
                         CatChannelInfo catChannelInfo = new CatChannelInfo();
                         if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
-                           catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
+                            catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
                                 catChannelInfo.setCategory(categoryItems);
                                 catChannelData.postValue(catChannelInfo);
                             });
@@ -299,7 +299,7 @@ public class SplashRepository {
 
     private void insertCategoryIntoDatabase(List<CategoryItem> category) {
         Completable.fromRunnable(() -> catChannelDao.insertCategory(category)).subscribeOn(Schedulers.io()).subscribe();
-}
+    }
 
     public LiveData<Integer> getRowCount() {
         rowCountData.addSource(mLoginDao.getTableSize(),integer -> rowCountData.postValue(integer));

@@ -6,9 +6,18 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.util.List;
+
 import androidtv.livetv.stb.db.AndroidTvDatabase;
+import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginInfo;
+import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.splash.SplashApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
 import io.reactivex.Completable;
@@ -18,6 +27,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -27,10 +37,13 @@ public class LoginRepository {
     private MediatorLiveData<LoginInfo> loginInfoLiveData;
     private  MediatorLiveData<Login> loginData;
     private LoginDao mLoginDao;
+    private MediatorLiveData<CatChannelInfo> catChannelData;
+    private CatChannelDao catChannelDao;
 
     private LoginRepository(Application application) {
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         mLoginDao = db.loginDao();
+        catChannelDao=db.catChannelDao();
         Retrofit retrofitInstance = ApiManager.getAdapter();
         loginApiInterface  = retrofitInstance.create(SplashApiInterface.class);
         loginData=new MediatorLiveData<>();
@@ -103,16 +116,54 @@ public class LoginRepository {
         return  loginData;
     }
 
-    private static  class insertAsyncTask extends AsyncTask<Login,Void,Void> {
-        private LoginDao mLoginDao;
-        public insertAsyncTask(LoginDao mLoginDao) {
-            this.mLoginDao=mLoginDao;
-        }
+    public LiveData<CatChannelInfo> getChannels(String token, String utc, String userId , String hashValue) {
+        catChannelData=new MediatorLiveData<>();
+        catChannelData.setValue(null);
+        Observable<Response<CatChannelInfo>> catChannel = loginApiInterface.getCatChannel(token, Long.parseLong(utc),userId,hashValue);
+        catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                .subscribe(new Observer<Response<CatChannelInfo>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-        @Override
-        protected Void doInBackground(Login... login) {
-            mLoginDao.insert(login[0]);
-            return null;
-        }
+                    }
+
+                    @Override
+                    public void onNext(Response<CatChannelInfo> catChannelInfoResponse) {
+                        if (catChannelInfoResponse.code() == 200) {
+                            CatChannelInfo catChannelInfo = catChannelInfoResponse.body();
+                            if(catChannelInfo!=null) {
+                                insertCategoryIntoDatabase(catChannelInfo.getCategory());
+                                insertChannelsintoDatabase(catChannelInfo.getChannel());
+                            }
+                            catChannelData.postValue(catChannelInfo);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        CatChannelInfo catChannelInfo = new CatChannelInfo();
+                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
+                            catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
+                                catChannelInfo.setCategory(categoryItems);
+                                catChannelData.postValue(catChannelInfo);
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return catChannelData;
+
+    }
+
+    private void insertChannelsintoDatabase(List<ChannelItem> channel) {
+        Completable.fromRunnable(() -> catChannelDao.insertChannels(channel)).subscribeOn(Schedulers.io()).subscribe();
+    }
+
+    private void insertCategoryIntoDatabase(List<CategoryItem> category) {
+        Completable.fromRunnable(() -> catChannelDao.insertCategory(category)).subscribeOn(Schedulers.io()).subscribe();
     }
 }

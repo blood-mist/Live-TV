@@ -3,10 +3,13 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
+import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
@@ -19,6 +22,7 @@ public class MenuRepository {
     private VideoPlayApiInterface videoPlayApiInterface;
     private MediatorLiveData<List<CategoryItem>> categoryData;
     private MediatorLiveData<List<ChannelItem>> channelList;
+    private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
     private CatChannelDao catChannelDao;
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
@@ -27,6 +31,8 @@ public class MenuRepository {
         videoPlayApiInterface = retrofitInstance.create(VideoPlayApiInterface.class);
         categoryData = new MediatorLiveData<>();
         channelList = new MediatorLiveData<>();
+        catChannelData=new MediatorLiveData<>();
+        catChannelData.addSource(catChannelDao.getCategoriesWithChannels(), categoriesWithChannels -> catChannelData.postValue(categoriesWithChannels));
         categoryData.addSource(catChannelDao.getCategories(), categoryItems -> categoryData.postValue(categoryItems));
 
 
@@ -44,5 +50,9 @@ public class MenuRepository {
     }
     public LiveData<List<CategoryItem>> getAllCategory() {
         return categoryData;
+    }
+
+    public LiveData<List<CategoriesWithChannels>>getCategoriesWithChannels(){
+        return catChannelData;
     }
 }

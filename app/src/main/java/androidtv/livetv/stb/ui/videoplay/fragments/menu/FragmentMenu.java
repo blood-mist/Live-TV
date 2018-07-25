@@ -24,12 +24,15 @@ import android.widget.Toast;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.support.constraint.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,6 +70,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_fragment_menu, container, false);
+        menuViewModel= ViewModelProviders.of(this).get(MenuViewModel.class);
         ButterKnife.bind(this, v);
         return v;
     }
@@ -74,9 +78,18 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        menuViewModel= ViewModelProviders.of(this).get(MenuViewModel.class);
         Log.d("frag","view created");
-        setUpRecylerViewCategory();
+        menuViewModel.getCategoriesWithChannels().observe(this, new Observer<List<CategoriesWithChannels>>() {
+            @Override
+            public void onChanged(@Nullable List<CategoriesWithChannels> categoriesWithChannels) {
+                if(categoriesWithChannels!=null) {
+                    CategoriesWithChannels item = categoriesWithChannels.get(1);
+                    List<ChannelItem> channelItems=item.channelItemList;
+                    Log.d(TAG, channelItems.size()+"");
+                }
+            }
+        });
+//        setUpRecylerViewCategory();
 
 
     }

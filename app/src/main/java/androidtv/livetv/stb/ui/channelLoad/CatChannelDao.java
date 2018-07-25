@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 
@@ -37,6 +38,11 @@ public interface CatChannelDao {
 
     @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
     int updateFav(int is_fav, int channel_id);
+
+    @Query("SELECT * FROM CATEGORY_TABLE")
+    LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
+
+
 
 
 }
