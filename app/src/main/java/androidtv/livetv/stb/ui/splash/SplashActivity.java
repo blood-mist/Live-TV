@@ -16,6 +16,7 @@ import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.downloads.DownloadFragment;
 import androidtv.livetv.stb.downloads.DownloadService;
 import androidtv.livetv.stb.entity.AppVersionInfo;
+import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.UserLoginData;
 import androidtv.livetv.stb.ui.login.LoginActivity;
 import androidtv.livetv.stb.ui.unauthorized.UnauthorizedAccess;
@@ -88,6 +89,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                 if (integer > 0)
                     splashViewModel.checkDatainDb().observe(this, login -> {
                         if (login != null) {
+                            GlobalVariables.login = login;
                             long utc = GetUtc.getInstance().getTimestamp().getUtc();
                             fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
                         }

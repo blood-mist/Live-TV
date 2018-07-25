@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.VideoPlayActivity;
 import androidtv.livetv.stb.utils.AppConfig;
@@ -78,6 +79,7 @@ public class LoginActivity  extends AppCompatActivity{
             if(loginInfo!=null){
                loginViewModel.getLoginInfoFromDB().observe(this,login1 -> {
                    if(login1!=null) {
+                       GlobalVariables.login = login1;
                        Toast.makeText(this, "userNamewhenOffline is" + login1.getEmail(), Toast.LENGTH_LONG).show();
                        long utc = GetUtc.getInstance().getTimestamp().getUtc();
                        fetchChannelDetails(login1.getToken(), utc, login1.getId(), LinkConfig.getHashCode(String.valueOf(login1.getId()), String.valueOf(utc), login1.getSession()));

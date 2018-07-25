@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
 
 
@@ -22,9 +24,14 @@ import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolde
 public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> {
     private final LayoutInflater mInflater;
 
-    private List<CategoryItem> categoryItemList;
+    private List<CategoriesWithChannels> categoryItemList;
     private OnListClickListener mListener;
     private int selectedPos;
+    private List<ChannelItem> allChannelList;
+
+    public void setAllChannelList(List<ChannelItem> allChannelList) {
+        this.allChannelList = allChannelList;
+    }
 
     /**
      * Constructer
@@ -76,7 +83,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
 
     }
 
-    public void setCategory(List<CategoryItem> categoryItems) {
+    public void setCategory(List<CategoriesWithChannels> categoryItems) {
         categoryItemList = categoryItems;
         notifyDataSetChanged();
     }
@@ -110,21 +117,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     @Override
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
-        CategoryItem categoryItem = null;
+        CategoriesWithChannels categoryItem = null;
         /**
          * check the position of list
          * if position is 0 the created a category called ALl with
          * id = -1;
          */
         if (position == 0) {
-            categoryItem = new CategoryItem();
-            categoryItem.setId(-1);
-            categoryItem.setTitle("ALL");
-            holder.mTitleView.setText(categoryItem.getTitle());
+            holder.mTitleView.setText("All");
         } else {
             if (categoryItemList != null) {
                 categoryItem = categoryItemList.get(position - 1);
-                holder.mTitleView.setText(categoryItem.getTitle());
+                holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
             } else {
                 holder.mTitleView.setText("No Categories Found");
             }
@@ -134,12 +138,17 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         /**
          * final object created.
          */
-        CategoryItem finalCategoryItem = categoryItem;
+        final CategoriesWithChannels finalCategoryItem = categoryItem;
         holder.mCategoryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 selectedPos = position;
-                mListener.onClickCategory(finalCategoryItem);
+                if(position == 0){
+                     mListener.onClickCategory(allChannelList);
+                }else {
+                    mListener.onClickCategory(finalCategoryItem.channelItemList);
+                }
             }
         });
 
@@ -173,7 +182,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             return 0;
     }
 
-    public List<CategoryItem> getCategoryItemList() {
+    public List<CategoriesWithChannels> getCategoryItemList() {
         return categoryItemList;
     }
 
@@ -181,7 +190,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      * interface for  clicklistener
      */
     public interface OnListClickListener {
-        void onClickCategory(CategoryItem categoryItem);
+
+        void onClickCategory(List channels);
     }
 
 }

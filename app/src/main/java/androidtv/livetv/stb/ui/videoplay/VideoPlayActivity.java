@@ -3,6 +3,7 @@ package androidtv.livetv.stb.ui.videoplay;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,9 +28,14 @@ import java.util.Random;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.GlobalVariables;
+import androidtv.livetv.stb.entity.Login;
+import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DeviceUtils;
+import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -141,5 +147,26 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannel(ChannelItem item) {
         //TODO play Channels
+
+      long utc = GetUtc.getInstance().getTimestamp().getUtc();
+      Login login = GlobalVariables.login;
+      videoPlayViewModel.getChannelLink(login.getToken(),utc,login.getId(),
+              LinkConfig.getHashCode(String.valueOf(login.getId()),String.valueOf(utc),login.getSession()),
+              item.getId()).observe(this, new Observer<ChannelLinkResponse>() {
+          @Override
+          public void onChanged(@Nullable ChannelLinkResponse channelLinkResponse) {
+              if(channelLinkResponse != null){
+                  playVideo(channelLinkResponse.getChannel().getLink());
+              }
+          }
+      });
+
+
+    }
+
+    private void playVideo(String channel) {
+        Log.d("media",channel);
+        MediaPlayer player = new  MediaPlayer();
+
     }
 }
