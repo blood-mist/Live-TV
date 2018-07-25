@@ -40,10 +40,11 @@ import static android.support.constraint.Constraints.TAG;
 public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener {
 
     private MenuViewModel menuViewModel;
-    private ChannelListAdapter adapterChannels;
     private FragmentMenuInteraction mListener;
     private List<CategoryItem> mListCategories;
     private List<ChannelItem> mListChannels;
+    private int channelIds;
+    private ChannelListAdapter adapter;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -63,6 +64,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.container_error) FrameLayout errorFrameLayout;
     @BindView(R.id.gv_channels) RecyclerView gvChannelsList;
 
+    public int getCatId() {
+        return catId;
+    }
+
+    public void setCatId(int catId) {
+        this.catId = catId;
+    }
+
+    private int catId = -1;
+
 
 
     @Override
@@ -79,6 +90,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag","view created");
+
         menuViewModel.getCategoriesWithChannels().observe(this, new Observer<List<CategoriesWithChannels>>() {
             @Override
             public void onChanged(@Nullable List<CategoriesWithChannels> categoriesWithChannels) {
@@ -92,6 +104,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 //        setUpRecylerViewCategory();
 
 
+//        setUpRecylerViewCategory();
+//        setUpChannelsCategory(catId);
+//>>>>>>> issue
+
     }
 
 
@@ -101,30 +117,42 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private void setUpRecylerViewCategory() {
         Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
         Log.d("frag","recycle view created");
-        CategoryAdapter adapter = new CategoryAdapter(getActivity());
+        CategoryAdapter adapter = new CategoryAdapter(getActivity(),this);
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
         categoryList.setAdapter(adapter);
-        menuViewModel.getCategoryData().observe(this, adapter::setCategory);
+        menuViewModel.getCategoryData().observe(this, categoryItems -> adapter.setCategory(categoryItems));
 
 
+
+
+    }
+
+    private void setUpChannelsCategory(int id){
+        adapter = new ChannelListAdapter(getActivity(),this);
+        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        gvChannelsList.setAdapter(adapter);
+//        menuViewModel.getChannels(id).observe(this, channelItems -> {
+//            adapter.setChannelItems(channelItems);
+//
+//        });
     }
 
 
 
     @Override
     public void onClickCategory(CategoryItem categoryItem) {
-
-
+      setUpChannelsCategory(categoryItem.getId());
     }
 
     @Override
     public void onClickChannel(int position) {
-       mListener.playChannel(adapterChannels.getmList().get(position));
+       onChannelFocused(position);
+       mListener.playChannel(adapter.getmList().get(position));
     }
 
     @Override
     public void onChannelFocused(int position) {
-
+     setValues(adapter.getmList().get(position));
     }
 
     @Override
@@ -142,6 +170,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction{
         void playChannel(ChannelItem item);
+    }
+
+    private void setValues(ChannelItem item){
+        if(item != null){
+            channelName.setText(item.getName());
+            channelDescription.setText(item.getChannelDesc());
+
+        }
     }
 
 

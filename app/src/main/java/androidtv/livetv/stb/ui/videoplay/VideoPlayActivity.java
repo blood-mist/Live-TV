@@ -76,20 +76,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     protected void onStart() {
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
-        videoPlayViewModel.getCatChannelData().observe(this, new Observer<List<CategoryItem>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoryItem> categoryItems) {
-                mCategoryList = categoryItems;
-            }
-        });
-
-
-        videoPlayViewModel.getChannelList(-1).observe(this, new Observer<List<ChannelItem>>() {
-            @Override
-            public void onChanged(@Nullable List<ChannelItem> channelItems) {
-                mChannelList = channelItems;
-            }
-        });
         openFragment(menuFragment);
     }
 

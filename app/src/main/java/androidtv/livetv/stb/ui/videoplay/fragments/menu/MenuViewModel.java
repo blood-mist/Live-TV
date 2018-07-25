@@ -35,13 +35,26 @@ public class MenuViewModel extends AndroidViewModel {
         LiveData<List<CategoriesWithChannels>> categoriesWithChannels=menuRepository.getCategoriesWithChannels();
         catChannelData.addSource(categoriesWithChannels, categoriesWithChannels1 -> catChannelData.setValue(categoriesWithChannels1));
 
+
     }
 
     public LiveData<List<CategoryItem>> getCategoryData() {
         return categoryItemData;
     }
 
-    public LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels(){
+    public LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels() {
         return catChannelData;
     }
+
+//
+//    public LiveData<List<ChannelItem>> getChannels(int id){
+//        LiveData<List<ChannelItem>> channels = menuRepository.getChannels(id);
+//        channelItemData.addSource(channels, channelItems -> {
+//            channelItemData.setValue(channelItems);
+//            channelItemData.removeSource(channels);
+//        });
+//        return channelItemData;
+//>>>>>>> issue
+//    }
 }
+

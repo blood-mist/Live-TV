@@ -31,8 +31,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      *
      * @param context
      */
-    public CategoryAdapter(Context context) {
+    public CategoryAdapter(Context context,OnListClickListener lis) {
         mInflater = LayoutInflater.from(context);
+        this.mListener = lis;
     }
 
     /**
@@ -119,6 +120,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             categoryItem = new CategoryItem();
             categoryItem.setId(-1);
             categoryItem.setTitle("ALL");
+            holder.mTitleView.setText(categoryItem.getTitle());
         } else {
             if (categoryItemList != null) {
                 categoryItem = categoryItemList.get(position - 1);
@@ -169,6 +171,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             return categoryItemList.size() + 1;
         else
             return 0;
+    }
+
+    public List<CategoryItem> getCategoryItemList() {
+        return categoryItemList;
     }
 
     /**

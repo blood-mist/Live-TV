@@ -24,6 +24,7 @@ public class MenuRepository {
     private MediatorLiveData<List<ChannelItem>> channelList;
     private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
     private CatChannelDao catChannelDao;
+
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
@@ -48,11 +49,24 @@ public class MenuRepository {
         }
         return mInstance;
     }
+
     public LiveData<List<CategoryItem>> getAllCategory() {
         return categoryData;
     }
 
-    public LiveData<List<CategoriesWithChannels>>getCategoriesWithChannels(){
+
+    public LiveData<List<CategoriesWithChannels>>getCategoriesWithChannels() {
         return catChannelData;
     }
+//    public LiveData<List<ChannelItem>> getChannels(int id) {
+//        if (id == -1) {
+//            channelList.addSource(catChannelDao.getChannels(), channelItems -> channelList.postValue(channelItems));
+//
+//        } else {
+//            channelList.addSource(catChannelDao.getChannels(id), channelItems -> channelList.postValue(channelItems));
+//
+//        }
+//        return channelList;
+//>>>>>>> issue
+//    }
 }
