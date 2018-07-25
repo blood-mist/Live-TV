@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="150dp"
     android:layout_height="103dp"
-    android:id="@+id/relative_layout">
+    android:id="@+id/relative_layout"
+    android:background="@drawable/main_channel_list_selector">
 
 
     <!-- <RelativeLayout

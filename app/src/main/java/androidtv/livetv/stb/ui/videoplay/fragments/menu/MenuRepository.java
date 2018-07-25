@@ -3,6 +3,8 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class MenuRepository {
     private MediatorLiveData<List<CategoryItem>> categoryData;
     private MediatorLiveData<List<ChannelItem>> channelList;
     private CatChannelDao catChannelDao;
+
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
@@ -42,7 +45,19 @@ public class MenuRepository {
         }
         return mInstance;
     }
+
     public LiveData<List<CategoryItem>> getAllCategory() {
         return categoryData;
+    }
+
+    public LiveData<List<ChannelItem>> getChannels(int id) {
+        if (id == -1) {
+            channelList.addSource(catChannelDao.getChannels(), channelItems -> channelList.postValue(channelItems));
+
+        } else {
+            channelList.addSource(catChannelDao.getChannels(id), channelItems -> channelList.postValue(channelItems));
+
+        }
+        return channelList;
     }
 }

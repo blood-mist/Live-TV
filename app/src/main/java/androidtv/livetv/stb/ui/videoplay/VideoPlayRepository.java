@@ -20,17 +20,13 @@ public class VideoPlayRepository {
 
     private static VideoPlayRepository mInstance;
     private VideoPlayApiInterface videoPlayApiInterface;
-    private MediatorLiveData<List<CategoryItem>> catChannelData;
-    private MediatorLiveData<List<ChannelItem>> channelList;
-    private CatChannelDao catChannelDao;
+
 
     public VideoPlayRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
-        catChannelDao = db.catChannelDao();
         videoPlayApiInterface = retrofitInstance.create(VideoPlayApiInterface.class);
-        catChannelData = new MediatorLiveData<>();
-        channelList = new MediatorLiveData<>();
+
 
 
     }
@@ -46,19 +42,8 @@ public class VideoPlayRepository {
         return mInstance;
     }
 
-    public MediatorLiveData<List<ChannelItem>> getChannelList(int id){
-        Observer<List<ChannelItem>> observer = channelItems -> channelList.setValue(channelItems);
-        if(id == -1){
-            channelList.addSource(catChannelDao.getChannels(), observer);
-        }else{
-            channelList.addSource(catChannelDao.getChannels(id),observer);
-        }
-       return channelList;
-    }
 
-    public MediatorLiveData<List<CategoryItem>> getCatChannelData(){
-        catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> catChannelData.setValue(categoryItems));
-        return catChannelData;
-    }
+
+
 
 }

@@ -4,7 +4,9 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.List;
 
@@ -26,9 +28,20 @@ public class MenuViewModel extends AndroidViewModel {
         LiveData<List<CategoryItem>> allCategory = menuRepository.getAllCategory();
         categoryItemData.addSource(allCategory, categoryItems -> categoryItemData.setValue(categoryItems));
 
+
     }
 
     public LiveData<List<CategoryItem>> getCategoryData() {
         return categoryItemData;
+    }
+
+
+    public LiveData<List<ChannelItem>> getChannels(int id){
+        LiveData<List<ChannelItem>> channels = menuRepository.getChannels(id);
+        channelItemData.addSource(channels, channelItems -> {
+            channelItemData.setValue(channelItems);
+            channelItemData.removeSource(channels);
+        });
+        return channelItemData;
     }
 }
