@@ -54,6 +54,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @BindView(R.id.container_movie_player) FrameLayout errorFrame;
     @BindView(R.id.scrollViewImage) ImageView scrollImg;
     @BindView(R.id.videoSurfaceContainer) FrameLayout videoSurfaceContainer;
+    @BindView(R.id.videoSurface) SurfaceView videoSurfaceView;
 
     private VideoPlayViewModel videoPlayViewModel;
     private Handler handlerToShowMac;
@@ -152,21 +153,19 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
       Login login = GlobalVariables.login;
       videoPlayViewModel.getChannelLink(login.getToken(),utc,login.getId(),
               LinkConfig.getHashCode(String.valueOf(login.getId()),String.valueOf(utc),login.getSession()),
-              item.getId()).observe(this, new Observer<ChannelLinkResponse>() {
-          @Override
-          public void onChanged(@Nullable ChannelLinkResponse channelLinkResponse) {
-              if(channelLinkResponse != null){
-                  playVideo(channelLinkResponse.getChannel().getLink());
-              }
-          }
-      });
+              item.getId()).observe(this, channelLinkResponse -> {
+                  if(channelLinkResponse != null){
+                      playVideo(channelLinkResponse.getChannel().getLink());
+                  }
+              });
 
 
     }
 
     private void playVideo(String channel) {
         Log.d("media",channel);
-        MediaPlayer player = new  MediaPlayer();
+        
+
 
     }
 }
