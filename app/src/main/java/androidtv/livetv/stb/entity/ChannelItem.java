@@ -15,7 +15,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_TABLE;
 
 @Generated("com.robohorse.robopojogenerator")
-@Entity(tableName = CHANNEL_TABLE)
+@Entity(tableName = CHANNEL_TABLE, foreignKeys = @ForeignKey(entity = CategoryItem.class, parentColumns = "category_id", childColumns = "category_id", onDelete = CASCADE),indices = {@Index("category_id")})
 public class ChannelItem {
 
     @ColumnInfo(name = "channel_logo")

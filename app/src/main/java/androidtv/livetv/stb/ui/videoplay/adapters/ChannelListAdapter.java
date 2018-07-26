@@ -18,6 +18,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyChannelListViewHo
 import androidtv.livetv.stb.utils.GlideApp;
 import androidtv.livetv.stb.utils.LinkConfig;
 
+
 /**
  * Adapter for channel list in live tv.
  */
