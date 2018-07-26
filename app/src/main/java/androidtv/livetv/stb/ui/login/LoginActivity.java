@@ -74,10 +74,12 @@ public class LoginActivity  extends AppCompatActivity{
     }
 
     private void initLogin() {
+        loginLoader.smoothToShow();
         loginViewModel.performLogin(username,passsword.equals("")?txtPasssword.getText().toString():passsword,macAddress ).observe(this,loginInfo -> {
             if(loginInfo!=null){
                loginViewModel.getLoginInfoFromDB().observe(this,login1 -> {
                    if(login1!=null) {
+
                        Toast.makeText(this, "userNamewhenOffline is" + login1.getEmail(), Toast.LENGTH_LONG).show();
                        long utc = GetUtc.getInstance().getTimestamp().getUtc();
                        fetchChannelDetails(login1.getToken(), utc, login1.getId(), LinkConfig.getHashCode(String.valueOf(login1.getId()), String.valueOf(utc), login1.getSession()));
@@ -103,5 +105,6 @@ public class LoginActivity  extends AppCompatActivity{
         Intent channelLoadIntent= new Intent(this,VideoPlayActivity.class);
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(channelLoadIntent);
+        loginLoader.smoothToHide();
     }
 }

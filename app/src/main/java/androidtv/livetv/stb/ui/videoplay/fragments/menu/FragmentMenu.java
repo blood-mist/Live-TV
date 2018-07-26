@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
@@ -79,13 +80,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag","view created");
-        menuViewModel.getCategoriesWithChannels().observe(this, new Observer<List<CategoriesWithChannels>>() {
-            @Override
-            public void onChanged(@Nullable List<CategoriesWithChannels> categoriesWithChannels) {
-                if(categoriesWithChannels!=null) {
-                    CategoriesWithChannels item = categoriesWithChannels.get(1);
-                    List<ChannelItem> channelItems=item.channelItemList;
-                    Log.d(TAG, channelItems.size()+"");
+
+        menuViewModel.getCategoriesWithChannels().observe(this, categoriesWithChannels -> {
+            if(categoriesWithChannels!=null) {
+                CategoriesWithChannels item = categoriesWithChannels.get(1);
+                List<ChannelItem> channelItems=item.channelItemList;
+                Log.d(TAG, channelItems.size()+"");
+                List<ChannelItem>allChannelitem=new ArrayList<>();
+                for(CategoriesWithChannels catWithCh:categoriesWithChannels){
+                    allChannelitem.addAll(item.channelItemList);
                 }
             }
         });

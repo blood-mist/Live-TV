@@ -5,6 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Transaction;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public interface CatChannelDao {
     @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
     int updateFav(int is_fav, int channel_id);
 
+    @Transaction
     @Query("SELECT * FROM CATEGORY_TABLE")
     LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
 
