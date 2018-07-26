@@ -116,6 +116,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         Intent channelLoadIntent= new Intent(this,VideoPlayActivity.class);
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(channelLoadIntent);
+
     }
 
     /**

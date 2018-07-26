@@ -3,6 +3,8 @@ package androidtv.livetv.stb.entity;
 import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 @Generated("com.robohorse.robopojogenerator")
 public class EpgItem{
 
@@ -17,6 +19,11 @@ public class EpgItem{
 
 	@SerializedName("end_time")
 	private String endTime;
+
+
+
+
+
 
 	public void setStartTime(String startTime){
 		this.startTime = startTime;

@@ -2,6 +2,8 @@
     android:layout_width="150dp"
     android:layout_height="103dp"
     android:id="@+id/relative_layout"
+    android:focusable="true"
+    android:clickable="true"
     android:background="@drawable/main_channel_list_selector">
 
 

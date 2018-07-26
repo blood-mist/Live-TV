@@ -49,6 +49,7 @@ public class LinkConfig {
     public static final String LOGIN_TABLE="login_table";
     public static final String CHANNEL_TABLE="channel_table";
     public static final String CATEGORY_TABLE="category_table";
+    public static final String EPG_TABLE = "epg_table";
     public  static final int  NO_CONNECTION=404;
     public static String getHashCode(String utc) {
       /*  String sessionId = null;

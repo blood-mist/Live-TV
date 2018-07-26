@@ -30,8 +30,10 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static android.support.constraint.Constraints.TAG;
 
@@ -192,6 +194,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
+        void load(Fragment epgFragment,String tag);
     }
 
     private void setValues(ChannelItem item) {
@@ -200,6 +203,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             channelDescription.setText(item.getChannelDesc());
 
         }
+    }
+
+
+    @OnClick(R.id.epg)
+    public void OnEpgClick(){
+        mListener.load(new EpgFragment(),"epg");
     }
 
 

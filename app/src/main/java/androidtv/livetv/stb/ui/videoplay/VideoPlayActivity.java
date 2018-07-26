@@ -164,6 +164,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
+    @Override
+    public void load(Fragment epgFragment,String tag) {
+        openFragmentWithBackStack(epgFragment,tag );
+    }
+
     private void playVideo(String channel) {
         Log.d("media",channel);
         MediaPlayer player = new  MediaPlayer();
