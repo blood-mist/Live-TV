@@ -48,6 +48,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private List<ChannelItem> mListChannels;
     private int channelIds;
     private ChannelListAdapter adapter;
+    private int selectedCurrentChannelId;
+    private int lastPlayedPosition = 0;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -139,6 +141,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                         channelItemList.addAll(withChannels.channelItemList);
                     }
                     adapter.setAllChannelList(channelItemList);
+
                     onClickCategory(channelItemList);
                 }
             }
@@ -154,6 +157,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
             gvChannelsList.setAdapter(adapter);
             adapter.setChannelItems(items);
+            selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
         }
         //        menuViewModel.getChannels(id).observe(this, channelItems -> {
 //            adapter.setChannelItems(channelItems);
@@ -171,6 +175,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onClickChannel(int position) {
         onChannelFocused(position);
+        selectedCurrentChannelId = adapter.getmList().get(position).getId();
         mListener.playChannel(adapter.getmList().get(position));
     }
 
@@ -195,6 +200,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
         void load(Fragment epgFragment,String tag);
+
+
     }
 
     private void setValues(ChannelItem item) {
@@ -208,7 +215,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @OnClick(R.id.epg)
     public void OnEpgClick(){
-        mListener.load(new EpgFragment(),"epg");
+        EpgFragment fragment = new EpgFragment();
+        fragment.setSelectedChannelId(selectedCurrentChannelId);
+        mListener.load(fragment,"epg");
     }
 
 

@@ -43,6 +43,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
     public void setSelectedChannel(int selectedChannelPos) {
         this.selectedChannel = selectedChannelPos;
+        notifyDataSetChanged();
     }
 
     private int selectedChannel=-1;
@@ -169,4 +170,37 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
     public interface OnChannelListInteractionListener {
         void onChannelClickInteraction(ChannelItem channel, int adapterPosition);
     }
+
+    public boolean hasData() {
+        if (channelList != null) {
+            return channelList.size() > 0;
+        }
+        else return false;
+    }
+
+    public ChannelItem getChannel(int selectedChannel){
+        ChannelItem returnItem = null;
+        for (ChannelItem item:channelList) {
+            if(item.getId() == selectedChannel){
+                returnItem = item;
+            }
+        }
+        return returnItem;
+    }
+
+    public void setSelectedChannelViaId(int channelId){
+        if(channelList != null){
+            for (int i = 0;i<channelList.size();i++){
+                ChannelItem item = channelList.get(i);
+                if(item.getId() == channelId){
+                    setSelectedChannel(i);
+                }
+            }
+        }
+    }
+
+
+
+
+
 }

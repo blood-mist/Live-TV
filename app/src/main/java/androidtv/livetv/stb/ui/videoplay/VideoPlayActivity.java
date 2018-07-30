@@ -32,6 +32,7 @@ import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.ui.utc.GetUtc;
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DeviceUtils;
@@ -64,7 +65,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private Fragment currentFragment;
     private List<CategoryItem> mCategoryList = new ArrayList<>();
     private List<ChannelItem> mChannelList = new ArrayList<>();
-
+    private int selectedChannelId;
 
 
     @Override
@@ -168,6 +169,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void load(Fragment epgFragment,String tag) {
         openFragmentWithBackStack(epgFragment,tag );
     }
+
 
     private void playVideo(String channel) {
         Log.d("media",channel);

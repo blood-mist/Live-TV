@@ -6,6 +6,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -20,10 +21,11 @@ import static androidtv.livetv.stb.utils.LinkConfig.EPG_TABLE;
 @Entity(tableName = EPG_TABLE,indices = {@Index("channel_id")})
 public class Epgs {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "epg_id")
     @SerializedName("id")
-    private int id;
+    private String id;
 
     @ColumnInfo(name = "channel_id")
     @SerializedName("channel_id")
@@ -46,11 +48,23 @@ public class Epgs {
     @SerializedName("date")
     private Date date;
 
-    public int getId() {
+    @ColumnInfo(name = "timezone")
+    @SerializedName("timezone")
+    private String timeZone;
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -14,10 +14,10 @@ import java.util.Locale;
  * Created by rupak on 31/10/2015.
  */
 public class DateUtils {
-    public static SimpleDateFormat dateAndTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    public static SimpleDateFormat dateAndTime = new SimpleDateFormat("yyyy-MM-dd");
     public static SimpleDateFormat _12HrsTimeFormat = new SimpleDateFormat("hh:mm");
     public static SimpleDateFormat _24HrsTimeFormat = new SimpleDateFormat("HH:mm");
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss Z");
     public static SimpleDateFormat smalldateFormat = new SimpleDateFormat("E, MMM d");
     public static SimpleDateFormat fullDayFormat =  new SimpleDateFormat("EEE", Locale.US);
 
@@ -38,6 +38,7 @@ public class DateUtils {
     public static Date convertStringToDate(String dateStr)throws ParseException {
 
         Date date = dateFormat.parse(dateStr);
+
         return date;
     }
     public static Date addMinutesToDate(int minutes, Date beforeTime) throws ParseException {
