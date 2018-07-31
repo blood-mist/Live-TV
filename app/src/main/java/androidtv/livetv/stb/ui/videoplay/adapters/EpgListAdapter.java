@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +46,21 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
         Epgs epg = mList.get(position);
         holder.prgmName.setText(epg.getProgramTitle());
         holder.prgmTime.setText(getPrgmTime(epg.getStartTime(),epg.getEndTime()));
+        Calendar currentCal = Calendar.getInstance();
+        Date currentDateTime = currentCal.getTime();
+        if((epg.getStartTime().before(currentDateTime) && epg.getEndTime().after(currentDateTime)) || epg.getStartTime() == currentDateTime || epg.getEndTime() == currentDateTime){
+
+            holder.alarmPlay.setImageResource(R.drawable.red_circle);
+            holder.onAirText.setText("ON AIR");
+            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
+
+        }else{
+            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
+            holder.alarmPlay.setImageResource(R.drawable.icon_alarm);
+            holder.onAirText.setText("");
+
+        }
+
 
 
     }
@@ -60,5 +76,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
        String end = DateUtils._24HrsTimeFormat.format(endDate);
        return start +" - "+ end;
       }
+
+
 
 }

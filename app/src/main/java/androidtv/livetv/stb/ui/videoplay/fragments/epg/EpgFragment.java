@@ -189,7 +189,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         for (Epgs epg : epgs) {
             if (checkDate(epg.getDate())) {
                 Calendar currentTime = Calendar.getInstance();
-                currentTime.set(Calendar.HOUR_OF_DAY,24);
                 Date currentDate = currentTime.getTime();
                 if (epg.getEndTime().after(currentDate)) {
                     newList.add(epg);
@@ -212,4 +211,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         setUpAdapter(cuurentEpgList);
         gvDate.smoothScrollToPosition(postion);
     }
+
+
 }
