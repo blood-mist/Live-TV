@@ -75,6 +75,7 @@ public class LoginActivity  extends AppCompatActivity{
     }
 
     private void initLogin() {
+        loginLoader.smoothToShow();
         loginViewModel.performLogin(username,passsword.equals("")?txtPasssword.getText().toString():passsword,macAddress ).observe(this,loginInfo -> {
             if(loginInfo!=null){
                loginViewModel.getLoginInfoFromDB().observe(this,login1 -> {
@@ -105,5 +106,6 @@ public class LoginActivity  extends AppCompatActivity{
         Intent channelLoadIntent= new Intent(this,VideoPlayActivity.class);
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(channelLoadIntent);
+        loginLoader.smoothToHide();
     }
 }
