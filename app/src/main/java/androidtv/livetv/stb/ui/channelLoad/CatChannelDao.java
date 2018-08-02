@@ -14,11 +14,15 @@ import java.util.List;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 
 @Dao
 public interface CatChannelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertCategory(List<CategoryItem> categoryItemList);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertEpgs(List<Epgs> epgList);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertChannels(List<ChannelItem> channelItemList);
@@ -33,9 +37,11 @@ public interface CatChannelDao {
     @Query("SELECT * FROM CHANNEL_TABLE ")
     LiveData<List<ChannelItem>> getChannels();
 
-
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
     LiveData<Integer> getCatTableSize();
+
+    @Query("SELECT * FROM EPG_TABLE WHERE channel_id = :id")
+    LiveData<List<Epgs>> getEpgs(int id);
 
     @Query("SELECT count(*)FROM CHANNEL_TABLE")
     LiveData<Integer> getChannelTableSize();

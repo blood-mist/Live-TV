@@ -14,7 +14,6 @@ public interface LoginDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Login login);
 
-
     @Query("DELETE FROM LOGIN_TABLE")
     void deleteAll();
 

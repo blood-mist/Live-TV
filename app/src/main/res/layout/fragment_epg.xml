@@ -145,7 +145,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <GridView
+                        <android.support.v7.widget.RecyclerView
                             android:id="@+id/gv_date"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -161,16 +161,15 @@
 
                             android:background="@color/view"/>
 
-                        <GridView
+                        <android.support.v7.widget.RecyclerView
                             android:id="@+id/gv_prgms"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="16"
-                            android:listSelector="@drawable/main_dvr_list_selector"
                             android:nextFocusLeft="@id/gv_date"
                             android:nextFocusUp="@id/channel_list"
                             android:drawSelectorOnTop="true"
-                            android:numColumns="1"/>
+                            />
                     </LinearLayout>
                 </FrameLayout>
 

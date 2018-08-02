@@ -41,6 +41,7 @@ import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.ui.utc.GetUtc;
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DeviceUtils;
@@ -96,7 +97,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private SharedPreferences lastPlayedPrefs;
 
     private SharedPreferences.Editor editor;
-
+    private int selectedChannelId;
 
 
     @Override
@@ -350,6 +351,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         editor.putInt(CHANNEL_ID,item.getId());
         editor.apply();
     }
+
+    @Override
+    public void load(Fragment epgFragment,String tag) {
+        openFragmentWithBackStack(epgFragment,tag );
+    }
+
 
 
     @Override

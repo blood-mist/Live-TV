@@ -23,6 +23,11 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
         applyAttributes(context, attrs);
     }
 
+    public void setFont(String fontname){
+        Typeface font = Typeface.createFromAsset(getResources().getAssets(), fontname);
+        this.setTypeface(font);
+    }
+
     private void applyAttributes(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CustomTextView);
         final int N = a.getIndexCount();

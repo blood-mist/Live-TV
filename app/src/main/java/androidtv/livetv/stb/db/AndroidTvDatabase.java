@@ -7,6 +7,7 @@ import android.content.Context;
 
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
@@ -14,7 +15,9 @@ import androidtv.livetv.stb.ui.login.LoginDao;
 
 import static androidtv.livetv.stb.utils.LinkConfig.DATABASE_NAME;
 
-@Database(entities = {Login.class, CategoryItem.class, ChannelItem.class}, version = 7,exportSchema = false)
+
+
+@Database(entities = {Login.class, CategoryItem.class, ChannelItem.class, Epgs.class}, version = 8,exportSchema = false)
 public abstract class AndroidTvDatabase extends RoomDatabase {
     private static AndroidTvDatabase INSTANCE;
 

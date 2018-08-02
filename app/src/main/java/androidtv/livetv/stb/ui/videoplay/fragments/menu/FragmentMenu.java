@@ -44,12 +44,13 @@ import androidtv.livetv.stb.ui.videoplay.ChannelChangeObserver;
 import androidtv.livetv.stb.ui.videoplay.VideoPlayActivity;
 import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
+
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
-
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import static android.support.constraint.Constraints.TAG;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 
@@ -63,6 +64,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private int channelIds;
     private ChannelListAdapter adapter;
     private SharedPreferences lastPlayedPrefs;
+    private int selectedCurrentChannelId;
+    private int lastPlayedPosition = 0;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -211,6 +214,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
             gvChannelsList.setAdapter(adapter);
             adapter.setChannelItems(items);
+            selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
         }
         //        menuViewModel.getChannels(id).observe(this, channelItems -> {
 //            adapter.setChannelItems(channelItems);
@@ -241,6 +245,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         onChannelFocused(position);
         currentChannelPosition = position;
         mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+        selectedCurrentChannelId = adapter.getmList().get(position).getId();
+        mListener.playChannel(adapter.getmList().get(position));
     }
 
 
@@ -382,6 +388,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
+        void load(Fragment epgFragment,String tag);
+
+
     }
 
     private void setValues(ChannelItem item) {
@@ -392,6 +401,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             channelNo.setText(String.valueOf(item.getChannelPriority()));
 
         }
+    }
+
+
+    @OnClick(R.id.epg)
+    public void OnEpgClick(){
+        EpgFragment fragment = new EpgFragment();
+        fragment.setSelectedChannelId(selectedCurrentChannelId);
+        mListener.load(fragment,"epg");
     }
 
 
