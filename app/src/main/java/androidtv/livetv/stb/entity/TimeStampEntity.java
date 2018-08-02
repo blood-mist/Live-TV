@@ -3,16 +3,15 @@ package androidtv.livetv.stb.entity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 public class TimeStampEntity {
-    @SerializedName("timestamp")
-    @Expose
-    private long timestamp;
+    @SerializedName("utc")
+    private int utc;
 
     public long getUtc() {
-        return timestamp;
+        return utc;
     }
 
-    public void setUtc(long timestamp) {
-        this.timestamp = timestamp;
+    public void setUtc(int utc) {
+        this.utc = utc;
     }
 
 }

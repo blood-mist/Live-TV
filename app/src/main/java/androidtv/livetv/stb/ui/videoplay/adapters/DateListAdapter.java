@@ -1,6 +1,8 @@
 package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +21,13 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
     private Context mContext;
     private List<Date> dateList;
     private DateClickLis listener;
+
+    public void setPositionClicked(int positionClicked) {
+        this.positionClicked = positionClicked;
+        notifyDataSetChanged();
+    }
+
+    private int positionClicked;
 
     public DateListAdapter(Context context , List<Date> lis,DateClickLis listener){
         this.mContext = context;
@@ -54,10 +63,29 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
             }
         });
 
+        if (positionClicked == position) {
+
+            holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
+            holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
+            // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
+            holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#9e1e27"));
+
+
+        } else {
+
+            holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Light));
+            holder.prgmDetails.setTextColor(Color.parseColor("#ddefde"));
+            holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
+
+        }
+
+
         holder.layoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setPositionClicked(position);
                 listener.onClick(position,dateList.get(position));
+
             }
         });
 
@@ -72,4 +100,6 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
     public interface DateClickLis{
         void onClick(int postion,Date date);
     }
+
+
 }

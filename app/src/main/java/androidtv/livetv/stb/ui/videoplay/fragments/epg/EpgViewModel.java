@@ -14,9 +14,11 @@ import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
 
 public class EpgViewModel extends AndroidViewModel {
+
     private EpgRepositary epgRepositary;
     private MediatorLiveData<List<ChannelItem>> channelListMediator;
     private MediatorLiveData<List<Epgs>> epLiveData;
+
     public EpgViewModel(@NonNull Application application) {
         super(application);
         epgRepositary = EpgRepositary.getInstance(application);
@@ -27,7 +29,6 @@ public class EpgViewModel extends AndroidViewModel {
 
 
     public LiveData<List<ChannelItem>> getChannels(){
-
         return channelListMediator;
     }
 

@@ -42,7 +42,7 @@ import butterknife.ButterKnife;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction {
 
-    @BindView(R.id.videoSurface)SurfaceView videoSurface;
+    //@BindView(R.id.videoSurface)SurfaceView videoSurface;
     //@BindView(R.id.videoView) VideoView videoView;
     @BindView(R.id.video_frame) RelativeLayout videoFrame;
     @BindView(R.id.img_play_pause) ImageView playPauseStatus;
@@ -75,7 +75,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         setContentView(R.layout.activity_video_play);
         ButterKnife.bind(this);
         txtRandomDisplayBoxId.setText( AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
-
         menuFragment = new FragmentMenu();
 
     }
@@ -91,9 +90,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("frag","called from activity");
         currentFragment = fragment;
         getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player,currentFragment).commit();
-
-
-
     }
 
     private void openFragmentWithBackStack(Fragment fragment,String tag) {

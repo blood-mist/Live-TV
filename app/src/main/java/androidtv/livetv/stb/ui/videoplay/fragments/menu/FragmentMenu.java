@@ -30,6 +30,7 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
+import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -93,6 +94,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     private int catId = -1;
+
+    private ChannelItem current;
 
 
     @Override
@@ -167,11 +170,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private void setUpChannelsCategory(List<ChannelItem> items) {
         if (items != null) {
-            adapter = new ChannelListAdapter(getActivity(), this);
-            gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-            gvChannelsList.setAdapter(adapter);
-            adapter.setChannelItems(items);
-            selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
+            if(items.size()>0) {
+                adapter = new ChannelListAdapter(getActivity(), this);
+                gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+                gvChannelsList.setAdapter(adapter);
+                adapter.setChannelItems(items);
+                selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
+                current = adapter.getmList().get(lastPlayedPosition);
+            }
         }
         //        menuViewModel.getChannels(id).observe(this, channelItems -> {
 //            adapter.setChannelItems(channelItems);
@@ -190,6 +196,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onClickChannel(int position) {
         onChannelFocused(position);
         selectedCurrentChannelId = adapter.getmList().get(position).getId();
+        current = adapter.getmList().get(position);
         mListener.playChannel(adapter.getmList().get(position));
     }
 
@@ -232,6 +239,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         EpgFragment fragment = new EpgFragment();
         fragment.setSelectedChannelId(selectedCurrentChannelId);
         mListener.load(fragment,"epg");
+    }
+
+    @OnClick(R.id.dvr)
+    public void OnDvrClick(){
+        DvrFragment fragment = new DvrFragment();
+        fragment.setCurrentChannel(current);
+        mListener.load(fragment,"Dvr");
     }
 
 

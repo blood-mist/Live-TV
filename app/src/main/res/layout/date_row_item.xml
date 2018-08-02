@@ -35,9 +35,6 @@
             android:textColor="#ddefde"
             android:textSize="20sp"/>
 
-
-
-
     </RelativeLayout>
 
     <View

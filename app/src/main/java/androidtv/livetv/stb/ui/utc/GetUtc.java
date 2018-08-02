@@ -13,7 +13,6 @@ import retrofit2.Retrofit;
 
 public class GetUtc {
     private static SplashApiInterface apiInterface;
-    private static GetUtc getUtc;
     private TimeStampEntity timeStampEntity;
 
     private GetUtc(SplashApiInterface apiInterface) {
@@ -21,8 +20,7 @@ public class GetUtc {
     }
 
     public static GetUtc getInstance() {
-        if (getUtc == null)
-            getUtc = new GetUtc(apiInterface);
+        GetUtc getUtc= new GetUtc(apiInterface);
         return getUtc;
 
     }
@@ -43,18 +41,17 @@ public class GetUtc {
                   @Override
                   public void onNext(Response<TimeStampEntity> timeStampEntityResponse) {
                       if (timeStampEntityResponse.body() != null) {
-                        timeStampEntity=timeStampEntityResponse.body();
+                        timeStampEntity.setUtc((int) timeStampEntityResponse.body().getUtc());
                       }
                   }
 
                   @Override
                   public void onError(Throwable e) {
-                    timeStampEntity.setUtc(System.currentTimeMillis());
+                    timeStampEntity.setUtc((int) System.currentTimeMillis());
                   }
 
                   @Override
                   public void onComplete() {
-
                   }
               });
       return timeStampEntity;
