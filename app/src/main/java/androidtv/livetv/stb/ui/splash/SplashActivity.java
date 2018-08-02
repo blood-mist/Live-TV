@@ -1,21 +1,29 @@
 package androidtv.livetv.stb.ui.splash;
 
 import android.Manifest;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import androidtv.livetv.stb.BuildConfig;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.downloads.DownloadFragment;
 import androidtv.livetv.stb.downloads.DownloadService;
 import androidtv.livetv.stb.entity.AppVersionInfo;
+import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.UserLoginData;
 import androidtv.livetv.stb.ui.login.LoginActivity;
@@ -58,6 +66,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     private PermissionUtils permissionutils;
     private String accountDownloadLink = "";
     ArrayList<String> permissions;
+    private CatChannelInfo catChannelInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,16 +115,52 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelInfo -> {
             if (catChannelInfo != null) {
                 Timber.d(catChannelInfo.getCategory().size() + "");
-                loadChannelActivity();
+                this.catChannelInfo=catChannelInfo;
+                checkForExistingChannelData();
+
             }
 
         });
+    }
+
+        private void checkForExistingChannelData() {
+        splashViewModel.checkChannelsInDB().observe(this, integer -> {
+            if(integer!=null){
+                if (integer>0){
+                    fetchChannelsFromDBtoUpdate();
+                }else{
+                    insertDataToDB();
+                }
+            }
+
+        });
+    }
+
+    private void fetchChannelsFromDBtoUpdate() {
+        splashViewModel.getAllChannelsInDBToCompare().observe(this, channelItemList -> {
+            if(channelItemList!=null){
+                updateListData(channelItemList,catChannelInfo.getChannel());
+            }
+        });
+
+    }
+
+    private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
+        channels.forEach(channelItem-> channelItemList.stream().filter(channelItem1 -> channelItem1.getId()==channelItem.getId()).findAny().ifPresent(channelItem1 -> channelItem.setIs_fav(channelItem1.getIs_fav())));
+        splashViewModel.insertChannelToDB(channels);
+        loadChannelActivity();
+    }
+
+    private void insertDataToDB(){
+        splashViewModel.insertCatChannelToDB(catChannelInfo);
+        loadChannelActivity();
     }
 
     private void loadChannelActivity() {
         Intent channelLoadIntent= new Intent(this,VideoPlayActivity.class);
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(channelLoadIntent);
+        finish();
     }
 
     /**
@@ -150,7 +195,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         unauthorizedIntent.putExtra(LIVE_ERROR_CODE, error_code);
         unauthorizedIntent.putExtra(LIVE_ERROR_MESSAGE, error_message);
         unauthorizedIntent.putExtra(LIVE_IP, ip);
-        unauthorizedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        unauthorizedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(unauthorizedIntent);
         finish();
     }
@@ -304,5 +349,10 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     @Override
     public void onDismissBtnClicked() {
         checkValidUser();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

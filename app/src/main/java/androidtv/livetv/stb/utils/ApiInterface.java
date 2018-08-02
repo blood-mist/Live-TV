@@ -1,4 +1,4 @@
-package androidtv.livetv.stb.ui.splash;
+package androidtv.livetv.stb.utils;
 
 import android.arch.lifecycle.LiveData;
 
@@ -6,6 +6,8 @@ import java.util.List;
 
 import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.FavoriteResponse;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.entity.MacInfo;
@@ -24,7 +26,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
-public interface SplashApiInterface {
+public interface ApiInterface {
     @GET(LinkConfig.MAC_EXISTS)
     Observable<Response<MacInfo>> checkMacValidation(@Query("mac") String macAddress);
 
@@ -50,4 +52,12 @@ public interface SplashApiInterface {
 
     @GET(LinkConfig.GET_UTC)
     Observable<Response<TimeStampEntity>> getTimestamp();
+    @GET(LinkConfig.CHANNEL_LINK_URL)
+    Observable<Response<ChannelLinkResponse>> getChannelLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash, @Query("channelID") String id);
+
+    @GET(LinkConfig.FAV_UNFAV_URL)
+    Observable<Response<FavoriteResponse>> addToFavorite(@Header("Authorization") String token, @Query("utc")long utc, @Query("userId")String userId, @Query("hash")String hash, @Query("channelId") String channelId);
+
+    @GET(LinkConfig.PREVIEW_LINK_LOADER)
+    Observable<Response<ChannelLinkResponse>> getPreviewLink(@Header("Authorization")String token, @Query("utc")long utc, @Query("userId")String userId,@Query("hash") String hash,@Query("channelID") String channelId);
 }

@@ -1,9 +1,12 @@
 package androidtv.livetv.stb.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -38,6 +41,7 @@ public class ApiManager {
         }
         return retrofit;
     }
+
 
     /**Method to get url used by DynamicEndPoint*/
     public static String getBaseUrl() {

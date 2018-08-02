@@ -160,6 +160,10 @@
     <string name="font_exo_medium">Exo2-Medium.otf</string>
     <string name="font_exo_Light">Exo2-Light.otf</string>
     <string name="font_exo_Bold">Exo2-Bold.otf</string>
+    <string name="epg">EPG</string>
+    <string name="dvr">DVR</string>
+    <string name="set_fav">Set Fav</string>
+    <string name="bought">BOUGHT</string>
 
 
 </resources>

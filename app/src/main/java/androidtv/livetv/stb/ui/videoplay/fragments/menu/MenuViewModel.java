@@ -11,51 +11,53 @@ import android.support.annotation.Nullable;
 import java.util.List;
 
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
-import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.FavoriteResponse;
 
 public class MenuViewModel extends AndroidViewModel {
-    private MediatorLiveData<List<CategoryItem>> categoryItemData;
-    private MediatorLiveData<List<ChannelItem>> channelItemData;
     private MenuRepository menuRepository;
     private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
+    private MediatorLiveData<ChannelLinkResponse> previewData;
+    private MediatorLiveData<ChannelItem> lastPlayedData;
+    private MediatorLiveData<FavoriteResponse> favoriteData;
+
 
     public MenuViewModel(@NonNull Application application) {
         super(application);
         menuRepository = MenuRepository.getInstance(application);
-        categoryItemData = new MediatorLiveData<>();
-        channelItemData = new MediatorLiveData<>();
         catChannelData=new MediatorLiveData<>();
-        channelItemData.setValue(null);
-        categoryItemData.setValue(null);
+        previewData=new MediatorLiveData<>();
+        previewData.setValue(null);
         catChannelData.setValue(null);
-//        LiveData<List<CategoryItem>> allCategory = menuRepository.getAllCategory();
-//        categoryItemData.addSource(allCategory, categoryItems -> categoryItemData.setValue(categoryItems));
+        LiveData<List<CategoriesWithChannels>> categoriesWithChannelsData=menuRepository.getCategoriesWithChannels();
+        catChannelData.addSource(categoriesWithChannelsData, categoriesWithChannels -> {
+            catChannelData.setValue(categoriesWithChannels);
+        });
+        lastPlayedData = new MediatorLiveData<>();
+        lastPlayedData.setValue(null);
 
-        LiveData<List<CategoriesWithChannels>> categoriesWithChannels=menuRepository.getCategoriesWithChannels();
-        catChannelData.addSource(categoriesWithChannels, categoriesWithChannels1 -> catChannelData.setValue(categoriesWithChannels1));
+        favoriteData=new MediatorLiveData<>();
+        favoriteData.setValue(null);
 
-
-    }
-
-    public LiveData<List<CategoryItem>> getCategoryData() {
-        return categoryItemData;
     }
 
     public LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels() {
         return catChannelData;
     }
 
+    public LiveData<ChannelLinkResponse> getPreviewLink(String token,long utc,String userId,String hashCode,int channelId) {
+        previewData.addSource(menuRepository.getPreviewLink(token, utc, String.valueOf(userId), String.valueOf(hashCode), String.valueOf(channelId)),
+                channelLinkResponse -> previewData.setValue(channelLinkResponse));
+        return previewData;
+    }
+    public LiveData<ChannelItem> getLastPlayedChannel(int channel_id) {
+        lastPlayedData.addSource(menuRepository.getLastPlayedChannel(channel_id), channelItem -> lastPlayedData.setValue(channelItem));
+        return lastPlayedData;
+    }
 
-//
-//    public LiveData<List<ChannelItem>> getChannels(int id){
-//        LiveData<List<ChannelItem>> channels = menuRepository.getChannels(id);
-//        channelItemData.addSource(channels, channelItems -> {
-//            channelItemData.setValue(channelItems);
-//            channelItemData.removeSource(channels);
-//        });
-//        return channelItemData;
-//>>>>>>> issue
-//    }
+    public void addChannelToFavorite( int favStatus,int channel_id) {
+        menuRepository.addChannelToFav(favStatus,channel_id);
+    }
 }
 

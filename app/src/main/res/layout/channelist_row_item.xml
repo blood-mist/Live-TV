@@ -1,7 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="150dp"
-    android:layout_height="103dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/relative_layout"
+    android:focusable="true"
+    android:clickable="true"
+    android:layout_gravity="center"
+    android:focusableInTouchMode="true"
+    android:importantForAccessibility="yes"
     android:background="@drawable/main_channel_list_selector">
 
 
@@ -28,12 +33,13 @@
         android:layout_above="@+id/view"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/rate"/>
+        android:src="@drawable/rate"
+        android:layout_alignParentEnd="true" />
 
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="0.1dip"
+        android:layout_height="1dp"
         android:layout_alignParentBottom="true"
         android:background="@color/view"/>
 

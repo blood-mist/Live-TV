@@ -1,11 +1,13 @@
 package androidtv.livetv.stb.ui.channelLoad;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
+import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -29,8 +31,7 @@ public interface CatChannelDao {
     LiveData<List<ChannelItem>> getChannels(int category_id);
 
     @Query("SELECT * FROM CHANNEL_TABLE ")
-    LiveData <List<ChannelItem>> getChannels();
-
+    LiveData<List<ChannelItem>> getChannels();
 
 
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
@@ -40,13 +41,15 @@ public interface CatChannelDao {
     LiveData<Integer> getChannelTableSize();
 
     @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
-    int updateFav(int is_fav, int channel_id);
+    void updateFav(int is_fav, int channel_id);
+
+
+    @Query("SELECT * FROM CHANNEL_TABLE  WHERE channel_id=:channel_id")
+    LiveData<ChannelItem> getLastPlayedChannel(int channel_id);
 
     @Transaction
     @Query("SELECT * FROM CATEGORY_TABLE")
     LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
-
-
 
 
 }

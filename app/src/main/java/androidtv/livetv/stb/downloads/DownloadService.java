@@ -1,6 +1,5 @@
 package androidtv.livetv.stb.downloads;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -33,7 +32,7 @@ import java.text.DecimalFormat;
 import androidtv.livetv.stb.BuildConfig;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.Download;
-import androidtv.livetv.stb.ui.splash.SplashApiInterface;
+import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import okhttp3.ResponseBody;
@@ -131,7 +130,7 @@ public class DownloadService extends Service {
 
         Retrofit retrofit = ApiManager.getAdapter();
 
-        SplashApiInterface retrofitInterface = retrofit.create(SplashApiInterface.class);
+        ApiInterface retrofitInterface = retrofit.create(ApiInterface.class);
 
         Call<ResponseBody> request = retrofitInterface.downloadFile(downloadUrl);
 

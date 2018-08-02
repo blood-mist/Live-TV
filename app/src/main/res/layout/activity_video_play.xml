@@ -5,27 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
-    <RelativeLayout
-        android:id="@+id/video_frame"
-        android:layout_width="320dp"
-        android:layout_height="200dp"
-        android:layout_gravity="right|bottom"
-        android:layout_marginBottom="80dp"
-        android:layout_marginRight="50dp"
-        android:background="@color/transp">
-
-        <VideoView
-            android:id="@+id/videoView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="right|bottom"
-            android:background="@drawable/preview_background" />
-    </RelativeLayout>
-
 
     <FrameLayout
         android:id="@+id/video_container"
@@ -73,8 +52,7 @@
             android:id="@+id/scrollViewImage"
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:layout_centerVertical="true"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="end|bottom"
             android:layout_marginBottom="35dp"
             android:visibility="gone" />
 
@@ -82,20 +60,25 @@
             android:id="@+id/videoStatus"
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="bottom|end"
             android:layout_marginBottom="40dp"
             android:layout_marginRight="80dp"
             android:layout_marginTop="70dp"
             android:alpha="0.8"
             android:src="@drawable/status_recorded"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            android:layout_marginEnd="80dp" />
 
     </FrameLayout>
-
+    <ImageView
+        android:id="@+id/menu_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/tc_background"/>
     <FrameLayout
         android:id="@+id/container_movie_player"
         android:layout_width="match_parent"
-        android:padding="20dp"
         android:layout_height="match_parent">
 
         <ImageView
@@ -103,7 +86,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:src="@drawable/tc_background"
             android:visibility="visible" />
 
         <ImageView
@@ -125,7 +107,7 @@
 
 
     </FrameLayout>
-    <TextView
+    <EditText
         android:id="@+id/tv_setchannelfrompriority"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -133,11 +115,15 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/transparent_rect_bordered_bg"
         android:gravity="center"
+        android:inputType="number"
+        android:digits="0123456789"
         android:padding="20dp"
+        android:textCursorDrawable="@android:color/transparent"
         android:text="@string/txt_empty"
         android:textColor="#ffffff"
         android:textSize="50sp"
         android:visibility="gone"
-        android:maxLength="3"/>
+        android:maxLength="4"/>
+
 
 </FrameLayout>

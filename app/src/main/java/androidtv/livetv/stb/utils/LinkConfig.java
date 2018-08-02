@@ -33,6 +33,7 @@ public class LinkConfig {
     public static final String FAV_UNFAV_URL = "api/v1/livetv/favorite/addfavorite";
     public static final String DVR_VIDEO_URL = "api/v1/dvr/getdvr";
     public static final String FAV_CHANNELS_ID_URL = "api/v1/livetv/favorite/list";
+    public static final String CHANNEL_CHANGE_OBSERVABLE="channel_change";
 
     public static final String LIVE_ERROR_CODE="error_code";
     public static final String LIVE_ERROR_MESSAGE="error_message";
@@ -50,6 +51,7 @@ public class LinkConfig {
     public static final String CHANNEL_TABLE="channel_table";
     public static final String CATEGORY_TABLE="category_table";
     public  static final int  NO_CONNECTION=404;
+    public static final String CHANNEL_ID ="channel_id" ;
     public static String getHashCode(String utc) {
       /*  String sessionId = null;
         try {

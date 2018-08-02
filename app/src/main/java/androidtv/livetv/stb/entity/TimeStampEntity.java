@@ -1,19 +1,39 @@
 package androidtv.livetv.stb.entity;
 
-import com.google.gson.annotations.Expose;
+import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
-public class TimeStampEntity {
-    @SerializedName("timestamp")
-    @Expose
-    private long timestamp;
 
-    public long getUtc() {
-        return timestamp;
-    }
+@Generated("com.robohorse.robopojogenerator")
+public class TimeStampEntity{
 
-    public void setUtc(long timestamp) {
-        this.timestamp = timestamp;
-    }
+	@SerializedName("utc")
+	private int utc;
 
+	@SerializedName("status")
+	private int status;
+
+	public void setUtc(int utc){
+		this.utc = utc;
+	}
+
+	public int getUtc(){
+		return utc;
+	}
+
+	public void setStatus(int status){
+		this.status = status;
+	}
+
+	public int getStatus(){
+		return status;
+	}
+
+	@Override
+ 	public String toString(){
+		return 
+			"TimeStampEntity{" + 
+			"utc = '" + utc + '\'' + 
+			",status = '" + status + '\'' + 
+			"}";
+		}
 }
-

@@ -3,7 +3,6 @@ package androidtv.livetv.stb.ui.splash;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 
 import java.net.ConnectException;
@@ -19,16 +18,15 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
-import androidtv.livetv.stb.entity.LoginSessionInfo;
 import androidtv.livetv.stb.entity.MacInfo;
 import androidtv.livetv.stb.entity.UserCheckInfo;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.login.LoginDao;
 import androidtv.livetv.stb.utils.ApiManager;
+import androidtv.livetv.stb.utils.ApiInterface;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,26 +41,52 @@ public class SplashRepository {
     private MediatorLiveData<MacInfo> macInfoMediatorLiveData;
     private MediatorLiveData<GeoAccessInfo> geoAccessLiveData;
     private MediatorLiveData<List<AppVersionInfo>> appInfoLiveData;
-    private SplashApiInterface splashApiInterface;
+    private ApiInterface apiInterface;
     private MediatorLiveData<UserCheckInfo> userCheckLiveData;
     private MediatorLiveData<Login> userCredentialData;
     private MediatorLiveData<Integer> rowCountData;
+    private MediatorLiveData<Integer> channelCountData;
     private MediatorLiveData<CatChannelInfo> catChannelData;
     private LoginDao mLoginDao;
     private CatChannelDao catChannelDao;
+    private MediatorLiveData<List<ChannelItem>> channelListData;
 
 
     SplashRepository(Application application) {
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         Retrofit retrofitInstance = ApiManager.getAdapter();
         mLoginDao = db.loginDao();
-        catChannelDao=db.catChannelDao();
-        userCredentialData=new MediatorLiveData<>();
+        catChannelDao = db.catChannelDao();
+        userCredentialData = new MediatorLiveData<>();
         userCredentialData.setValue(null);
-
-        rowCountData=new MediatorLiveData<>();
+        apiInterface = retrofitInstance.create(ApiInterface.class);
+        rowCountData = new MediatorLiveData<>();
         rowCountData.setValue(null);
-        splashApiInterface = retrofitInstance.create(SplashApiInterface.class);
+        rowCountData.addSource(mLoginDao.getTableSize(), integer -> {
+            if (integer != null) {
+                rowCountData.removeSource(mLoginDao.getTableSize());
+                rowCountData.postValue(integer);
+            }
+
+
+        });
+        channelCountData = new MediatorLiveData<>();
+        channelCountData.setValue(null);
+        channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> {
+            if (integer != null) {
+                channelCountData.removeSource(catChannelDao.getChannelTableSize());
+                channelCountData.postValue(integer);
+            }
+        });
+
+        channelListData = new MediatorLiveData<>();
+        channelListData.setValue(null);
+        channelListData.addSource(catChannelDao.getChannels(), channelItemList -> {
+            if (channelItemList != null) {
+                channelListData.removeSource(catChannelDao.getChannels());
+                channelListData.postValue(channelItemList);
+            }
+        });
 
     }
 
@@ -80,7 +104,7 @@ public class SplashRepository {
     public LiveData<MacInfo> isMacRegistered(String macAddress) {
         macInfoMediatorLiveData = new MediatorLiveData<>();
         macInfoMediatorLiveData.setValue(null);
-        Observable<Response<MacInfo>> macObserver = splashApiInterface.checkMacValidation(macAddress);
+        Observable<Response<MacInfo>> macObserver = apiInterface.checkMacValidation(macAddress);
         macObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<MacInfo>>() {
                     @Override
@@ -123,7 +147,7 @@ public class SplashRepository {
     public LiveData<GeoAccessInfo> isGeoAccessEnabled() {
         geoAccessLiveData = new MediatorLiveData<>();
         geoAccessLiveData.setValue(null);
-        Observable<Response<GeoAccessInfo>> geoAccess = splashApiInterface.checkGeoAccess();
+        Observable<Response<GeoAccessInfo>> geoAccess = apiInterface.checkGeoAccess();
         geoAccess.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<GeoAccessInfo>>() {
                     @Override
@@ -167,7 +191,7 @@ public class SplashRepository {
         appInfoLiveData = new MediatorLiveData<>();
         appInfoLiveData.setValue(null);
         List<AppVersionInfo> appVersionInfoList = new ArrayList<>();
-        Observable<Response<List<AppVersionInfo>>> checkVersion = splashApiInterface.checkForAppVersion(macAddress, versionCode, versionName, applicationId);
+        Observable<Response<List<AppVersionInfo>>> checkVersion = apiInterface.checkForAppVersion(macAddress, versionCode, versionName, applicationId);
         checkVersion.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<List<AppVersionInfo>>>() {
                     @Override
@@ -204,7 +228,7 @@ public class SplashRepository {
     public LiveData<UserCheckInfo> isUserRegistered(String macAddress) {
         userCheckLiveData = new MediatorLiveData<>();
         userCheckLiveData.setValue(null);
-        Observable<Response<UserCheckInfo>> userCheckObserver = splashApiInterface.checkUserStatus(macAddress);
+        Observable<Response<UserCheckInfo>> userCheckObserver = apiInterface.checkUserStatus(macAddress);
         userCheckObserver.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<UserCheckInfo>>() {
                     @Override
@@ -246,14 +270,20 @@ public class SplashRepository {
     }
 
     public LiveData<Login> getData() {
-        userCredentialData.addSource(mLoginDao.getLoginData(), login -> userCredentialData.postValue(login));
-        return  userCredentialData;
+        userCredentialData.addSource(mLoginDao.getLoginData(), login -> {
+            if(login!=null) {
+                userCredentialData.removeSource(mLoginDao.getLoginData());
+                userCredentialData.postValue(login);
+            }
+
+        });
+        return userCredentialData;
     }
 
-    public LiveData<CatChannelInfo> getChannels(String token,String utc,String userId ,String hashValue) {
-        catChannelData=new MediatorLiveData<>();
+    public LiveData<CatChannelInfo> getChannels(String token, String utc, String userId, String hashValue) {
+        catChannelData = new MediatorLiveData<>();
         catChannelData.setValue(null);
-        Observable<Response<CatChannelInfo>> catChannel = splashApiInterface.getCatChannel(token, Long.parseLong(utc),userId,hashValue);
+        Observable<Response<CatChannelInfo>> catChannel = apiInterface.getCatChannel(token, Long.parseLong(utc), userId, hashValue);
         catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<CatChannelInfo>>() {
                     @Override
@@ -265,10 +295,6 @@ public class SplashRepository {
                     public void onNext(Response<CatChannelInfo> catChannelInfoResponse) {
                         if (catChannelInfoResponse.code() == 200) {
                             CatChannelInfo catChannelInfo = catChannelInfoResponse.body();
-                            if(catChannelInfo!=null) {
-                                insertCategoryIntoDatabase(catChannelInfo.getCategory());
-                                insertChannelsintoDatabase(catChannelInfo.getChannel());
-                            }
                             catChannelData.postValue(catChannelInfo);
                         }
                     }
@@ -280,6 +306,7 @@ public class SplashRepository {
                             catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
                                 catChannelInfo.setCategory(categoryItems);
                                 catChannelData.postValue(catChannelInfo);
+                                catChannelData.removeSource(catChannelDao.getCategories());
                             });
                         }
                     }
@@ -294,16 +321,32 @@ public class SplashRepository {
     }
 
     private void insertChannelsintoDatabase(List<ChannelItem> channel) {
-        Completable.fromRunnable(() -> catChannelDao.insertChannels(channel)).subscribeOn(Schedulers.io()).subscribe();
+        Completable.fromRunnable(() -> catChannelDao.insertChannels(channel)).subscribeOn(Schedulers.io()).subscribe().dispose();
     }
 
     private void insertCategoryIntoDatabase(List<CategoryItem> category) {
-        Completable.fromRunnable(() -> catChannelDao.insertCategory(category)).subscribeOn(Schedulers.io()).subscribe();
+        Completable.fromRunnable(() -> catChannelDao.insertCategory(category)).subscribeOn(Schedulers.io()).subscribe().dispose();
     }
 
     public LiveData<Integer> getRowCount() {
-        rowCountData.addSource(mLoginDao.getTableSize(),integer -> rowCountData.postValue(integer));
         return rowCountData;
 
+    }
+
+    public LiveData<Integer> getChannelCount() {
+        return channelCountData;
+    }
+
+    public void insertCatChannelToDB(CatChannelInfo catChannelInfo) {
+        insertCategoryIntoDatabase(catChannelInfo.getCategory());
+        insertChannelsintoDatabase(catChannelInfo.getChannel());
+    }
+
+    public LiveData<List<ChannelItem>> getChannelList() {
+        return channelListData;
+    }
+
+    public void insertChannelsToDB(List<ChannelItem> channels) {
+        insertChannelsintoDatabase(channels);
     }
 }

@@ -145,9 +145,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
 
                 selectedPos = position;
                 if(position == 0){
-                     mListener.onClickCategory(allChannelList);
+                     mListener.onClickCategory("All Channels",allChannelList);
                 }else {
-                    mListener.onClickCategory(finalCategoryItem.channelItemList);
+                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(),finalCategoryItem.channelItemList);
                 }
             }
         });
@@ -182,16 +182,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             return 0;
     }
 
-    public List<CategoriesWithChannels> getCategoryItemList() {
-        return categoryItemList;
-    }
 
     /**
      * interface for  clicklistener
      */
     public interface OnListClickListener {
 
-        void onClickCategory(List channels);
+        void onClickCategory(String categoryName,List <ChannelItem>channels);
     }
 
 }

@@ -3,8 +3,6 @@ package androidtv.livetv.stb.ui.login;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -18,12 +16,11 @@ import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
-import androidtv.livetv.stb.ui.splash.SplashApiInterface;
+import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -33,7 +30,7 @@ import retrofit2.Retrofit;
 
 public class LoginRepository {
     private static LoginRepository loginInstance;
-    private SplashApiInterface loginApiInterface;
+    private ApiInterface loginApiInterface;
     private MediatorLiveData<LoginInfo> loginInfoLiveData;
     private  MediatorLiveData<Login> loginData;
     private LoginDao mLoginDao;
@@ -45,7 +42,7 @@ public class LoginRepository {
         mLoginDao = db.loginDao();
         catChannelDao=db.catChannelDao();
         Retrofit retrofitInstance = ApiManager.getAdapter();
-        loginApiInterface  = retrofitInstance.create(SplashApiInterface.class);
+        loginApiInterface  = retrofitInstance.create(ApiInterface.class);
         loginData=new MediatorLiveData<>();
 
     }

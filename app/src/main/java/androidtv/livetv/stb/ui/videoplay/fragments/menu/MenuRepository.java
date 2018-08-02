@@ -6,32 +6,39 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
 
+
 import java.util.List;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.FavoriteResponse;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
-import androidtv.livetv.stb.ui.videoplay.VideoPlayApiInterface;
+import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class MenuRepository {
     private static MenuRepository mInstance;
-    private VideoPlayApiInterface videoPlayApiInterface;
+    private ApiInterface videoPlayApiInterface;
     private MediatorLiveData<List<CategoryItem>> categoryData;
-    private MediatorLiveData<List<ChannelItem>> channelList;
     private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
     private CatChannelDao catChannelDao;
+    private MediatorLiveData<ChannelItem> lastChannelData;
 
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         catChannelDao = db.catChannelDao();
-        videoPlayApiInterface = retrofitInstance.create(VideoPlayApiInterface.class);
+        videoPlayApiInterface = retrofitInstance.create(ApiInterface.class);
         categoryData = new MediatorLiveData<>();
-        channelList = new MediatorLiveData<>();
         catChannelData=new MediatorLiveData<>();
         catChannelData.addSource(catChannelDao.getCategoriesWithChannels(), categoriesWithChannels -> catChannelData.postValue(categoriesWithChannels));
         categoryData.addSource(catChannelDao.getCategories(), categoryItems -> categoryData.postValue(categoryItems));
@@ -60,15 +67,54 @@ public class MenuRepository {
     public LiveData<List<CategoriesWithChannels>>getCategoriesWithChannels() {
         return catChannelData;
     }
-//    public LiveData<List<ChannelItem>> getChannels(int id) {
-//        if (id == -1) {
-//            channelList.addSource(catChannelDao.getChannels(), channelItems -> channelList.postValue(channelItems));
-//
-//        } else {
-//            channelList.addSource(catChannelDao.getChannels(id), channelItems -> channelList.postValue(channelItems));
-//
-//        }
-//        return channelList;
-//>>>>>>> issue
-//    }
+
+    public LiveData<ChannelLinkResponse> getPreviewLink(String token, long utc, String userId, String hash, String channelId) {
+        MediatorLiveData<ChannelLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
+        responseMediatorLiveData.setValue(null);
+       Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getPreviewLink(token,utc,userId,hash,channelId);
+        call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response<ChannelLinkResponse> channelLinkResponseResponse) {
+                        if (channelLinkResponseResponse.code() == 200) {
+                            ChannelLinkResponse response = channelLinkResponseResponse.body();
+                            responseMediatorLiveData.postValue(response);
+                        } else {
+                            responseMediatorLiveData.postValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        responseMediatorLiveData.postValue(null);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return responseMediatorLiveData;
+    }
+    public LiveData<ChannelItem> getLastPlayedChannel(int channel_id) {
+        lastChannelData = new MediatorLiveData<>();
+        lastChannelData.addSource(catChannelDao.getLastPlayedChannel(channel_id), channelItem -> {
+            if (channelItem != null) {
+                lastChannelData.removeSource(catChannelDao.getLastPlayedChannel(channel_id));
+                lastChannelData.postValue(channelItem);
+            }
+        });
+        return lastChannelData;
+
+    }
+
+    public void addChannelToFav(int favStatus,int channel_id) {
+        Completable.fromRunnable(() -> catChannelDao.updateFav(favStatus,channel_id)).subscribeOn(Schedulers.io()).subscribe().dispose();
+    }
 }
