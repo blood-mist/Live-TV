@@ -3,6 +3,7 @@ package androidtv.livetv.stb.ui.videoplay.fragments.epg;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +33,8 @@ import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.adapters.DateListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.EpgListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.ChannelRecyclerAdapter;
+import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
+import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
@@ -40,8 +43,10 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnChannelListInteractionListener, DateListAdapter.DateClickLis {
+public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnChannelListInteractionListener, DateListAdapter.DateClickLis, EpgListAdapter.EpgListAdapterListener {
 
+
+    private FragmentEpgInteraction mListener;
 
     public void setSelectedChannelId(int selectedChannelId) {
         this.selectedChannelId = selectedChannelId;
@@ -138,7 +143,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         dateListAdapter = new DateListAdapter(getActivity(), getDateList(), this);
         gvDate.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvDate.setAdapter(dateListAdapter);
-        epgListAdapter = new EpgListAdapter(getActivity());
+        epgListAdapter = new EpgListAdapter(getActivity(),this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
         if (adapter.hasData()) {
@@ -227,4 +232,38 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     }
 
 
+    @Override
+    public void onEpgClicked(Epgs epg) {
+         mListener.playChannel(epg.getChannelID());
+    }
+
+    @Override
+    public void onOnAirSetup(Epgs epgs) {
+       txtChannelName.setText(getChannelName(epgs.getChannelID()));
+       txtPrgmName.setText(epgs.getProgramTitle());
+       txtPrgmTime.setText(DataUtils.getPrgmTime(epgs.getStartTime(),epgs.getEndTime()));
+
+
+    }
+
+    private String getChannelName(int channelID) {
+      ChannelItem item = adapter.getChannel(channelID);
+      return item.getName();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentMenu.FragmentMenuInteraction) {
+            mListener = (FragmentEpgInteraction) context;
+
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    public interface FragmentEpgInteraction {
+        void playChannel(int channelId);
+    }
 }

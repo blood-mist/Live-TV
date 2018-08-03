@@ -38,9 +38,11 @@ import java.util.concurrent.TimeUnit;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.ui.utc.GetUtc;
+import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
@@ -53,7 +55,8 @@ import timber.log.Timber;
 
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 
-public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction, SurfaceHolder.Callback {
+public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
+        SurfaceHolder.Callback,EpgFragment.FragmentEpgInteraction ,DvrFragment.FragmentDvrInteraction {
 
     @BindView(R.id.img_play_pause)
     ImageView playPauseStatus;
@@ -503,5 +506,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void showProgressBar() {
         progressBar.smoothToShow();
+    }
+
+    @Override
+    public void playDvr(Epgs epgs) {
+//TODO
+    }
+
+    @Override
+    public void playChannel(int channelId) {
+//TODO
     }
 }

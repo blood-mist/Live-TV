@@ -3,6 +3,7 @@ package androidtv.livetv.stb.ui.videoplay.fragments.dvr;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +36,8 @@ import androidtv.livetv.stb.ui.videoplay.adapters.DateListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.DvrListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.EpgListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.ChannelRecyclerAdapter;
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
+import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
@@ -52,6 +55,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private List<Epgs> cuurentEpgList;
     private Date currentEpgDate;
     private DvrListAdapter dvrListAdapter;
+    private FragmentDvrInteraction mListener;
 
     public DvrFragment() {
         // Required empty public constructor
@@ -242,10 +246,46 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void clickDvr(Epgs epg) {
         Log.d("dvr","clicked :"+epg.getProgramTitle());
+        mListener.playDvr(epg);
 
+    }
+
+    @Override
+    public void onOnAirSetup(Epgs epg) {
+        txtChannelName.setText(getChannelName(epg.getChannelID()));
+        txtPrgmName.setText(epg.getProgramTitle());
+        txtPrgmTime.setText(DataUtils.getPrgmTime(epg.getStartTime(),epg.getEndTime()));
+    }
+
+    private String getChannelName(int channelID) {
+        ChannelItem item = adapter.getChannel(channelID);
+        return item.getName();
+    }
+
+    @Override
+    public void onAirClick(Epgs epgs) {
+        mListener.playChannel(epgs.getChannelID());
     }
 
     public void setCurrentChannel(ChannelItem currentChannel) {
         this.currentChannel = currentChannel;
+    }
+
+    public interface FragmentDvrInteraction {
+        void playChannel(int channelId);
+        void playDvr(Epgs epgs);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentMenu.FragmentMenuInteraction) {
+            mListener = (FragmentDvrInteraction) context;
+
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+
     }
 }

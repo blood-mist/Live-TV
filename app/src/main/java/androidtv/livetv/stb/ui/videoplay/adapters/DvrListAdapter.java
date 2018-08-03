@@ -45,21 +45,27 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         Calendar currentCal = Calendar.getInstance();
         Date currentDateTime = currentCal.getTime();
         if ((epg.getStartTime().before(currentDateTime) && epg.getEndTime().after(currentDateTime)) || epg.getStartTime() == currentDateTime || epg.getEndTime() == currentDateTime) {
-
+            holder.LayoutTxtImgHor.setTag("12");
             holder.alarmPlay.setImageResource(R.drawable.red_circle);
             holder.onAirText.setText("ON AIR");
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
+            listener.onOnAirSetup(epg);
 
         } else {
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
             holder.alarmPlay.setImageResource(R.drawable.play);
             holder.onAirText.setText("");
+            holder.LayoutTxtImgHor.setTag("10");
 
         }
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.clickDvr(epg);
+                if(v.getTag() == "12"){
+                    listener.onAirClick(epg);
+                }else {
+                    listener.clickDvr(epg);
+                }
             }
         });
 
@@ -84,6 +90,8 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
 
     public interface OnClickDvrList {
         void clickDvr(Epgs epg);
+        void onOnAirSetup(Epgs epg);
+        void onAirClick(Epgs epgs);
     }
 
 
