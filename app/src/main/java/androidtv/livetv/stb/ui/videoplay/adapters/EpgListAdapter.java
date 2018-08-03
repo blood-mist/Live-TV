@@ -13,6 +13,9 @@ import java.util.List;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.EpgViewHolder;
+
+import androidtv.livetv.stb.utils.DataUtils;
+
 import androidtv.livetv.stb.utils.DateUtils;
 
 
@@ -41,7 +44,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
     public void onBindViewHolder(@NonNull EpgViewHolder holder, int position) {
         Epgs epg = mList.get(position);
         holder.prgmName.setText(epg.getProgramTitle());
-        holder.prgmTime.setText(getPrgmTime(epg.getStartTime(),epg.getEndTime()));
+        holder.prgmTime.setText(DataUtils.getPrgmTime(epg.getStartTime(),epg.getEndTime()));
         Calendar currentCal = Calendar.getInstance();
         Date currentDateTime = currentCal.getTime();
         if((epg.getStartTime().before(currentDateTime) && epg.getEndTime().after(currentDateTime)) || epg.getStartTime() == currentDateTime || epg.getEndTime() == currentDateTime){
@@ -67,12 +70,10 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
         else return 0;
     }
 
-    public String getPrgmTime(Date startTime , Date endDate){
-       String start = DateUtils._24HrsTimeFormat.format(startTime);
-       String end = DateUtils._24HrsTimeFormat.format(endDate);
-       return start +" - "+ end;
-      }
 
 
-
+    public void clear() {
+        mList = null;
+        notifyDataSetChanged();
+    }
 }

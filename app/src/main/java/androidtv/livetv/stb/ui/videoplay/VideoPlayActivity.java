@@ -48,6 +48,7 @@ import androidtv.livetv.stb.utils.DeviceUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import timber.log.Timber;
 
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
@@ -80,6 +81,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @BindView(R.id.menu_bg)
     ImageView menuBackground;
 
+
     private VideoPlayViewModel videoPlayViewModel;
     private Handler handlerToShowMac;
     private Handler handlerToHideMac;
@@ -106,8 +108,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         setContentView(R.layout.activity_video_play);
         lastPlayedPrefs= PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
+
         hideMenuHandler = new Handler();
         txtRandomDisplayBoxId.setText(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
+
+        txtRandomDisplayBoxId.setText( AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
+
         menuFragment = new FragmentMenu();
         channelChangeObservable = new ChannelChangeObserver();
         channelChangeObservable.addObserver(menuFragment);
@@ -134,6 +140,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragment(Fragment fragment) {
         Log.d("frag", "called from activity");
         currentFragment = fragment;
+
         getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, currentFragment).commit();
 
 
@@ -211,6 +218,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 startChChangeFrmPriority(chFrmPriorityHandler, editable.toString());
             }
         });
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player,currentFragment).commit();
+
     }
 
     private void stopChPriorityHandler(Handler chFrmPriorityHandler) {
