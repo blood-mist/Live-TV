@@ -19,12 +19,21 @@ import androidtv.livetv.stb.utils.DateUtils;
 
 public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
     private Context mContext;
+
+    public List<Date> getDateList() {
+        return dateList;
+    }
+
     private List<Date> dateList;
     private DateClickLis listener;
 
     public void setPositionClicked(int positionClicked) {
         this.positionClicked = positionClicked;
         notifyDataSetChanged();
+    }
+
+    public int getPositionClicked() {
+        return positionClicked;
     }
 
     private int positionClicked;

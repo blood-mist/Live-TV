@@ -7,6 +7,7 @@ import java.util.List;
 import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.FavoriteResponse;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.LoginInfo;
@@ -60,4 +61,7 @@ public interface ApiInterface {
 
     @GET(LinkConfig.PREVIEW_LINK_LOADER)
     Observable<Response<ChannelLinkResponse>> getPreviewLink(@Header("Authorization")String token, @Query("utc")long utc, @Query("userId")String userId,@Query("hash") String hash,@Query("channelID") String channelId);
+
+    @GET(LinkConfig.DVR_VIDEO_URL)
+    Observable<Response<DvrLinkResponse>> getDvrLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash, @Query("channelId") String id, @Query("date") String date, @Query("startTime")String startTime);
 }

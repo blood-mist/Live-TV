@@ -65,6 +65,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
                     listener.onAirClick(epg);
                 }else {
                     listener.clickDvr(epg);
+
                 }
             }
         });

@@ -12,6 +12,7 @@ import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.splash.SplashRepository;
 import androidtv.livetv.stb.utils.ApiInterface;
@@ -93,6 +94,43 @@ public class VideoPlayRepository {
                 });
         return responseMediatorLiveData;
     }
+
+    public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, String userId, String hashValue, String channelId, String date, String startTime) {
+        MediatorLiveData<DvrLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
+        responseMediatorLiveData.setValue(null);
+        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getDvrLink(token, utc, userId, hashValue, channelId,date,startTime);
+        call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                .subscribe(new io.reactivex.Observer<Response<DvrLinkResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response<DvrLinkResponse> channelLinkResponseResponse) {
+                        if (channelLinkResponseResponse.code() == 200) {
+                            DvrLinkResponse response = channelLinkResponseResponse.body();
+                            responseMediatorLiveData.postValue(response);
+                        } else {
+                            responseMediatorLiveData.postValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        responseMediatorLiveData.postValue(null);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return responseMediatorLiveData;
+    }
+
+
 
 
 }

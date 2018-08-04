@@ -169,6 +169,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onChannelClickInteraction(ChannelItem channel, int adapterPosition) {
         //TODO Call api
+        resetOnAir();
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         epgListAdapter.clear();
@@ -243,7 +244,12 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
        txtPrgmName.setText(epgs.getProgramTitle());
        txtPrgmTime.setText(DataUtils.getPrgmTime(epgs.getStartTime(),epgs.getEndTime()));
 
+    }
 
+    private void resetOnAir(){
+        txtChannelName.setText("");
+        txtPrgmName.setText("");
+        txtPrgmTime.setText("");
     }
 
     private String getChannelName(int channelID) {

@@ -56,6 +56,8 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private Date currentEpgDate;
     private DvrListAdapter dvrListAdapter;
     private FragmentDvrInteraction mListener;
+    private Date selectedDate;
+    private int selectedDatePosition = -1;
 
     public DvrFragment() {
         // Required empty public constructor
@@ -119,7 +121,8 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        String currentDate = androidtv.livetv.stb.utils.DateUtils.dateAndTime.format(Calendar.getInstance().getTime());
+        txtDateView.setText(currentDate);
         gvDate.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvDate.setVisibility(View.GONE);
         adapter = new ChannelRecyclerAdapter(getContext(), this);
@@ -158,7 +161,11 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                     gvDate.setAdapter(dateListAdapter);
                     gvDate.setVisibility(View.VISIBLE);
                     gvDate.scrollToPosition(dateListAdapter.getItemCount()-1);
-                    dateListAdapter.setPositionClicked(dateListAdapter.getItemCount()-1);
+                    if(selectedDatePosition == -1) {
+                         selectedDatePosition = dateListAdapter.getItemCount()-1;
+                    }
+                    dateListAdapter.setPositionClicked(selectedDatePosition);
+
                     setUpEpgs(channel,login,utc);
                 }
             }
@@ -247,7 +254,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     public void clickDvr(Epgs epg) {
         Log.d("dvr","clicked :"+epg.getProgramTitle());
         mListener.playDvr(epg);
-
+        selectedDatePosition = dateListAdapter.getPositionClicked();
     }
 
     @Override

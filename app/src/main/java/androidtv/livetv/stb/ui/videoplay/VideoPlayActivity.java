@@ -38,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
@@ -46,6 +48,7 @@ import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.AppConfig;
+import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DeviceUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
@@ -510,11 +513,33 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     public void playDvr(Epgs epgs) {
-//TODO
+        //TODO play Channels
+        showProgressBar();
+        long utc = GetUtc.getInstance().getTimestamp().getUtc();
+        Login login = GlobalVariables.login;
+        String date = DateUtils.dateAndTime.format(epgs.getStartTime());
+        String startTime = DateUtils._24HrsTimeFormat.format(epgs.getStartTime());
+        videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                epgs.getChannelID(),date,startTime).observe(this, new Observer<DvrLinkResponse>() {
+            @Override
+            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                if (channelLinkResponse != null) {
+                    if(channelLinkResponse.getErrorCode()>0){
+                        Log.d("dvr","error");
+                    }else{
+                        VideoPlayActivity.this.playVideo(channelLinkResponse.getLink());
+
+                    }
+                }
+            }
+        });
+
+
     }
 
     @Override
     public void playChannel(int channelId) {
-//TODO
+     //TODO
     }
 }
