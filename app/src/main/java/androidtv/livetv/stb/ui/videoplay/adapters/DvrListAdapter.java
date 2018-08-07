@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.DvrViewHolder;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.EpgViewHolder;
@@ -58,6 +59,16 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
             holder.LayoutTxtImgHor.setTag("10");
 
         }
+        holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+                } else{
+                    holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
+                }
+            }
+        });
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

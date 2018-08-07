@@ -151,10 +151,10 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="3"
-                            android:listSelector="@drawable/main_channel_list_selector"
                             android:nextFocusUp="@id/channel_list"
-                            android:drawSelectorOnTop="true"
-                            android:numColumns="1"/>
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
+                            />
 
                         <View
                             android:layout_width="1dp"

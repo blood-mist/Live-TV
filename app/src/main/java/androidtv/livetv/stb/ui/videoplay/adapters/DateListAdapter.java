@@ -30,6 +30,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
     public void setPositionClicked(int positionClicked) {
         this.positionClicked = positionClicked;
         notifyDataSetChanged();
+
     }
 
     public int getPositionClicked() {
@@ -38,7 +39,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
 
     private int positionClicked;
 
-    public DateListAdapter(Context context , List<Date> lis,DateClickLis listener){
+    public DateListAdapter(Context context, List<Date> lis, DateClickLis listener) {
         this.mContext = context;
         this.dateList = lis;
         this.listener = listener;
@@ -60,24 +61,34 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
         holder.layoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
+                if (position == positionClicked) {
+                    holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
+                    holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
+                    // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
+                    holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#9e1e27"));
+                } else if (hasFocus) {
                     holder.prgmDetails.setFont(mContext.getResources().getString(R.string.font_exo_Bold));
                     holder.prgmDetails.setScaleX(1.05f);
                     holder.prgmDetails.setScaleY(1.05f);
-                }else{
+                    holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+                }
+                // listener.onClick(position,dateList.get(position));
+                else {
                     holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Light));
                     holder.prgmDetails.setScaleX(1f);
                     holder.prgmDetails.setScaleY(1f);
+                    holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
                 }
+
             }
         });
 
         if (positionClicked == position) {
-
             holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
             holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
             // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
             holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#9e1e27"));
+            holder.layoutTxtImgHor.requestFocus();
 
 
         } else {
@@ -93,7 +104,8 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
             @Override
             public void onClick(View v) {
                 setPositionClicked(position);
-                listener.onClick(position,dateList.get(position));
+                listener.onClick(position, dateList.get(position));
+                v.requestFocus();
 
             }
         });
@@ -106,8 +118,9 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
         return dateList.size();
     }
 
-    public interface DateClickLis{
-        void onClick(int postion,Date date);
+
+    public interface DateClickLis {
+        void onClick(int postion, Date date);
     }
 
 

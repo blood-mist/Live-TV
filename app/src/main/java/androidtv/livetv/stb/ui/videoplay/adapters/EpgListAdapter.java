@@ -56,15 +56,23 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
             holder.onAirText.setText("ON AIR");
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
             listener.onOnAirSetup(epg);
-
-
         }else{
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
             holder.alarmPlay.setImageResource(R.drawable.icon_alarm);
             holder.onAirText.setText("");
             holder.LayoutTxtImgHor.setClickable(false);
-
         }
+
+        holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+               if(hasFocus){
+                   holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+               } else{
+                   holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
+               }
+            }
+        });
 
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override

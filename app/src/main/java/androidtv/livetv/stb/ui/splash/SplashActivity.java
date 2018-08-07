@@ -92,23 +92,24 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void checkIfLoginDetailsAvailable() {
-        splashViewModel.checkIfDataExists().observe(this, integer -> {
-            if (integer != null) {
-                Timber.d(integer + "");
-                //TODO fetch channel details if valid credentials
-                if (integer > 0)
-                    splashViewModel.checkDatainDb().observe(this, login -> {
-                        if (login != null) {
-                            GlobalVariables.login = login;
-                            long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                            fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
-                        }
-                    });
-                else
-                    checkForValidMacAddress();
-
-            }
-        });
+        checkForValidMacAddress();
+//        splashViewModel.checkIfDataExists().observe(this, integer -> {
+//            if (integer != null) {
+//                Timber.d(integer + "");
+//                //TODO fetch channel details if valid credentials
+//                if (integer > 0)
+//                    splashViewModel.checkDatainDb().observe(this, login -> {
+//                        if (login != null) {
+//                            GlobalVariables.login = login;
+//                            long utc = GetUtc.getInstance().getTimestamp().getUtc();
+//                            fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
+//                        }
+//                    });
+//                else
+//                    checkForValidMacAddress();
+//
+//            }
+//        });
     }
 
 

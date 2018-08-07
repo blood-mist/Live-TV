@@ -195,11 +195,13 @@
 
 
                     <LinearLayout
-
+                        android:id="@+id/layout_epg"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center"
+                        android:focusable="true"
+                        android:clickable="true"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -231,11 +233,13 @@
                     </LinearLayout>
 
                     <LinearLayout
-
+                        android:id="@+id/layout_dvr"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center"
+                        android:focusable="true"
+                        android:clickable="true"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -267,10 +271,12 @@
                     </LinearLayout>
 
                     <LinearLayout
-
+                        android:id="@+id/layout_fav"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2.4"
+                        android:focusable="true"
+                        android:clickable="true"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 

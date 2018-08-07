@@ -58,6 +58,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private FragmentDvrInteraction mListener;
     private Date selectedDate;
     private int selectedDatePosition = -1;
+    private int selectedChannelId = 0;
 
     public DvrFragment() {
         // Required empty public constructor
@@ -135,9 +136,27 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItems) {
                 adapter.setChannelList(channelItems);
+                adapter.setSelectedChannel(adapter.getChannelPositionById(currentChannel.getId()));
+                onChannelClickInteraction(adapter.getChannelById(currentChannel.getId()),selectedDatePosition);
             }
         });
+        gvChannelList.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Log.d( "onFocusChange: ","channelFocus");
+            }
+        });
+        gvDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    Log.d("focus","true");
+                }else{
 
+                }
+            }
+        });
+        gvChannelList.setNextFocusDownId(gvDate.getId());
 
     }
 
@@ -149,6 +168,9 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onChannelClickInteraction(ChannelItem channel, int adapterPosition) {
         setCurrentChannel(channel);
+        txtChannelName.setText(channel.getName());
+        gvDate.setVisibility(View.GONE);
+        gvEpgDvr.setVisibility(View.GONE);
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         viewModel.getStartTime(login.getToken(),utc.getUtc(),String.valueOf(login.getId()),
@@ -156,17 +178,26 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                         ,String.valueOf(utc.getUtc()),login.getSession()),1, String.valueOf(channel.getId())).observe(this, new Observer<DvrStartDateTimeEntity>() {
             @Override
             public void onChanged(@Nullable DvrStartDateTimeEntity dvrStartDateTimeEntity) {
-                if(dvrStartDateTimeEntity != null){
+
+                if(dvrStartDateTimeEntity.getStartDate() != null && dvrStartDateTimeEntity.getStartTime() != null){
                     dateListAdapter = new DateListAdapter(getContext(),getDateList(dvrStartDateTimeEntity.getStartDate()),DvrFragment.this::onClick);
                     gvDate.setAdapter(dateListAdapter);
                     gvDate.setVisibility(View.VISIBLE);
+                    gvEpgDvr.setVisibility(View.VISIBLE);
                     gvDate.scrollToPosition(dateListAdapter.getItemCount()-1);
                     if(selectedDatePosition == -1) {
                          selectedDatePosition = dateListAdapter.getItemCount()-1;
                     }
                     dateListAdapter.setPositionClicked(selectedDatePosition);
-
                     setUpEpgs(channel,login,utc);
+
+                }else{
+                    if(dvrStartDateTimeEntity.getErrorCode().equals("100")){
+                        //TODO Show Error
+
+                        nOEpg.setText(dvrStartDateTimeEntity.getErrorMessage());
+                        nOEpg.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
@@ -253,7 +284,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void clickDvr(Epgs epg) {
         Log.d("dvr","clicked :"+epg.getProgramTitle());
-        mListener.playDvr(epg);
+        mListener.playDvr(epg,currentChannel);
         selectedDatePosition = dateListAdapter.getPositionClicked();
     }
 
@@ -271,16 +302,18 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onAirClick(Epgs epgs) {
-        mListener.playChannel(epgs.getChannelID());
+        mListener.playChannel(adapter.getChannel(epgs.getChannelID()));
     }
 
     public void setCurrentChannel(ChannelItem currentChannel) {
         this.currentChannel = currentChannel;
+
+
     }
 
     public interface FragmentDvrInteraction {
-        void playChannel(int channelId);
-        void playDvr(Epgs epgs);
+        void playChannel(ChannelItem channel);
+        void playDvr(Epgs epgs,ChannelItem item);
     }
 
     @Override

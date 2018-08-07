@@ -235,7 +235,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onEpgClicked(Epgs epg) {
-         mListener.playChannel(epg.getChannelID());
+         mListener.playChannel(adapter.getChannel(epg.getChannelID()));
     }
 
     @Override
@@ -250,6 +250,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         txtChannelName.setText("");
         txtPrgmName.setText("");
         txtPrgmTime.setText("");
+
     }
 
     private String getChannelName(int channelID) {
@@ -270,6 +271,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     }
 
     public interface FragmentEpgInteraction {
-        void playChannel(int channelId);
+        void playChannel(ChannelItem channelItem);
     }
 }

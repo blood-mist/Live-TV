@@ -45,6 +45,7 @@ import java.util.Locale;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.ui.custom_views.CustomTextView;
 import androidtv.livetv.stb.utils.GlideApp;
 
 
@@ -106,7 +107,7 @@ public class VideoControllerView extends FrameLayout {
     private Button mInfoButton;
 
     private TextView mVideoTitle;
-    public TextView videoInfo;
+    public CustomTextView videoInfo;
     private ImageView mVideoLogo;
     /**
      *
@@ -614,9 +615,8 @@ public class VideoControllerView extends FrameLayout {
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
-        videoInfo = (TextView)v.findViewById(R.id.programName);
-        Typeface bold = Typeface.createFromAsset(mContext.getAssets(), "font/Exo2-Bold.otf");
-        videoInfo.setTypeface(bold);
+        videoInfo = (CustomTextView) v.findViewById(R.id.programName);
+        videoInfo.setFont(mContext.getString(R.string.font_exo_Bold));
         videoInfo.setVisibility(GONE);
         mVideoLogo = (ImageView) v.findViewById(R.id.video_logo);
 

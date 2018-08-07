@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -78,6 +79,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @BindView(R.id.btn_focus)
     Button focusHelper;
+    @BindView(R.id.layout_epg)
+    LinearLayout layoutEpg;
+    @BindView(R.id.layout_dvr)
+    LinearLayout layoutDvr;
+    @BindView(R.id.layout_fav)
+    LinearLayout layoutFav;
     @BindView(R.id.txt_title)
     TextView channelName;
     @BindView(R.id.ChannelDescription)
@@ -153,13 +160,35 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
         setUpRecylerViewCategory();
         playLastPlayedChannel();
-        gvChannelsList.setNextFocusRightId(txtEpg.getId());
+        gvChannelsList.setNextFocusRightId(layoutEpg.getId());
         txtEpg.setNextFocusUpId(categoryList.getId());
         txtDvr.setNextFocusUpId(categoryList.getId());
         txtFavUnfav.setNextFocusUpId(categoryList.getId());
         focusHelper.setOnFocusChangeListener((view1, b) -> {
             if (b)
-                txtEpg.requestFocus();
+                layoutEpg.requestFocus();
+        });
+
+        layoutEpg.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    txtEpg.setTextScaleX(1.5f);
+                }else{
+                    txtEpg.setTextScaleX(1.0f);
+                }
+            }
+        });
+
+        layoutDvr.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    txtDvr.setTextScaleX(1.5f);
+                }else {
+                    txtDvr.setTextScaleX(1.0f);
+                }
+            }
         });
 
 
@@ -273,6 +302,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedChannelPosition = position;
         setValues(adapter.getmList().get(position));
         stopPreview();
+        current = adapter.getmList().get(position);
         fetchPreview(adapter.getmList().get(position));
     }
 
@@ -417,14 +447,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
 
-    @OnClick(R.id.epg)
+    @OnClick(R.id.layout_epg)
     public void OnEpgClick(){
         EpgFragment fragment = new EpgFragment();
         fragment.setSelectedChannelId(selectedCurrentChannelId);
         mListener.load(fragment,"epg");
     }
 
-    @OnClick(R.id.dvr)
+    @OnClick(R.id.layout_dvr)
     public void OnDvrClick(){
         DvrFragment fragment = new DvrFragment();
         fragment.setCurrentChannel(current);
