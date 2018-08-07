@@ -11,6 +11,8 @@ import androidtv.livetv.stb.R;
 import timber.log.Timber;
 
 public class LinkConfig {
+    public static final String LOGIN_FILE_NAME = "androidtv_mylogin";
+    public static final String TOKEN_CONFIG_FILE_NAME ="authCode" ;
     public static final String ACCOUNT_PACKAGE="androidtv.myaccount.stb";
     public static final String BASE_URL ="https://middleware.yourman.info/" ;
     public static final String CHECK_IF_SERVER_RECHABLE = "https://middleware.yourman.info";
@@ -51,8 +53,11 @@ public class LinkConfig {
     public static final String CHANNEL_TABLE="channel_table";
     public static final String CATEGORY_TABLE="category_table";
     public static final String EPG_TABLE = "epg_table";
-    public  static final int  NO_CONNECTION=404;
+    public  static final int  NO_CONNECTION=400;
+    public static final int INVALID_HASH = 101;
+    public static final int INVALID_USER=102;
     public static final String CHANNEL_ID ="channel_id" ;
+    public static final String CATEGORY_FAVORITE = "Favorites";
     public static String getHashCode(String utc) {
       /*  String sessionId = null;
         try {

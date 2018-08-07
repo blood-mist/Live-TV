@@ -29,15 +29,16 @@ public class VideoPlayViewModel extends AndroidViewModel {
 
         channelListData = new MediatorLiveData<>();
         channelListData.setValue(null);
-        channelListData.addSource(videoPlayRepository.getAllChannels(), channelItemList -> channelListData.setValue(channelItemList));
+        LiveData<List<ChannelItem>> allChannelsData = videoPlayRepository.getAllChannels();
+        channelListData.addSource(allChannelsData, channelItemList -> channelListData.setValue(channelItemList));
 
 
     }
 
 
     public LiveData<ChannelLinkResponse> getChannelLink(String token, long utc, int id, String hashCode, int channelId) {
-        channelLinkResponseMediatorLiveData.addSource(videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId)),
-                channelLinkResponse -> channelLinkResponseMediatorLiveData.setValue(channelLinkResponse));
+        LiveData<ChannelLinkResponse> fetchChannels = videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId));
+        channelLinkResponseMediatorLiveData.addSource(fetchChannels, channelLinkResponse -> channelLinkResponseMediatorLiveData.setValue(channelLinkResponse));
         return channelLinkResponseMediatorLiveData;
     }
 

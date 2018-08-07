@@ -17,11 +17,14 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
 
+import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
+
 
 /**
  * Category Adapter
  */
 public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> {
+
     private final LayoutInflater mInflater;
 
     private List<CategoriesWithChannels> categoryItemList;
@@ -38,7 +41,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      *
      * @param context
      */
-    public CategoryAdapter(Context context,OnListClickListener lis) {
+    public CategoryAdapter(Context context, OnListClickListener lis) {
         mInflater = LayoutInflater.from(context);
         this.mListener = lis;
     }
@@ -124,7 +127,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
          * id = -1;
          */
         if (position == 0) {
-            holder.mTitleView.setText("All");
+            holder.mTitleView.setText("All Channels");
         } else {
             if (categoryItemList != null) {
                 categoryItem = categoryItemList.get(position - 1);
@@ -139,37 +142,50 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
          * final object created.
          */
         final CategoriesWithChannels finalCategoryItem = categoryItem;
-        holder.mCategoryLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mCategoryLayout.setOnClickListener(v -> {
 
-                selectedPos = position;
-                if(position == 0){
-                     mListener.onClickCategory("All Channels",allChannelList);
-                }else {
-                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(),finalCategoryItem.channelItemList);
-                }
+            selectedPos = position;
+            if (position == 0) {
+                mListener.onClickCategory("All Channels", allChannelList);
+            } else {
+                mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
             }
         });
 
         /**
          * when focus changes
          */
-        holder.mCategoryLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    holder.mTitleView.setSelected(true);
-                    holder.mCategoryLayout.setScaleY(1.02f);
-                } else {
-                    holder.mTitleView.setSelected(false);
-                    holder.mCategoryLayout.setScaleX(1.0f);
-                }
+        holder.mCategoryLayout.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                holder.mTitleView.setSelected(true);
+                holder.mCategoryLayout.setScaleY(1.02f);
+            } else {
+                holder.mTitleView.setSelected(false);
+                holder.mCategoryLayout.setScaleX(1.0f);
             }
         });
 
 
     }
+
+    public void addFavoriteItem(CategoriesWithChannels item) {
+        if (!categoryItemList.contains(item)) {
+            categoryItemList.add(0, item);
+            notifyItemInserted(1);
+        }
+    }
+
+    public void removeFavoriteItem() {
+        for (CategoriesWithChannels toCheckFavExists : categoryItemList) {
+            if (toCheckFavExists.categoryItem.getTitle().equalsIgnoreCase(CATEGORY_FAVORITE)) {
+                categoryItemList.remove(toCheckFavExists);
+                notifyItemRemoved(1);
+                break;
+            }
+        }
+
+    }
+
 
     /**
      * @return list count
@@ -188,7 +204,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     public interface OnListClickListener {
 
-        void onClickCategory(String categoryName,List <ChannelItem>channels);
+        void onClickCategory(String categoryName, List<ChannelItem> channels);
     }
 
 }

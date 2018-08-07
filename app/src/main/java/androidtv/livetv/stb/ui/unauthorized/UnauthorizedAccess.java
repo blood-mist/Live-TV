@@ -101,10 +101,10 @@ public class UnauthorizedAccess extends Activity {
         else
             /*mb.append("Box ID: " + macAddress.toUpperCase())
                     .append("\n")
-                    .append("Error Code: " + error_code)
+                    .append("LoginError Code: " + error_code)
                     .append("\n")
                     .append(error_message);*/
-            errorCode_txt.setText("Error Code: " + error_code);
+            errorCode_txt.setText("LoginError Code: " + error_code);
 
 //        messageView.setText(mb.toString());
         retry.setOnClickListener(new View.OnClickListener() {

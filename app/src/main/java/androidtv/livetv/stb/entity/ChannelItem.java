@@ -383,6 +383,15 @@ public class ChannelItem {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        ChannelItem item= (ChannelItem) obj;
+        if(item.getId()==getId())
+            return true;
+        else
+            return false;
+    }
+
+    @Override
     public String toString() {
         return
                 "ChannelItem{" +

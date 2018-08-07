@@ -70,8 +70,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     LinearLayout backgroundTransparent;
     @BindView(R.id.container_movie_player)
     FrameLayout errorFrame;
-    @BindView(R.id.scrollViewImage)
-    ImageView scrollImg;
     @BindView(R.id.videoSurfaceContainer)
     FrameLayout videoSurfaceContainer;
     @BindView(R.id.videoSurface)
@@ -424,7 +422,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
                 player.reset();
                 StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                Toast.makeText(VideoPlayActivity.this, "Error Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                 showMenu();
                 return true;
             });

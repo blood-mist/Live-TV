@@ -4,20 +4,20 @@ import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("com.robohorse.robopojogenerator")
-public class UserCheckInfo{
+public class VersionErrorResponse{
 
-	@SerializedName("data")
-	private Data data;
+	@SerializedName("message")
+	private String message;
 
 	@SerializedName("status")
 	private int status;
 
-	public void setData(Data data){
-		this.data = data;
+	public void setMessage(String message){
+		this.message = message;
 	}
 
-	public Data getData(){
-		return data;
+	public String getMessage(){
+		return message;
 	}
 
 	public void setStatus(int status){
@@ -31,8 +31,8 @@ public class UserCheckInfo{
 	@Override
  	public String toString(){
 		return 
-			"UserCheckInfo{" + 
-			"data = '" + data + '\'' + 
+			"VersionErrorResponse{" + 
+			"message = '" + message + '\'' + 
 			",status = '" + status + '\'' + 
 			"}";
 		}

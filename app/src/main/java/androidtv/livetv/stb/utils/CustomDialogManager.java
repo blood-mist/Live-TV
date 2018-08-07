@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.LoginError;
 import androidtv.livetv.stb.ui.splash.SplashActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -163,10 +164,10 @@ public class CustomDialogManager {
     }
 
     private void setTypeFace() {
-        light = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Light.otf");
-        medium = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Medium.otf");
-        semibold = Typeface.createFromAsset(context.getAssets(), "font/Exo2-SemiBold.otf");
-        regular = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Regular_0.otf");
+        light = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Light.ttf");
+        medium = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Medium.ttf");
+        semibold = Typeface.createFromAsset(context.getAssets(), "font/Exo2-SemiBold.ttf");
+        regular = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Regular.ttf");
         alertTitle.setText(title);
         alertTitle.setTypeface(semibold);
         MacTextViewFixed.setTypeface(semibold);
@@ -461,7 +462,7 @@ public class CustomDialogManager {
         if (error_code.equalsIgnoreCase("null") || error_code.equals("")) {
             errorCodeTextView.setVisibility(View.GONE);
         } else {
-            errorCodeTextView.setText("Error Code:" + error_code);
+            errorCodeTextView.setText("LoginError Code:" + error_code);
         }
     }
 
@@ -548,40 +549,36 @@ public class CustomDialogManager {
 
             noInternet.addDissmissButtonToDialog();
 
-            noInternet.setNeutralButton(context.getString(R.string.btn_settings), new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    noInternet.dismiss();
-                    //  MarketAppDetailParser.openApk(context, MarketAppDetailParser.MyNITVSettings);
+            noInternet.setNeutralButton(context.getString(R.string.btn_settings), view -> {
+                noInternet.dismiss();
 
+                try {
                     try {
-                        try {
 
+                        Intent intent = new Intent();
+                        intent.setComponent(new ComponentName("com.rk_itvui.settings", "com.rk_itvui.settings.Settings"));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                        ((Activity) context).finish();
+                    } catch (Exception e) {
+                        try {
+                            Intent LaunchIntent = context.getPackageManager().getLaunchIntentForPackage("com.giec.settings");
+                            context.startActivity(LaunchIntent);
+                            ((Activity) context).finish();
+                        } catch (Exception c) {
                             Intent intent = new Intent();
-                            intent.setComponent(new ComponentName("com.rk_itvui.settings", "com.rk_itvui.settings.Settings"));
+                            intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings"));
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
                             ((Activity) context).finish();
-                        } catch (Exception e) {
-                            try {
-                                Intent LaunchIntent = context.getPackageManager().getLaunchIntentForPackage("com.giec.settings");
-                                context.startActivity(LaunchIntent);
-                                ((Activity) context).finish();
-                            } catch (Exception c) {
-                                Intent intent = new Intent();
-                                intent.setComponent(new ComponentName("com.android.settings", "com.android.settings.Settings"));
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(intent);
-                                ((Activity) context).finish();
-                            }
                         }
-
-
-                    } catch (Exception a) {
-                        context.startActivity(
-                                new Intent(Settings.ACTION_SETTINGS));
-                        ((Activity) context).finish();
                     }
+
+
+                } catch (Exception a) {
+                    context.startActivity(
+                            new Intent(Settings.ACTION_SETTINGS));
+                    ((Activity) context).finish();
                 }
             });
 
@@ -591,26 +588,16 @@ public class CustomDialogManager {
                 noInternet.finishActivityonDismissPressed(context);
                 noInternet.finishActivityOnBackPressed(context);
 
-                noInternet.setPositiveButton(context.getString(R.string.btn_reconnect), new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent i = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        noInternet.dismiss();
-                        context.startActivity(i);
-                        ((Activity) context).finish();
-
-                    }
-                });
-
-                noInternet.getInnerObject().setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-
-                        ((Activity) context).finish();
-                    }
+                noInternet.setPositiveButton(context.getString(R.string.btn_reconnect), view -> {
+                    Intent i = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    noInternet.dismiss();
+                    context.startActivity(i);
+                    ((Activity) context).finish();
 
                 });
+
+                noInternet.getInnerObject().setOnCancelListener(dialogInterface -> ((Activity) context).finish());
             }
             return noInternet;
         }
@@ -636,14 +623,21 @@ public class CustomDialogManager {
         error.build();
         error.showMacAndVersion();
         error.setMessage("null", context.getString(R.string.err_json_exception));
-        error.setExtraButton(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                error.dismiss();
-                ((Activity) context).finish();
+        error.setExtraButton(v -> {
+            error.dismiss();
+            ((Activity) context).finish();
 
-            }
         });
+        error.show();
+    }
+
+    public static void loginErrorDialog(Context context, LoginError loginError){
+        final CustomDialogManager error = new CustomDialogManager(context, CustomDialogManager.ALERT);
+        error.build();
+        error.showMacAndVersion();
+        error.setMessage(String.valueOf(loginError.getErrorCode()),loginError.getMessage());
+        error.setExtraButton(v -> error.dismiss());
+        error.setNeutralButton(context.getString(R.string.btn_retry), view -> error.dismiss());
         error.show();
     }
 

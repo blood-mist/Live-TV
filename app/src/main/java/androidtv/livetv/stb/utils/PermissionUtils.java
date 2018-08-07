@@ -131,9 +131,6 @@ public class PermissionUtils
      */
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
     {
-        switch (requestCode)
-        {
-            case 1:
                 if(grantResults.length>0)
                 {
                     Map<String, Integer> perms = new HashMap<>();
@@ -198,8 +195,6 @@ public class PermissionUtils
 
 
                 }
-                break;
-        }
     }
 
 

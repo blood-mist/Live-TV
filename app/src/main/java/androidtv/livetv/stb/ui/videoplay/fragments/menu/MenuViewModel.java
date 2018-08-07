@@ -31,9 +31,7 @@ public class MenuViewModel extends AndroidViewModel {
         previewData.setValue(null);
         catChannelData.setValue(null);
         LiveData<List<CategoriesWithChannels>> categoriesWithChannelsData=menuRepository.getCategoriesWithChannels();
-        catChannelData.addSource(categoriesWithChannelsData, categoriesWithChannels -> {
-            catChannelData.setValue(categoriesWithChannels);
-        });
+        catChannelData.addSource(categoriesWithChannelsData, categoriesWithChannels -> catChannelData.setValue(categoriesWithChannels));
         lastPlayedData = new MediatorLiveData<>();
         lastPlayedData.setValue(null);
 

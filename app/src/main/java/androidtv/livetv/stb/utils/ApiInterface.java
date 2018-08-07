@@ -34,21 +34,21 @@ public interface ApiInterface {
     Observable<Response<GeoAccessInfo>> checkGeoAccess();
 
     @GET(LinkConfig.LINK_SEVER_APKs)
-    Observable<Response<List<AppVersionInfo>>> checkForAppVersion(@Query("macAddress") String macAddress, @Query("versionCode") int versionCode
+    Observable<Response<ResponseBody>> checkForAppVersion(@Query("macAddress") String macAddress, @Query("versionCode") int versionCode
             , @Query("versionName") String versionName, @Query("packageName") String packageName);
 
     @GET
     Call<ResponseBody> downloadFile(@Url String fileUrl);
 
     @GET(LinkConfig.CHECK_VALIDITY_ACTIVATION_APPROVAL)
-    Observable<Response<UserCheckInfo>> checkUserStatus(@Query("boxId") String macAddress);
+    Observable<Response<ResponseBody>> checkUserStatus(@Query("boxId") String macAddress);
 
     @POST(LinkConfig.LOGIN_BUTTON_CLICK)
     @FormUrlEncoded
-    Observable<Response<LoginInfo>> signIn(@Field("uname") String userEmail, @Field("pswd") String userPassword, @Field("boxId") String boxId);
+    Observable<Response<ResponseBody>> signIn(@Field("uname") String userEmail, @Field("pswd") String userPassword, @Field("boxId") String boxId);
 
     @GET(LinkConfig.CATEGORY_URL)
-    Observable<Response<CatChannelInfo>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);
+    Observable<Response<ResponseBody>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);
 
     @GET(LinkConfig.GET_UTC)
     Observable<Response<TimeStampEntity>> getTimestamp();

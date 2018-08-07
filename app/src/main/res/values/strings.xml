@@ -15,7 +15,7 @@
     <string name="btn_reconnect">Re-connect</string>
     <string name="no_internet_title">No Connection</string>
     <string name="no_internet_body">Couldn\'t connect to the server. Please try again.</string>
-    <string name="btn_settings">ettings</string>
+    <string name="btn_settings">Settings</string>
 
 
     <string name="msg_feature_not_available">This feature is not available.</string>
@@ -164,6 +164,9 @@
     <string name="dvr">DVR</string>
     <string name="set_fav">Set Fav</string>
     <string name="bought">BOUGHT</string>
+    <string name="session_expired">Your previous session expired.Please re-login</string>
+    <string name="channel_rm_fav">has been removed from favorites</string>
+    <string name="channel_set_fav">has been added to favorites</string>
 
 
 </resources>
