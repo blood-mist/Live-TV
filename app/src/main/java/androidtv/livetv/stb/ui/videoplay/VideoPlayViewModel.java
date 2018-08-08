@@ -36,8 +36,8 @@ public class VideoPlayViewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<ChannelLinkResponse> getChannelLink(String token, long utc, int id, String hashCode, int channelId) {
-        LiveData<ChannelLinkResponse> fetchChannels = videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId));
+    public LiveData<ChannelLinkResponse> getChannelLink(String token, long utc, int id, String hashCode, String macAddress,int channelId) {
+        LiveData<ChannelLinkResponse> fetchChannels = videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode),macAddress, String.valueOf(channelId));
         channelLinkResponseMediatorLiveData.addSource(fetchChannels, channelLinkResponse -> channelLinkResponseMediatorLiveData.setValue(channelLinkResponse));
         return channelLinkResponseMediatorLiveData;
     }

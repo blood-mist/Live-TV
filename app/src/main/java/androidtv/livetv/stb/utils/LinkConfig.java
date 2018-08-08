@@ -18,6 +18,7 @@ public class LinkConfig {
     public static final String CHECK_IF_SERVER_RECHABLE = "https://middleware.yourman.info";
     public static final String CHANNEL_LOGO_URL = "uploads/channel/";
     public static final String CHANNEL_LINK_URL = "api/v1/livetv/getchannels";
+    public static final String NEW_CHANNEL_LINK="api/v1/livetv/package_validation";
     public static final String EXTRA_LINK_URL = "api/v1/livetv/internet";
 
 

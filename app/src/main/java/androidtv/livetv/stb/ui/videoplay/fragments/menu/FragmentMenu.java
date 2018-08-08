@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -79,8 +82,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         // Required empty public constructor
     }
 
-    @BindView(R.id.btn_focus)
-    Button focusHelper;
     @BindView(R.id.txt_title)
     TextView channelName;
     @BindView(R.id.ChannelDescription)
@@ -105,6 +106,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     VideoView previewView;
     @BindView(R.id.preview_container)
     FrameLayout previewContainer;
+    @BindView(R.id.epg)
+    ImageView btnEpg;
+
+    @BindView(R.id.dvr)
+    ImageView btnDvr;
+
+    @BindView(R.id.fav)
+    ImageView btnFav;
+
 
 
     public int getCatId() {
@@ -148,13 +158,65 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
         setUpRecylerViewCategory();
         playLastPlayedChannel();
-        gvChannelsList.setNextFocusRightId(txtEpg.getId());
-        txtEpg.setNextFocusUpId(categoryList.getId());
-        txtDvr.setNextFocusUpId(categoryList.getId());
-        txtFavUnfav.setNextFocusUpId(categoryList.getId());
-        focusHelper.setOnFocusChangeListener((view1, b) -> {
-            if (b)
-                txtEpg.requestFocus();
+        btnEpg.setNextFocusUpId(categoryList.getId());
+        btnDvr.setNextFocusUpId(categoryList.getId());
+        btnFav.setNextFocusUpId(categoryList.getId());
+        btnFav.setOnFocusChangeListener((view12, hasFocus) -> {
+            if (hasFocus) {
+                btnFav.setScaleX(1.4f);
+                btnFav.setScaleY(1.4f);
+                txtFavUnfav.setScaleX(1.3f);
+                txtFavUnfav.setScaleY(1.3f);
+                txtFavUnfav.setTextColor(getResources().getColor(R.color.white));
+                btnFav.setColorFilter(getResources().getColor(R.color.white));
+
+            } else {
+                txtFavUnfav.setTextColor(getResources().getColor(R.color.dvr_text_color));
+                btnFav.setColorFilter(getResources().getColor(R.color.dvr_text_color));
+                btnFav.setScaleX(1.0f);
+                btnFav.setScaleY(1.0f);
+                txtFavUnfav.setScaleX(1.0f);
+                txtFavUnfav.setScaleY(1.0f);
+            }
+        });
+
+        btnDvr.setOnFocusChangeListener((view1, hasFocus) -> {
+            if (hasFocus) {
+                btnDvr.setScaleX(1.4f);
+                btnDvr.setScaleY(1.4f);
+                txtDvr.setScaleX(1.3f);
+                txtDvr.setScaleY(1.3f);
+                txtDvr.setTextColor(getResources().getColor(R.color.white));
+                btnDvr.setColorFilter(getResources().getColor(R.color.white));
+
+            } else {
+                txtDvr.setTextColor(getResources().getColor(R.color.dvr_text_color));
+                btnDvr.setColorFilter(getResources().getColor(R.color.dvr_text_color));
+                btnDvr.setScaleX(1.0f);
+                btnDvr.setScaleY(1.0f);
+                txtDvr.setScaleX(1.0f);
+                txtDvr.setScaleY(1.0f);
+            }
+
+        });
+
+        btnEpg.setOnFocusChangeListener((view1, hasFocus) -> {
+            if (hasFocus) {
+                btnEpg.setScaleX(1.4f);
+                btnEpg.setScaleY(1.4f);
+                txtEpg.setScaleX(1.3f);
+                txtEpg.setScaleY(1.3f);
+                txtDvr.setTextColor(getResources().getColor(R.color.white));
+                btnDvr.setColorFilter(getResources().getColor(R.color.white));
+
+            } else {
+                txtEpg.setTextColor(getResources().getColor(R.color.dvr_text_color));
+                btnEpg.setColorFilter(getResources().getColor(R.color.dvr_text_color));
+                btnEpg.setScaleX(1.0f);
+                btnEpg.setScaleY(1.0f);
+                txtEpg.setScaleX(1.0f);
+                txtEpg.setScaleY(1.0f);
+            }
         });
 
 
@@ -259,10 +321,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             adapter.setChannelItems(items);
             selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
         }
-        //        menuViewModel.getChannels(id).observe(this, channelItems -> {
-//            adapter.setChannelItems(channelItems);
-//
-//        });
     }
 
     /**
@@ -299,10 +357,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     @Override
     public void onChannelFocused(int position) {
+        gvChannelsList.findViewHolderForLayoutPosition(position).itemView.setNextFocusRightId(btnEpg.getId());
         selectedChannelPosition = position;
         setValues(adapter.getmList().get(position));
         stopPreview();
         fetchPreview(adapter.getmList().get(position));
+
     }
 
     /**
@@ -383,7 +443,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onDetach();
     }
 
-    @OnClick(R.id.txt_fav_unfav)
+    @OnClick(R.id.fav)
     public void onFavClick() {
         ChannelItem selectedChannel = adapter.getmList().get(selectedChannelPosition);
         int toFavUnfavId = selectedChannel.getId();

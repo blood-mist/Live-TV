@@ -59,10 +59,10 @@ public class VideoPlayRepository {
         return channelList;
     }
 
-    public LiveData<ChannelLinkResponse> getChannelLink(String token, long utc, String userId, String hashValue, String channelId) {
+    public LiveData<ChannelLinkResponse> getChannelLink(String token, long utc, String userId, String hashValue,String macAddress, String channelId) {
         MediatorLiveData<ChannelLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue, channelId);
+        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue,macAddress, channelId);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
                     @Override

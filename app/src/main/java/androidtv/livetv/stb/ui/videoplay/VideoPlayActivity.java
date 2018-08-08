@@ -96,16 +96,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private SharedPreferences.Editor editor;
     private int selectedChannelId;
+    String macAddress;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
-        lastPlayedPrefs= PreferenceManager.getDefaultSharedPreferences(this);
+        lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
         hideMenuHandler = new Handler();
-        txtRandomDisplayBoxId.setText(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
+        macAddress = AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this);
+        txtRandomDisplayBoxId.setText(macAddress);
         menuFragment = new FragmentMenu();
         channelChangeObservable = new ChannelChangeObserver();
         channelChangeObservable.addObserver(menuFragment);
@@ -120,7 +122,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
     public void openErrorFragment() {
-        Toast.makeText(this,"Last Playing Channel error ",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Last Playing Channel error ", Toast.LENGTH_LONG).show();
     }
 
     private void initSurafaceView() {
@@ -325,15 +327,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     public void playChannel(ChannelItem item) {
-        Timber.d("Played Channel:"+item.getName());
+        Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
         showProgressBar();
 
         long utc = GetUtc.getInstance().getTimestamp().getUtc();
         Login login = GlobalVariables.login;
         videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
-                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-                item.getId()).observe(this, channelLinkResponse -> {
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
+                        login.getSession()), macAddress, item.getId()).observe(this, channelLinkResponse -> {
             if (channelLinkResponse != null) {
                 playVideo(channelLinkResponse.getChannel().getLink());
             }
@@ -344,17 +346,16 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void saveCurrentInPrefs(ChannelItem item) {
-        lastPlayedPrefs= PreferenceManager.getDefaultSharedPreferences(this);
-        editor=lastPlayedPrefs.edit();
-        editor.putInt(CHANNEL_ID,item.getId());
+        lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = lastPlayedPrefs.edit();
+        editor.putInt(CHANNEL_ID, item.getId());
         editor.apply();
     }
 
     @Override
-    public void load(Fragment epgFragment,String tag) {
-        openFragmentWithBackStack(epgFragment,tag );
+    public void load(Fragment epgFragment, String tag) {
+        openFragmentWithBackStack(epgFragment, tag);
     }
-
 
 
     @Override
