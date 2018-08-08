@@ -3,8 +3,7 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
+
 
 
 import java.util.List;

@@ -40,6 +40,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
     public void setPositionSelected(int positionSelected) {
         this.positionSelected = positionSelected;
+        notifyDataSetChanged();
     }
 
     public ChannelListAdapter(Context context, ChannelListClickListener lis) {
@@ -72,6 +73,10 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             holder.fav.setVisibility(View.VISIBLE);
         else
             holder.fav.setVisibility(GONE);
+
+        if(getPositionSelected() == position){
+            holder.relativeLayout.requestFocus();
+        }
     }
 
     @Override

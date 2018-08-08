@@ -100,257 +100,257 @@
 
         </LinearLayout>
 
-            <LinearLayout
+        <LinearLayout
 
-                android:layout_width="match_parent"
-                android:layout_height="230dp"
-                android:background="@color/transp"
-                android:padding="25dp"
-                android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:background="@color/transp"
+            android:padding="25dp"
+            android:layout_gravity="bottom"
+            android:focusable="false"
+            android:layout_alignParentBottom="true"
+            android:importantForAccessibility="auto"
+            android:orientation="horizontal"
+            android:weightSum="6">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingStart="20dp"
                 android:focusable="false"
-                android:layout_alignParentBottom="true"
                 android:importantForAccessibility="auto"
-                android:orientation="horizontal"
-                android:weightSum="6">
+                tools:ignore="RtlSymmetry">
 
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4"
-                    android:orientation="vertical"
-                    android:paddingLeft="20dp"
-                    android:paddingStart="20dp"
+                <LinearLayout
+                    android:id="@+id/txt_descTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:focusable="false"
-                    android:importantForAccessibility="auto"
-                    tools:ignore="RtlSymmetry">
-
-                    <LinearLayout
-                        android:id="@+id/txt_descTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:focusable="false"
-                        android:importantForAccessibility="noHideDescendants"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:padding="5dp"
-                        android:layout_alignParentLeft="true">
-
-                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                            android:id="@+id/txt_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:maxLines="1"
-                            android:maxWidth="200dp"
-                            android:focusable="false"
-                            android:importantForAccessibility="noHideDescendants"
-                            app:fontAssetName="@string/font_exo_Light"
-                            android:text="@string/txt_empty"
-                            android:textColor="@color/color_white"
-                            android:textSize="25sp" />
-
-                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                            android:id="@+id/amount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:background="@drawable/rectangle_grey"
-                            android:padding="5dp"
-                            android:focusable="false"
-                            android:importantForAccessibility="noHideDescendants"
-                            android:textColor="@color/text_color"
-                            app:fontAssetName="@string/font_exo_semi_bold"
-                            android:text="@string/txt_empty"
-                            android:textSize="12sp" />
-
-                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                            android:id="@+id/channelNo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="5dp"
-                            android:focusable="false"
-                            android:importantForAccessibility="noHideDescendants"
-                            android:padding="3dp"
-                            app:fontAssetName="@string/font_exo_Bold"
-                            android:text="@string/txt_empty"
-                            android:textColor="@color/red_selector"
-                            android:textSize="30sp" />
-
-                    </LinearLayout>
-
+                    android:importantForAccessibility="noHideDescendants"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:padding="5dp"
+                    android:layout_alignParentLeft="true">
 
                     <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                        android:id="@+id/ChannelDescription"
-                        android:layout_width="match_parent"
-                        android:layout_below="@+id/txt_descTitle"
-                        android:layout_height="60dp"
-                        android:layout_margin="5dp"
-                        android:textColor="@color/text_color"
-                        android:maxLines="4"
-                        android:minLines="3"
+                        android:id="@+id/txt_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:maxLines="1"
+                        android:maxWidth="200dp"
                         android:focusable="false"
                         android:importantForAccessibility="noHideDescendants"
-                        android:layout_alignParentStart="true"
                         app:fontAssetName="@string/font_exo_Light"
-                        android:paddingBottom="5dp"
-                        android:textSize="17sp"
-                        android:layout_alignParentLeft="true" />
+                        android:text="@string/txt_empty"
+                        android:textColor="@color/color_white"
+                        android:textSize="25sp" />
+
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                        android:id="@+id/amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/rectangle_grey"
+                        android:padding="5dp"
+                        android:focusable="false"
+                        android:importantForAccessibility="noHideDescendants"
+                        android:textColor="@color/text_color"
+                        app:fontAssetName="@string/font_exo_semi_bold"
+                        android:text="@string/txt_empty"
+                        android:textSize="12sp" />
+
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                        android:id="@+id/channelNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:focusable="false"
+                        android:importantForAccessibility="noHideDescendants"
+                        android:padding="3dp"
+                        app:fontAssetName="@string/font_exo_Bold"
+                        android:text="@string/txt_empty"
+                        android:textColor="@color/red_selector"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                    android:id="@+id/ChannelDescription"
+                    android:layout_width="match_parent"
+                    android:layout_below="@+id/txt_descTitle"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:textColor="@color/text_color"
+                    android:maxLines="4"
+                    android:minLines="3"
+                    android:focusable="false"
+                    android:importantForAccessibility="noHideDescendants"
+                    android:layout_alignParentStart="true"
+                    app:fontAssetName="@string/font_exo_Light"
+                    android:paddingBottom="5dp"
+                    android:textSize="17sp"
+                    android:layout_alignParentLeft="true" />
+
+
+                <LinearLayout
+                    android:layout_below="@+id/ChannelDescription"
+                    android:layout_width="match_parent"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    android:layout_gravity="bottom"
+                    android:focusable="false"
+                    android:importantForAccessibility="auto"
+                    android:gravity="bottom"
+                    android:weightSum="11"
+                    android:baselineAligned="false">
 
 
                     <LinearLayout
-                        android:layout_below="@+id/ChannelDescription"
-                        android:layout_width="match_parent"
-                        android:layout_alignParentBottom="true"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:visibility="visible"
-                        android:layout_gravity="bottom"
+                        android:id="@+id/layout_epg"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
                         android:focusable="false"
                         android:importantForAccessibility="auto"
-                        android:gravity="bottom"
-                        android:weightSum="11"
-                        android:baselineAligned="false">
+                        android:orientation="horizontal">
 
+                        <ImageView
+                            android:id="@+id/epg"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:importantForAccessibility="yes"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:focusableInTouchMode="true"
+                            android:src="@drawable/main_epg_selector"
+                            android:layout_marginStart="10dp" />
 
-                        <LinearLayout
-
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="2"
-                            android:gravity="center"
+                        <TextView
+                            android:id="@+id/txt_epg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
                             android:focusable="false"
-                            android:importantForAccessibility="auto"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:id="@+id/epg"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginLeft="10dp"
-                                android:importantForAccessibility="yes"
-                                android:focusable="true"
-                                android:clickable="true"
-                                android:focusableInTouchMode="true"
-                                android:src="@drawable/main_epg_selector"
-                                android:layout_marginStart="10dp" />
-
-                            <TextView
-                                android:id="@+id/txt_epg"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="15dp"
-                                android:focusable="false"
-                                android:importantForAccessibility="no"
-                                android:textColor="@color/dvr_text_color"
-                                android:gravity="center_vertical"
-                                android:singleLine="true"
-                                android:text="@string/epg"
-                                android:textSize="15sp"
-                                android:layout_marginStart="15dp" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="2"
-                            android:gravity="center"
-                            android:focusable="false"
-                            android:importantForAccessibility="auto"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:id="@+id/dvr"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginLeft="10dp"
-                                android:importantForAccessibility="yes"
-                                android:focusable="true"
-                                android:clickable="true"
-                                android:src="@drawable/main_dvr_selector"
-                                android:layout_marginStart="10dp" />
-
-                            <TextView
-                                android:id="@+id/txt_dvr"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="15dp"
-                                android:gravity="center_vertical"
-                                android:singleLine="true"
-                                android:textColor="@color/dvr_text_color"
-                                android:text="@string/dvr"
-                                android:focusable="false"
-                                android:importantForAccessibility="no"
-                                android:textSize="15sp"
-                                android:layout_marginStart="15dp" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="2.4"
+                            android:importantForAccessibility="no"
+                            android:textColor="@color/dvr_text_color"
                             android:gravity="center_vertical"
-                            android:focusable="false"
-                            android:importantForAccessibility="auto"
-                            android:orientation="horizontal">
+                            android:singleLine="true"
+                            android:text="@string/epg"
+                            android:textSize="15sp"
+                            android:layout_marginStart="15dp" />
 
-                            <ImageView
-                                android:id="@+id/fav"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginLeft="10dp"
-                                android:importantForAccessibility="yes"
-                                android:focusable="true"
-                                android:src="@drawable/main_fav_selector"
-                                android:layout_marginStart="10dp" />
-
-                            <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                                android:id="@+id/txt_fav_unfav"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginLeft="15dp"
-                                android:gravity="center"
-                                android:singleLine="true"
-                                android:text="@string/set_fav"
-                                android:textColor="@color/dvr_text_color"
-                                android:focusable="false"
-                                android:importantForAccessibility="no"
-                                app:fontAssetName="@string/font_exo_regular"
-                                android:textAllCaps="true"
-                                android:textSize="15sp"
-                                android:layout_marginStart="15dp" />
-
-                        </LinearLayout>
                     </LinearLayout>
-                </RelativeLayout>
 
-                <FrameLayout
-                    android:id="@+id/preview_container"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="visible"
-                    android:background="@color/color_black">
+                    <LinearLayout
+                        android:id="@+id/layout_dvr"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:focusable="false"
+                        android:importantForAccessibility="auto"
+                        android:orientation="horizontal">
 
-                    <VideoView
-                        android:id="@+id/preview_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        <ImageView
+                            android:id="@+id/dvr"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:importantForAccessibility="yes"
+                            android:focusable="true"
+                            android:clickable="true"
+                            android:src="@drawable/main_dvr_selector"
+                            android:layout_marginStart="10dp" />
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/txt_dvr"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:textColor="@color/dvr_text_color"
+                            android:text="@string/dvr"
+                            android:focusable="false"
+                            android:importantForAccessibility="no"
+                            android:textSize="15sp"
+                            android:layout_marginStart="15dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_fav"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2.4"
+                        android:gravity="center_vertical"
+                        android:focusable="false"
+                        android:importantForAccessibility="auto"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/fav"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="10dp"
+                            android:importantForAccessibility="yes"
+                            android:focusable="true"
+                            android:src="@drawable/main_fav_selector"
+                            android:layout_marginStart="10dp" />
+
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
+                            android:id="@+id/txt_fav_unfav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dp"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="@string/set_fav"
+                            android:textColor="@color/dvr_text_color"
+                            android:focusable="false"
+                            android:importantForAccessibility="no"
+                            app:fontAssetName="@string/font_exo_regular"
+                            android:textAllCaps="true"
+                            android:textSize="15sp"
+                            android:layout_marginStart="15dp" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <FrameLayout
+                android:id="@+id/preview_container"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:background="@color/color_black">
+
+                <VideoView
+                    android:id="@+id/preview_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
 
 
-            </LinearLayout>
+        </LinearLayout>
 
 
         <Button

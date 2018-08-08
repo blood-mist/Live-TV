@@ -249,5 +249,6 @@ public class LoginActivity extends AppCompatActivity {
         channelLoadIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(channelLoadIntent);
         loginLoader.smoothToHide();
+        finish();
     }
 }

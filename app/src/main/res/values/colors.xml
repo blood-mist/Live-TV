@@ -37,6 +37,7 @@
     <color name="date_defocused">#929091</color>
     <color name="epg_prgm_name_defocused">#aeb0af</color>
     <color name="dvr_text_color">#9b9b9b</color>
+    <color name="darkgrey">#848484</color>
 
 
 </resources>

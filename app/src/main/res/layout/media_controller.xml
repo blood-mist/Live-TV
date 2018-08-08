@@ -194,7 +194,7 @@
         android:layout_height="100dp"/>
 
 
-    <TextView
+    <androidtv.livetv.stb.ui.custom_views.CustomTextView
         android:id="@+id/programName"
         android:layout_width="match_parent"
         android:textSize="30sp"

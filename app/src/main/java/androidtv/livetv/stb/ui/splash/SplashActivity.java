@@ -205,20 +205,20 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
         Completable.fromRunnable(() -> {
-                    for(int i=0;i<channels.size();i++) {
-                      for(ChannelItem dbCHannelItem:channelItemList) {
-                        if(channels.get(i).getId()==dbCHannelItem.getId()) {
+            for(int i=0;i<channels.size();i++) {
+                for(ChannelItem dbCHannelItem:channelItemList) {
+                    if(channels.get(i).getId()==dbCHannelItem.getId()) {
                         channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
-                        }
-                      }
                     }
+                }
+            }
             saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
 
         }).subscribeOn(Schedulers.io()).subscribe().dispose();
 //        channels.forEach(channelItem -> channelItemList.stream().filter(channelItem1 -> channelItem1.getId() == channelItem.getId()).findAny().ifPresent(channelItem1 -> channelItem.setIs_fav(channelItem1.getIs_fav())));
 
 
-        }
+    }
 
 
 

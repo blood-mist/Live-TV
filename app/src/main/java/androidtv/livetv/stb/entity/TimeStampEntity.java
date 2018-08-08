@@ -3,11 +3,13 @@ package androidtv.livetv.stb.entity;
 import javax.annotation.Generated;
 import com.google.gson.annotations.SerializedName;
 
+
 @Generated("com.robohorse.robopojogenerator")
 public class TimeStampEntity{
 
 	@SerializedName("utc")
 	private int utc;
+
 
 	@SerializedName("status")
 	private int status;

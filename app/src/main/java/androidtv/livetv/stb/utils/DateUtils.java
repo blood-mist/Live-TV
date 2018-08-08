@@ -41,6 +41,12 @@ public class DateUtils {
 
         return date;
     }
+    public static Date convertStringToDateNew(String dateStr)throws ParseException {
+
+        Date date = dateAndTime.parse(dateStr);
+
+        return date;
+    }
     public static Date addMinutesToDate(int minutes, Date beforeTime) throws ParseException {
         final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
 

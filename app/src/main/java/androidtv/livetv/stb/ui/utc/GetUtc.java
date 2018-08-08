@@ -12,8 +12,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class GetUtc {
+
     private static ApiInterface apiInterface;
     private static GetUtc getUtc;
+
     private TimeStampEntity timeStampEntity;
 
     private GetUtc(ApiInterface apiInterface) {
@@ -21,8 +23,7 @@ public class GetUtc {
     }
 
     public static GetUtc getInstance() {
-        if (getUtc == null)
-            getUtc = new GetUtc(apiInterface);
+        GetUtc getUtc= new GetUtc(apiInterface);
         return getUtc;
 
     }
@@ -40,6 +41,7 @@ public class GetUtc {
                         public void onSubscribe(Disposable d) {
 
                         }
+
 
                         @Override
                         public void onNext(Response<TimeStampEntity> timeStampEntityResponse) {
