@@ -98,6 +98,12 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        if(mList != null && mList.size()>0){
+            mList.clear();
+            notifyDataSetChanged();
+        }
+    }
 
 
     public interface OnClickDvrList {

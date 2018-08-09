@@ -164,10 +164,10 @@ public class CustomDialogManager {
     }
 
     private void setTypeFace() {
-        light = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Light.ttf");
-        medium = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Medium.ttf");
-        semibold = Typeface.createFromAsset(context.getAssets(), "font/Exo2-SemiBold.ttf");
-        regular = Typeface.createFromAsset(context.getAssets(), "font/Exo2-Regular.ttf");
+        light = Typeface.createFromAsset(context.getAssets(), "Exo2-Light.otf");
+        medium = Typeface.createFromAsset(context.getAssets(), "Exo2-Medium.otf");
+        semibold = Typeface.createFromAsset(context.getAssets(), "Exo2-SemiBold.otf");
+        regular = Typeface.createFromAsset(context.getAssets(), "Exo2-Regular_0.otf");
         alertTitle.setText(title);
         alertTitle.setTypeface(semibold);
         MacTextViewFixed.setTypeface(semibold);

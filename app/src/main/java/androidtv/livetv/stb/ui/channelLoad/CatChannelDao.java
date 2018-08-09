@@ -21,7 +21,7 @@ public interface CatChannelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertCategory(List<CategoryItem> categoryItemList);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEpgs(List<Epgs> epgList);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

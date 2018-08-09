@@ -54,6 +54,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 
 
+import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.utils.LinkConfig;
 
 import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
@@ -179,10 +180,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
         setUpRecylerViewCategory();
         playLastPlayedChannel();
-        btnEpg.setNextFocusUpId(categoryList.getId());
-        btnDvr.setNextFocusUpId(categoryList.getId());
-        btnFav.setNextFocusUpId(categoryList.getId());
-        btnFav.setOnFocusChangeListener((view12, hasFocus) -> {
+        layoutEpg.setNextFocusUpId(categoryList.getId());
+        layoutDvr.setNextFocusUpId(categoryList.getId());
+        layoutFav.setNextFocusUpId(categoryList.getId());
+        layoutFav.setOnFocusChangeListener((view12, hasFocus) -> {
             if (hasFocus) {
                 btnFav.setScaleX(1.4f);
                 btnFav.setScaleY(1.4f);
@@ -201,7 +202,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }
         });
 
-        btnDvr.setOnFocusChangeListener((view1, hasFocus) -> {
+        layoutDvr.setOnFocusChangeListener((view1, hasFocus) -> {
             if (hasFocus) {
                 btnDvr.setScaleX(1.4f);
                 btnDvr.setScaleY(1.4f);
@@ -222,7 +223,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
         });
 
-        btnEpg.setOnFocusChangeListener((view1, hasFocus) -> {
+        layoutEpg.setOnFocusChangeListener((view1, hasFocus) -> {
             if (hasFocus) {
                 btnEpg.setScaleX(1.4f);
                 btnEpg.setScaleY(1.4f);
@@ -278,14 +279,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
                 menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
                     if (categoriesWithChannels != null) {
-                        adapter.setCategory(categoriesWithChannels);
-                        CategoriesWithChannels item = categoriesWithChannels.get(1);
-                        List<ChannelItem> channelItems = item.channelItemList;
-                        Log.d(TAG, channelItems.size() + "");
-                        io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+                            adapter.setCategory(categoriesWithChannels);
+                            CategoriesWithChannels item = categoriesWithChannels.get(1);
+                            List<ChannelItem> channelItems = item.channelItemList;
+                            Log.d(TAG, channelItems.size() + "");
+                            io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+
 
                     }
                 });
+
 
 
             }
@@ -389,7 +392,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
              */
             @Override
             public void onChannelFocused ( int position){
-                gvChannelsList.findViewHolderForLayoutPosition(position).itemView.setNextFocusRightId(btnEpg.getId());
+
+               gvChannelsList.findViewHolderForLayoutPosition(position).itemView.setNextFocusRightId(layoutEpg.getId());
                 selectedChannelPosition = position;
                 setValues(adapter.getmList().get(position));
                 stopPreview();
@@ -546,7 +550,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @OnClick(R.id.layout_epg)
     public void OnEpgClick(){
         EpgFragment fragment = new EpgFragment();
-        fragment.setSelectedChannelId(selectedCurrentChannelId);
+        fragment.setCurrentSelectedChannel(current);
         mListener.load(fragment, "epg");
     }
 
@@ -555,6 +559,21 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         DvrFragment fragment = new DvrFragment();
         fragment.setCurrentChannel(current);
         mListener.load(fragment,"Dvr");
+    }
+
+    public void showErrorFrag(ErrorFragment errorFragment) {
+      getChildFragmentManager().beginTransaction().replace(R.id.error_layout,errorFragment).commit();
+    }
+
+    public void hideErrorFrag() {
+        ErrorFragment menuFrag = (ErrorFragment) getChildFragmentManager().findFragmentById(R.id.error_layout);
+        if (menuFrag != null)
+            getChildFragmentManager().beginTransaction().hide(menuFrag).commit();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+
     }
 
     public interface FragmentMenuInteraction {

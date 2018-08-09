@@ -65,7 +65,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
                     holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
                     holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
                     // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
-                    holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#9e1e27"));
+                    holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#8F5B282C"));
                 } else if (hasFocus) {
                     holder.prgmDetails.setFont(mContext.getResources().getString(R.string.font_exo_Bold));
                     holder.prgmDetails.setScaleX(1.05f);

@@ -5,7 +5,6 @@
     android:focusable="true"
     android:clickable="true"
     android:layout_gravity="center"
-    android:focusableInTouchMode="true"
     android:importantForAccessibility="yes"
     android:background="@drawable/main_channel_list_selector">
 

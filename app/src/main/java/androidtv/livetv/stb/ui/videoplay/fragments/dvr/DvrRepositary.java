@@ -83,18 +83,24 @@ public class DvrRepositary {
                     public void onNext(Response<EpgResponse> epgResponseResponse) {
                         if (epgResponseResponse.code() == 200) {
                             EpgResponse response = epgResponseResponse.body();
-                            if(response != null) {
-
+                            if (response != null) {
                                 List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
                                 if (epgs.size() > 0) {
                                     insertToDb(epgs);
                                 }
-                                responseMediatorLiveData.postValue(epgs);
+
                             }
 
-                        } else {
-                            responseMediatorLiveData.postValue(null);
                         }
+
+                        responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
+                            @Override
+                            public void onChanged(@Nullable List<Epgs> epgs) {
+                                responseMediatorLiveData.postValue(epgs);
+                            }
+                        });
+
+
 
 
                     }
