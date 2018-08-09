@@ -22,6 +22,7 @@ import androidtv.livetv.stb.downloads.DownloadFragment;
 import androidtv.livetv.stb.downloads.DownloadService;
 import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
@@ -129,24 +130,30 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
 
     private void fetchChannelDetails(String token, long utc, int id, String hashCode) {
-        splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelWrapper -> {
-            if (catChannelWrapper != null) {
-                if (catChannelWrapper.getCatChannelInfo() != null) {
-                    Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
-                    this.catChannelInfo=catChannelWrapper.getCatChannelInfo();
-                    checkForExistingChannelData();
-                } else {
-                    switch (catChannelWrapper.getCatChannelError().getStatus()) {
-                        case INVALID_HASH:
-                            showErrorDialog(INVALID_HASH, getString(R.string.session_expired));
-                            break;
-                        case INVALID_USER:
-                            showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
-                            break;
+        LiveData<CatChannelWrapper> categoryChannelData = splashViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode);
+        categoryChannelData.observe(this, new Observer<CatChannelWrapper>() {
+            @Override
+            public void onChanged(@Nullable CatChannelWrapper catChannelWrapper) {
+                if (catChannelWrapper != null) {
+                    if (catChannelWrapper.getCatChannelInfo() != null) {
+                        Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
+                        catChannelInfo = catChannelWrapper.getCatChannelInfo();
+                        checkForExistingChannelData();
+                    } else {
+                        switch (catChannelWrapper.getCatChannelError().getStatus()) {
+                            case INVALID_HASH:
+                                showErrorDialog(INVALID_HASH, getString(R.string.session_expired));
+                                break;
+                            case INVALID_USER:
+                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
+                                break;
+                        }
                     }
-                }
+                    categoryChannelData.removeObserver(this);
 
+                }
             }
+
         });
     }
 
@@ -181,7 +188,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             @Override
             public void onChanged(@Nullable Integer integer) {
                 if (integer != null) {
-                    Timber.d("size:"+integer);
+                    Timber.d("size:" + integer);
                     if (integer > 0) {
                         fetchChannelsFromDBtoUpdate();
                     } else {
@@ -206,9 +213,9 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
         Completable.fromRunnable(() -> {
-            for(int i=0;i<channels.size();i++) {
-                for(ChannelItem dbCHannelItem:channelItemList) {
-                    if(channels.get(i).getId()==dbCHannelItem.getId()) {
+            for (int i = 0; i < channels.size(); i++) {
+                for (ChannelItem dbCHannelItem : channelItemList) {
+                    if (channels.get(i).getId() == dbCHannelItem.getId()) {
                         channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
                     }
                 }
@@ -220,8 +227,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
 
     }
-
-
 
 
     private void insertDataToDB() {
@@ -424,7 +429,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
                 }
             });
-        }else{
+        } else {
             LoginFileUtils.deleteLoginFile();
             showLogin(emailFrmApi);
         }
@@ -498,6 +503,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
 
     }

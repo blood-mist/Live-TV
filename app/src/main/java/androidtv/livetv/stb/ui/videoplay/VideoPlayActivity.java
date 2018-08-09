@@ -39,13 +39,16 @@ import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.ChannelLinkResponse;
+import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
+import androidtv.livetv.stb.entity.PlayBackErrorEntity;
 import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
+import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.ui.videoplay.videocontroller.MyVideoController;
 import androidtv.livetv.stb.ui.videoplay.videocontroller.VideoControllerView;
@@ -111,7 +114,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     String macAddress;
 
     private ChannelItem currentDvrChannelItem;
-
+    private String nextVideoNameDvr;
 
 
     @Override
@@ -157,7 +160,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragment(Fragment fragment) {
         Log.d("frag", "called from activity");
         currentFragment = fragment;
-
         getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, currentFragment).commit();
 
 
@@ -172,27 +174,27 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 showMenu();
                 break;
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
-                if(mVideoController == null) {
+                if (mVideoController == null) {
                     changeToPreviousChannel();
                     return true;
 
-                }else{
+                } else {
                     return false;
                 }
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if(mVideoController == null)
-                    changeToPreviousChannel();
+                    if (mVideoController == null)
+                        changeToPreviousChannel();
                     return true;
                 } else {
                     return false;
                 }
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case 63:
-                if(mVideoController!=null) {
+                if (mVideoController != null) {
                     mVideoController.show();
                     return true;
-                }else
+                } else
                     return false;
 
             case KeyEvent.KEYCODE_CHANNEL_UP:
@@ -200,7 +202,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 return true;
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if(mVideoController == null) changeToNextChannel();
+                    if (mVideoController == null) changeToNextChannel();
                     return true;
                 } else {
                     return false;
@@ -379,13 +381,48 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Login login = GlobalVariables.login;
         videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
-                        login.getSession()), macAddress, item.getId()).observe(this, channelLinkResponse -> {
-            if (channelLinkResponse != null) {
-                playVideo(channelLinkResponse.getChannel().getLink(),false);
+                        login.getSession()), macAddress, item.getId()).observe(this, new Observer<ChannelLinkResponseWrapper>() {
+            @Override
+            public void onChanged(@Nullable ChannelLinkResponseWrapper channelLinkResponse) {
+                if (channelLinkResponse != null) {
+                    if (channelLinkResponse.getChannelLinkResponse() != null) {
+                        VideoPlayActivity.this.playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
+                    } else if (channelLinkResponse.getException() != null) {
+                        setErrorFragment(channelLinkResponse.getException(), 0, 0);
+                    }
+                }
             }
         });
         saveCurrentInPrefs(item);
 
+
+    }
+
+    private void setErrorFragment(Exception exception, int what, int extra) {
+        PlayBackErrorEntity errorEntity = null;
+        if (exception != null) {
+            errorEntity = new PlayBackErrorEntity(1, getString(R.string.err_code_server_unreachable), getString(R.string.err_server_unreachable));
+        } else {
+            StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
+            errorEntity = new PlayBackErrorEntity(2, sb.toString(), getString(R.string.err_media_error));
+        }
+        showMenuBg();
+        showMenuFrag();
+        stopCloseMenuHandler();
+        ErrorFragment errorFragment = new ErrorFragment();
+        errorFragment.setPlayBackErrorEntity(errorEntity);
+        menuFragment.showErrorFrag(errorFragment);
+    }
+
+    private void showMenuFrag() {
+        Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+        if (menuFrag == null)
+            openFragment(menuFragment);
+        else {
+            getSupportFragmentManager().beginTransaction().show(menuFrag).commit();
+
+
+        }
 
     }
 
@@ -436,11 +473,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onDestroy();
     }
 
-    private void playVideo(String channelLink,boolean isDvr) {
+    private void playVideo(String channelLink, boolean isDvr) {
         Log.d("media", channelLink);
-        if(player == null){
+        if (player == null) {
             player = new MediaPlayer();
-        }else player.reset();
+        } else player.reset();
 //        String link = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
         try {
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -451,24 +488,30 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 hideProgressBar();
                 player.setScreenOnWhilePlaying(true);
                 player.start();
-                if(isDvr){
-                    MyVideoController controller = new MyVideoController(this,player,currentDvrChannelItem,this);
-                    mVideoController = new VideoControllerView(this,true);
+                if (isDvr) {
+                    MyVideoController controller = new MyVideoController(this, player, currentDvrChannelItem, this);
+                    mVideoController = new VideoControllerView(this, true);
                     mVideoController.setAnchorView(videoSurfaceContainer);
-                    mVideoController.setMediaPlayer(controller,player);
+                    mVideoController.setMediaPlayer(controller, player);
                     mVideoController.show();
                 }
-                if(isDvr){
+                if (isDvr) {
                     hideMenuUI();
-                }else{
+                } else {
                     startCloseMenuHandler();
+                    if (menuFragment != null) {
+                        menuFragment.hideErrorFrag();
+                    }
+
+
                 }
+
 
                 randomDisplayMacAddress();
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        if(isDvr){
+                        if (isDvr) {
                             loadNextDvr();
                         }
                     }
@@ -478,20 +521,27 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             });
 
 
-            player.setOnErrorListener((mp, what, extra) -> {
-                Timber.d("on error ");
-                hideProgressBar();
-                showMenuBg();
-                hideMacDisplayHandler();
-                try {
-                    player.stop();
-                } catch (Exception ignored) {
+            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Timber.d("on error ");
+                    VideoPlayActivity.this.hideProgressBar();
+                    VideoPlayActivity.this.hideMacDisplayHandler();
+                    try {
+                        player.stop();
+                    } catch (Exception ignored) {
+                    }
+                    player.reset();
+                    StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
+                    Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                    if (isDvr) {
+                        stopCloseMenuHandler();
+                        showMenu();
+                    } else {
+                        setErrorFragment(null, what, extra);
+                    }
+                    return true;
                 }
-                player.reset();
-                StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                showMenu();
-                Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                return true;
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -500,6 +550,23 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void loadNextDvr() {
+        showProgressBar();
+        long utc = GetUtc.getInstance().getTimestamp().getUtc();
+        Login login = GlobalVariables.login;
+        videoPlayViewModel.getNextDvrLink(login.getToken(), utc, login.getId(),
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                currentDvrChannelItem.getId(), nextVideoNameDvr).observe(this, new Observer<DvrLinkResponse>() {
+            @Override
+            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                if (channelLinkResponse != null) {
+                    if (channelLinkResponse.getErrorCode() > 0) {
+                        Log.d("dvr", "error");
+                    } else {
+                        setUpVideoController(currentDvrChannelItem, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
+                    }
+                }
+            }
+        });
 
     }
 
@@ -565,8 +632,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     @Override
-    public void playDvr(Epgs epgs ,ChannelItem item) {
-        //TODO play Channels
+    public void playDvr(Epgs epgs, ChannelItem item) {
         showProgressBar();
         long utc = GetUtc.getInstance().getTimestamp().getUtc();
         Login login = GlobalVariables.login;
@@ -581,7 +647,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     if (channelLinkResponse.getErrorCode() > 0) {
                         Log.d("dvr", "error");
                     } else {
-                        setUpVideoController(item,channelLinkResponse.getLink());
+                        setUpVideoController(item, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
                     }
                 }
             }
@@ -590,9 +656,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-    private void setUpVideoController(ChannelItem item,String link) {
+    private void setUpVideoController(ChannelItem item, String link, String nextVideoName) {
         currentDvrChannelItem = item;
-       VideoPlayActivity.this.playVideo(link,true);
+        nextVideoNameDvr = nextVideoName;
+        VideoPlayActivity.this.playVideo(link, true);
 
 
     }

@@ -97,7 +97,6 @@ public class SplashRepository {
         rowCountData.setValue(null);
         rowCountData.addSource(mLoginDao.getTableSize(), integer -> {
             if (integer != null) {
-                rowCountData.removeSource(mLoginDao.getTableSize());
                 rowCountData.postValue(integer);
             }
 
@@ -111,7 +110,6 @@ public class SplashRepository {
         channelListData.setValue(null);
         channelListData.addSource(catChannelDao.getChannels(), channelItemList -> {
             if (channelItemList != null) {
-                channelListData.removeSource(catChannelDao.getChannels());
                 channelListData.postValue(channelItemList);
             }
         });
@@ -368,7 +366,6 @@ public class SplashRepository {
     public LiveData<Login> getData() {
         userCredentialData.addSource(mLoginDao.getLoginData(), login -> {
             if (login != null) {
-                userCredentialData.removeSource(mLoginDao.getLoginData());
                 userCredentialData.postValue(login);
             }
 
@@ -421,7 +418,6 @@ public class SplashRepository {
                             catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
                                 if (categoryItems != null) {
                                     catChannelInfo.setCategory(categoryItems);
-                                    catChannelData.removeSource(catChannelDao.getCategories());
                                     catChannelData.addSource(catChannelDao.getChannels(), channelItemList -> {
                                         if (channelItemList != null) {
                                             catChannelInfo.setChannel(channelItemList);

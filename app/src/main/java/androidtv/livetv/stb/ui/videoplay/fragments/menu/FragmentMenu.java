@@ -52,6 +52,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 
 
+import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.utils.LinkConfig;
 
 import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
@@ -151,8 +152,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private Handler watchPreviewHandler = new Handler();
 
-    private ChannelItem currentSelected,currentPlayed;
-
+    private ChannelItem currentSelected, currentPlayed;
 
 
     @Override
@@ -162,8 +162,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Timber.d("onCreateView");
         View v = inflater.inflate(R.layout.fragment_fragment_menu, container, false);
@@ -240,57 +239,58 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
             }
         });
-    }
+        }
 
-    private void playLastPlayedChannel() {
-        lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
-        selectedCurrentChannelId = lastPlayedId;
-        if (lastPlayedId != -1) {
-            LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
+        private void playLastPlayedChannel () {
+            lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
+            selectedCurrentChannelId = lastPlayedId;
+            if (lastPlayedId != -1) {
+                LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
 
-            lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
-                @Override
-                public void onChanged(@Nullable ChannelItem channelItem) {
-                    if (channelItem != null) {
-                        setValues(channelItem);
-                        mListener.playChannel(channelItem);
-                        currentPlayed=channelItem;
-                        lastPlayedChData.removeObserver(this);
+                lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
+                    @Override
+                    public void onChanged(@Nullable ChannelItem channelItem) {
+                        if (channelItem != null) {
+                            setValues(channelItem);
+                            mListener.playChannel(channelItem);
+                            currentPlayed = channelItem;
+                            lastPlayedChData.removeObserver(this);
+                        }
                     }
+                });
+            } else {
+                openErrorFragment();
+            }
+        }
+
+        private void openErrorFragment () {
+            ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
+        }
+
+        /**
+         * get Categories along with channel list from database and populate into their respective adapters
+         */
+        private void setUpRecylerViewCategory () {
+            Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
+            Log.d("frag", "recycle view created");
+            CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
+            categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+            categoryList.setAdapter(adapter);
+
+            menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
+                if (categoriesWithChannels != null) {
+                    adapter.setCategory(categoriesWithChannels);
+                    CategoriesWithChannels item = categoriesWithChannels.get(1);
+                    List<ChannelItem> channelItems = item.channelItemList;
+                    Log.d(TAG, channelItems.size() + "");
+                    io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+
                 }
             });
-        } else {
-            openErrorFragment();
+
+
         }
-    }
 
-    private void openErrorFragment() {
-        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
-    }
-
-    /**
-     * get Categories along with channel list from database and populate into their respective adapters
-     */
-    private void setUpRecylerViewCategory() {
-        Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
-        Log.d("frag", "recycle view created");
-        CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
-        categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-        categoryList.setAdapter(adapter);
-
-        menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
-            if (categoriesWithChannels != null) {
-                adapter.setCategory(categoriesWithChannels);
-                CategoriesWithChannels item = categoriesWithChannels.get(1);
-                List<ChannelItem> channelItems = item.channelItemList;
-                Log.d(TAG, channelItems.size() + "");
-                io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
-
-            }
-        });
-
-
-    }
 
     private void setUpCategoriesToView(List<ChannelItem> channelItemList, CategoryAdapter adapter) {
         allChannelItems = channelItemList;
@@ -341,8 +341,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     }
 
-    private List<ChannelItem> addAllChannels
-            (List<CategoriesWithChannels> categoriesWithChannels) {
+    private List<ChannelItem> addAllChannels(List<CategoriesWithChannels> categoriesWithChannels) {
         List<ChannelItem> channelItemList = new ArrayList<>();
         for (CategoriesWithChannels withChannels : categoriesWithChannels) {
             channelItemList.addAll(withChannels.channelItemList);
@@ -410,7 +409,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedCurrentChannelId = adapter.getmList().get(position).getId();
         mListener.playChannel(adapter.getmList().get(currentChannelPosition));
         currentSelected = adapter.getmList().get(position);
-        currentPlayed=adapter.getmList().get(position);
+        currentPlayed = adapter.getmList().get(position);
         mListener.playChannel(adapter.getmList().get(position));
 
     }
@@ -433,6 +432,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         fetchPreview(adapter.getmList().get(position));
 
     }
+
 
     /**
      * stop handler and video playback
@@ -580,7 +580,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @OnClick(R.id.layout_epg)
     public void OnEpgClick() {
         EpgFragment fragment = new EpgFragment();
-        fragment.setSelectedChannelId(selectedCurrentChannelId);
+        fragment.setCurrentSelectedChannel(currentSelected);
         mListener.load(fragment, "epg");
     }
 
@@ -589,6 +589,21 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         DvrFragment fragment = new DvrFragment();
         fragment.setCurrentChannel(currentSelected);
         mListener.load(fragment, "Dvr");
+    }
+
+    public void showErrorFrag(ErrorFragment errorFragment) {
+        getChildFragmentManager().beginTransaction().replace(R.id.error_layout, errorFragment).commit();
+    }
+
+    public void hideErrorFrag() {
+        ErrorFragment menuFrag = (ErrorFragment) getChildFragmentManager().findFragmentById(R.id.error_layout);
+        if (menuFrag != null)
+            getChildFragmentManager().beginTransaction().hide(menuFrag).commit();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+
     }
 
     public interface FragmentMenuInteraction {

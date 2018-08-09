@@ -170,7 +170,6 @@
                             android:id="@+id/gv_prgms"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-
                             android:nextFocusLeft="@id/gv_date"
                             android:nextFocusUp="@id/channel_list"
                             android:drawSelectorOnTop="true"
@@ -183,8 +182,9 @@
                                 android:gravity="center"
                                 android:textColor="@color/color_white"
                                 android:textSize="22sp"
+                                android:layout_centerInParent="true"
                                 app:fontAssetName="@string/font_exo_semi_bold"
-                                android:text="Epg Loading...Please wait "/>
+                                android:text="Loading..."/>
                         </RelativeLayout>
                     </LinearLayout>
                 </FrameLayout>

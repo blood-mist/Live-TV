@@ -101,11 +101,11 @@
         </LinearLayout>
 
         <LinearLayout
-
+            android:id="@+id/desc_layout"
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:background="@color/transp"
-            android:padding="25dp"
+            android:padding="10dp"
             android:layout_gravity="bottom"
             android:focusable="false"
             android:layout_alignParentBottom="true"
@@ -188,8 +188,8 @@
                     android:layout_height="60dp"
                     android:layout_margin="5dp"
                     android:textColor="@color/text_color"
-                    android:maxLines="4"
-                    android:minLines="3"
+                    android:maxLines="5"
+                    android:minLines="4"
                     android:focusable="false"
                     android:importantForAccessibility="noHideDescendants"
                     android:layout_alignParentStart="true"
@@ -220,7 +220,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -230,7 +230,7 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:importantForAccessibility="yes"
-                            android:focusable="true"
+                            android:focusable="false"
                             android:clickable="true"
                             android:focusableInTouchMode="true"
                             android:src="@drawable/main_epg_selector"
@@ -259,7 +259,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -269,7 +269,7 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:importantForAccessibility="yes"
-                            android:focusable="true"
+                            android:focusable="false"
                             android:clickable="true"
                             android:src="@drawable/main_dvr_selector"
                             android:layout_marginStart="10dp" />
@@ -297,7 +297,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="2.4"
                         android:gravity="center_vertical"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -307,7 +307,7 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:importantForAccessibility="yes"
-                            android:focusable="true"
+                            android:focusable="false"
                             android:src="@drawable/main_fav_selector"
                             android:layout_marginStart="10dp" />
 
@@ -360,7 +360,15 @@
             android:importantForAccessibility="yes"
             android:layout_height="match_parent"
             android:layout_below="@+id/category_list_container" />
+<FrameLayout
+    android:id="@+id/error_layout"
+    android:layout_below="@+id/category_list_container"
+    android:layout_above="@+id/desc_layout"
+    android:layout_centerInParent="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+</FrameLayout>
     </RelativeLayout>
 </LinearLayout>
 

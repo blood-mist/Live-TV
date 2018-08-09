@@ -122,11 +122,7 @@ public class SplashViewModel extends AndroidViewModel {
 
     public LiveData<CatChannelWrapper> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
         LiveData<CatChannelWrapper> catChannelInfoLiveData = splashRepository.getChannels(token, utc, userId, hashValue);
-        catChannelData.addSource(catChannelInfoLiveData, catChannelWrapper -> {
-            if (catChannelWrapper != null)
-                catChannelData.removeSource(catChannelInfoLiveData);
-            catChannelData.setValue(catChannelWrapper);
-        });
+        catChannelData.addSource(catChannelInfoLiveData, catChannelWrapper -> catChannelData.setValue(catChannelWrapper));
         return catChannelData;
 
     }
@@ -144,9 +140,9 @@ public class SplashViewModel extends AndroidViewModel {
 
     public LiveData<Integer> checkChannelsInDB() {
         chSizeMediatorData.addSource(channelTableSizeData, integer -> {
-            if (integer != null) {
-                chSizeMediatorData.removeSource(channelTableSizeData);
+            if(integer!=null) {
                 chSizeMediatorData.setValue(integer);
+                chSizeMediatorData.removeSource(channelTableSizeData);
             }
         });
         return chSizeMediatorData;

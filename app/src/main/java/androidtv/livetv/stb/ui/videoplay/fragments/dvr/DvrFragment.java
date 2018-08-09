@@ -10,12 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,9 +32,7 @@ import androidtv.livetv.stb.entity.TimeStampEntity;
 import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.adapters.DateListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.DvrListAdapter;
-import androidtv.livetv.stb.ui.videoplay.adapters.EpgListAdapter;
-import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.ChannelRecyclerAdapter;
-import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
+import androidtv.livetv.stb.ui.videoplay.adapters.ChannelRecyclerAdapter;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
@@ -169,9 +165,12 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     public void onChannelClickInteraction(ChannelItem channel, int adapterPosition) {
         setCurrentChannel(channel);
         txtChannelName.setText(channel.getName());
+        dvrListAdapter.clear();
         gvDate.setVisibility(View.GONE);
         gvEpgDvr.setVisibility(View.GONE);
         Login login = GlobalVariables.login;
+        nOEpg.setText("Loading...");
+        nOEpg.setVisibility(View.VISIBLE);
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         viewModel.getStartTime(login.getToken(),utc.getUtc(),String.valueOf(login.getId()),
                 LinkConfig.getHashCode(String.valueOf(login.getId())
@@ -210,8 +209,6 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             public void onChanged(@Nullable List<Epgs> epgs) {
                 setUpAdapter(epgs);
                 cuurentEpgList = epgs;
-
-
             }
         });
     }
@@ -290,9 +287,13 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onOnAirSetup(Epgs epg) {
-        txtChannelName.setText(getChannelName(epg.getChannelID()));
-        txtPrgmName.setText(epg.getProgramTitle());
-        txtPrgmTime.setText(DataUtils.getPrgmTime(epg.getStartTime(),epg.getEndTime()));
+        if(currentChannel.getId() == epg.getChannelID()) {
+            txtPrgmName.setText(epg.getProgramTitle());
+            txtPrgmTime.setText(DataUtils.getPrgmTime(epg.getStartTime(), epg.getEndTime()));
+        }else{
+            txtPrgmName.setText("");
+            txtPrgmTime.setText("");
+        }
     }
 
     private String getChannelName(int channelID) {

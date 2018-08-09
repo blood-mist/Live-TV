@@ -1,6 +1,7 @@
 package androidtv.livetv.stb.ui.videoplay.fragments.epg;
 
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -14,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,6 +25,7 @@ import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.EpgEntity;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
@@ -32,7 +33,7 @@ import androidtv.livetv.stb.entity.TimeStampEntity;
 import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.adapters.DateListAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.EpgListAdapter;
-import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.ChannelRecyclerAdapter;
+import androidtv.livetv.stb.ui.videoplay.adapters.ChannelRecyclerAdapter;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
@@ -47,6 +48,16 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
 
     private FragmentEpgInteraction mListener;
+    private LiveData<EpgEntity> epgEntityLive = null;
+    private ChannelItem currentSelectedChannel;
+
+    public ChannelItem getCurrentSelectedChannel() {
+        return currentSelectedChannel;
+    }
+
+    public void setCurrentSelectedChannel(ChannelItem currentSelectedChannel) {
+        this.currentSelectedChannel = currentSelectedChannel;
+    }
 
     public void setSelectedChannelId(int selectedChannelId) {
         this.selectedChannelId = selectedChannelId;
@@ -132,23 +143,23 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         super.onViewCreated(view, savedInstanceState);
         currentEpgDate = Calendar.getInstance().getTime();
         adapter = new ChannelRecyclerAdapter(getContext(), this);
+        adapter.setSelectedChannelId(selectedChannelId);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gvChannelList.setAdapter(adapter);
         viewModel.getChannels().observe(this, new Observer<List<ChannelItem>>() {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItems) {
                 adapter.setChannelList(channelItems);
+
             }
         });
         dateListAdapter = new DateListAdapter(getActivity(), getDateList(), this);
         gvDate.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvDate.setAdapter(dateListAdapter);
-        epgListAdapter = new EpgListAdapter(getActivity(),this);
+        epgListAdapter = new EpgListAdapter(getActivity(), this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
-        if (adapter.hasData()) {
-            onChannelClickInteraction(adapter.getChannel(selectedChannelId), 0);
-        }
+        onChannelClickInteraction(getCurrentSelectedChannel(),0);
 
 
     }
@@ -168,18 +179,35 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onChannelClickInteraction(ChannelItem channel, int adapterPosition) {
-        //TODO Call api
-        resetOnAir();
+        if(epgEntityLive != null && epgEntityLive.hasActiveObservers()){
+            epgEntityLive.removeObservers(this);
+        }
+        resetOnAir(channel);
+        currentSelectedChannel = channel;
+        Log.d("channel",channel.getName());
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         epgListAdapter.clear();
-        viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
-                , String.valueOf(utc.getUtc()), login.getSession()), String.valueOf(channel.getId())).observe(this, new Observer<List<Epgs>>() {
-            @Override
-            public void onChanged(@Nullable List<Epgs> epgs) {
-                setUpAdapter(epgs);
-                cuurentEpgList = epgs;
+        showNoEpg("Loading");
+        epgEntityLive =   viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
+                , String.valueOf(utc.getUtc()), login.getSession()), String.valueOf(channel.getId()));
 
+       epgEntityLive.observe(this, new Observer<EpgEntity>() {
+            @Override
+            public void onChanged(@Nullable EpgEntity epgs) {
+                if (epgs != null) {
+                    if (epgs.getEpgsList() != null && epgs.getEpgsList().size() > 0) {
+                        setUpAdapter(epgs.getEpgsList());
+                        cuurentEpgList = epgs.getEpgsList();
+                    } else {
+                        nOEpg.setVisibility(View.VISIBLE);
+                        if (epgs.getError_message() != null && epgs.getError_message().length()>0) {
+                           showNoEpg(epgs.getError_message());
+                        } else {
+                            showNoEpg("No epg found");
+                        }
+                    }
+                }
             }
         });
 
@@ -188,19 +216,24 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private void setUpAdapter(List<Epgs> epgs) {
         if (epgs != null) {
             List<Epgs> newList = getFilteredEpgs(epgs);
-            if(newList.size()>0) {
+            if (newList.size() > 0) {
                 epgListAdapter.setmList(newList);
                 nOEpg.setVisibility(View.GONE);
-            }else{
-                showNoEpg();
+                gvDate.setVisibility(View.VISIBLE);
+                gvEpgDvr.setVisibility(View.VISIBLE);
+            } else {
+                showNoEpg("No epg found");
             }
-        }else{
-            showNoEpg();
+        } else {
+            showNoEpg("No epg found");
         }
 
     }
 
-    private void showNoEpg() {
+    private void showNoEpg(String message) {
+        gvDate.setVisibility(View.GONE);
+        gvEpgDvr.setVisibility(View.GONE);
+        nOEpg.setText(message);
         nOEpg.setVisibility(View.VISIBLE);
     }
 
@@ -235,27 +268,39 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onEpgClicked(Epgs epg) {
-         mListener.playChannel(adapter.getChannel(epg.getChannelID()));
+        mListener.playChannel(adapter.getChannel(epg.getChannelID()));
     }
 
     @Override
     public void onOnAirSetup(Epgs epgs) {
-       txtChannelName.setText(getChannelName(epgs.getChannelID()));
-       txtPrgmName.setText(epgs.getProgramTitle());
-       txtPrgmTime.setText(DataUtils.getPrgmTime(epgs.getStartTime(),epgs.getEndTime()));
+        if(currentSelectedChannel.getId() == epgs.getChannelID()) {
+            txtPrgmName.setText(epgs.getProgramTitle());
+            txtPrgmTime.setText(DataUtils.getPrgmTime(epgs.getStartTime(), epgs.getEndTime()));
+        }else{
+            txtPrgmName.setText("");
+            txtPrgmTime.setText("");
+        }
 
     }
 
-    private void resetOnAir(){
-        txtChannelName.setText("");
-        txtPrgmName.setText("");
-        txtPrgmTime.setText("");
+    private void resetOnAir(ChannelItem channel) {
+//        if(getActivity() != null)
+//        getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+        String name = channel.getName();
+                txtChannelName.setText(name);
+                txtPrgmName.setText("N/A");
+                txtPrgmTime.setText("N/A");
+//            }
+//        });
+
 
     }
 
     private String getChannelName(int channelID) {
-      ChannelItem item = adapter.getChannel(channelID);
-      return item.getName();
+        ChannelItem item = adapter.getChannel(channelID);
+        return item.getName();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package androidtv.livetv.stb.ui.videoplay.adapters.viewholder;
+package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
@@ -32,10 +31,20 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
     private List<ChannelItem> channelList;
     private OnChannelListInteractionListener mListener;
+    private int selectedChannelId;
+
+    public int getSelectedChannelId() {
+        return selectedChannelId;
+    }
+
+    public void setSelectedChannelId(int selectedChannelId) {
+        this.selectedChannelId = selectedChannelId;
+    }
 
     private Context mContext;
     private int focusedItem = 0;
     int tryFocusItem;
+
 
     public int getSelectedChannel() {
         return selectedChannel;
@@ -122,6 +131,11 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             holder.itemLayout.setSelected(false);
         }
 
+        if(selectedChannelId == channel.getId()){
+            setSelectedChannel(position);
+            holder.itemLayout.setSelected(true);
+            onChannelClicked(channel,position);
+        }
 
     }
 
@@ -164,7 +178,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             super(itemView);
             channelImage=itemView.findViewById(R.id.img);
             itemLayout = itemView.findViewById(R.id.relativeLayout);
-            itemView.setOnClickListener(new View.OnClickListener() {
+            itemLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     onChannelClicked(channelList.get(getAdapterPosition()),getAdapterPosition());

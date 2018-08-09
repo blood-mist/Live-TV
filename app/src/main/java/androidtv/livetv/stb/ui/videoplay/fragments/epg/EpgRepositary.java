@@ -18,6 +18,7 @@ import java.util.List;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.EpgEntity;
 import androidtv.livetv.stb.entity.EpgItem;
 import androidtv.livetv.stb.entity.EpgResponse;
 import androidtv.livetv.stb.entity.Epgs;
@@ -66,8 +67,8 @@ public class EpgRepositary {
         return channelList;
     }
 
-    public LiveData<List<Epgs>> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
-        MediatorLiveData<List<Epgs>> responseMediatorLiveData = new MediatorLiveData<>();
+    public LiveData<EpgEntity> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
+        MediatorLiveData<EpgEntity> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
         List<Epgs> epgsList = new ArrayList<>();
         io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
@@ -84,18 +85,29 @@ public class EpgRepositary {
                     public void onNext(Response<EpgResponse> epgResponseResponse) {
                         if (epgResponseResponse.code() == 200) {
                             EpgResponse response = epgResponseResponse.body();
-                            if(response != null) {
+                            if (response != null) {
+                                EpgEntity epgEntity = new EpgEntity();
+                                if (response.getError_code() <= 0) {
+                                    List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
+                                    if (epgs != null && epgs.size() > 0) {
+                                        insertToDb(epgs);
+                                    }
 
-                                List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
-                                if (epgs.size() > 0) {
-                                    insertToDb(epgs);
                                 }
-                                responseMediatorLiveData.postValue(epgs);
                             }
-
-                        } else {
-                            responseMediatorLiveData.postValue(null);
-                        }
+                                responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
+                                    @Override
+                                    public void onChanged(@Nullable List<Epgs> epgs) {
+                                        EpgEntity epgEntity = new EpgEntity();
+                                        if (epgs.size() > 0) {
+                                            epgEntity.setEpgsList(epgs);
+                                        } else {
+                                            epgEntity.setError_message("No Epg Found!");
+                                        }
+                                        responseMediatorLiveData.postValue(epgEntity);
+                                    }
+                                });
+                            }
 
 
                     }
@@ -106,7 +118,13 @@ public class EpgRepositary {
                             responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
                                 @Override
                                 public void onChanged(@Nullable List<Epgs> epgs) {
-                                    responseMediatorLiveData.postValue(epgs);
+                                    EpgEntity epgEntity = new EpgEntity();
+                                    if(epgs.size()>0){
+                                        epgEntity.setEpgsList(epgs);
+                                    }else{
+                                        epgEntity.setError_message("No Epg Found!");
+                                    }
+                                    responseMediatorLiveData.postValue(epgEntity);
                                 }
                             });
                         }

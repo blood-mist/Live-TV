@@ -64,4 +64,7 @@ public interface ApiInterface {
 
     @GET(LinkConfig.DVR_VIDEO_URL)
     Observable<Response<DvrLinkResponse>> getDvrLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash, @Query("channelId") String id, @Query("date") String date, @Query("startTime")String startTime);
+
+    @GET(LinkConfig.DVR_VIDEO_URL)
+    Observable<Response<DvrLinkResponse>> getNextDvrLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash, @Query("channelId") String id, @Query("nextVideoName")String nextVideoName);
 }

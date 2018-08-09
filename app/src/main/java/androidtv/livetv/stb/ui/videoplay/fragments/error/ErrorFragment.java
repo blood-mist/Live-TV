@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.PlayBackErrorEntity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -35,6 +36,15 @@ public class ErrorFragment extends Fragment {
     @BindView(R.id.error)
     TextView error;
 
+    public PlayBackErrorEntity getPlayBackErrorEntity() {
+        return playBackErrorEntity;
+    }
+
+    public void setPlayBackErrorEntity(PlayBackErrorEntity playBackErrorEntity) {
+        this.playBackErrorEntity = playBackErrorEntity;
+    }
+
+    private PlayBackErrorEntity playBackErrorEntity;
 
     public ErrorFragment() {
         // Required empty public constructor
@@ -59,6 +69,34 @@ public class ErrorFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setUpError(playBackErrorEntity);
 
+    }
+
+    private void checkErrorType(int errorType) {
+        switch(errorType){
+            case 1:
+                txtErrorCode.setText(getString(R.string.err_code_media_error));
+                txtErrorMessage.setText(getString(R.string.err_media_error));
+                break;
+
+            case 2:
+                txtErrorCode.setText(getString(R.string.err_code_server_unreachable));
+                txtErrorMessage.setText(getString(R.string.err_server_unreachable));
+                break;
+
+            default:
+                txtErrorCode.setText("UNKNOWN");
+                txtErrorMessage.setText("Unknown error occured.Please , try again later!." +
+                        "Sorry for inconvenience.");
+                break;
+
+
+        }
+    }
+
+    public void setUpError(PlayBackErrorEntity upError) {
+       txtErrorCode.setText(upError.getErrorCode());
+       txtErrorMessage.setText(upError.getErrorMessage());
     }
 }

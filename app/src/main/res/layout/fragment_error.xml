@@ -69,6 +69,7 @@
             android:id="@+id/btn_positive"
             android:layout_width="0dip"
             android:layout_height="40dp"
+            android:visibility="gone"
             android:textColor="@color/color_black"
             android:background="@drawable/button_round_shape"
             android:layout_weight="1"
@@ -82,6 +83,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:text="negative"
+            android:visibility="gone"
             android:textColor="@color/color_black"
             android:background="@drawable/button_round_shape"/>
     </LinearLayout>

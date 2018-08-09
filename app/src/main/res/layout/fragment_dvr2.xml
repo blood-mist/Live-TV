@@ -183,7 +183,7 @@
                                  android:textColor="@color/color_white"
                                  android:textSize="22sp"
                                  app:fontAssetName="@string/font_exo_semi_bold"
-                                 android:text="Dvr Loading...Please wait "/>
+                                 android:text="Dvr Loading..."/>
                          </RelativeLayout>
 
                     </LinearLayout>

@@ -24,8 +24,14 @@ public class CustomTextView extends android.support.v7.widget.AppCompatTextView 
     }
 
     public void setFont(String fontname){
-        Typeface font = Typeface.createFromAsset(getResources().getAssets(), fontname);
-        this.setTypeface(font);
+        try {
+          Typeface font = Typeface.createFromAsset(getContext().getAssets(), fontname);
+            this.setTypeface(font);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.print("font error +"+ e.getMessage());
+        }
+
     }
 
     private void applyAttributes(Context context, AttributeSet attrs) {
