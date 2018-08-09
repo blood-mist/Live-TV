@@ -11,25 +11,25 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginLeft="100dp"
+        android:layout_marginStart="100dp"
         android:layout_weight="2"
-        android:importantForAccessibility="auto"
-        android:focusable="false"
         android:background="@color/transp"
-        android:orientation="vertical"
-        android:layout_marginStart="100dp">
+        android:focusable="false"
+        android:importantForAccessibility="auto"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/currentcategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:focusable="false"
             android:gravity="center"
             android:importantForAccessibility="no"
             android:maxLines="1"
             android:padding="5dp"
-            android:focusable="false"
-            android:textColor="@color/text_color"
             android:text="@string/txt_empty"
             android:textAllCaps="true"
+            android:textColor="@color/text_color"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -37,10 +37,10 @@
             android:id="@+id/gv_channels"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="auto"
             android:animationCache="false"
-            android:nextFocusUp="@+id/categoryList"
+            android:importantForAccessibility="auto"
             android:nextFocusRight="@id/img_open_categories"
+            android:nextFocusUp="@+id/categoryList"
             android:scrollingCache="false"
             android:smoothScrollbar="true" />
     </LinearLayout>
@@ -50,15 +50,14 @@
         android:layout_height="match_parent"
         android:layout_weight="10"
         android:focusable="false"
-        android:importantForAccessibility="auto"
-        >
+        android:importantForAccessibility="auto">
 
         <LinearLayout
             android:id="@+id/category_list_container"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:importantForAccessibility="auto"
             android:focusable="false"
+            android:importantForAccessibility="auto"
             android:orientation="horizontal">
 
             <ImageView
@@ -67,8 +66,8 @@
                 android:layout_height="match_parent"
                 android:background="#000"
                 android:focusable="false"
-                android:importantForAccessibility="yes"
                 android:focusableInTouchMode="false"
+                android:importantForAccessibility="yes"
                 android:nextFocusDown="@id/gv_channels"
                 android:paddingBottom="8dp"
                 android:paddingLeft="5dp"
@@ -88,14 +87,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:importantForAccessibility="auto"
                     android:background="@color/transp"
+                    android:importantForAccessibility="auto"
+                    android:nextFocusDown="@id/gv_channels"
+                    android:nextFocusLeft="@id/gv_channels"
                     android:paddingBottom="8dp"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:paddingTop="8dp"
-                    android:nextFocusLeft="@id/gv_channels"
-                    android:nextFocusDown="@id/gv_channels"/>
+                    android:paddingTop="8dp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -105,52 +104,52 @@
 
             android:layout_width="match_parent"
             android:layout_height="230dp"
-            android:background="@color/transp"
-            android:padding="25dp"
-            android:layout_gravity="bottom"
-            android:focusable="false"
             android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:background="@color/transp"
+            android:focusable="false"
             android:importantForAccessibility="auto"
             android:orientation="horizontal"
+            android:padding="25dp"
             android:weightSum="6">
 
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
+                android:focusable="false"
+                android:importantForAccessibility="auto"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
                 android:paddingStart="20dp"
-                android:focusable="false"
-                android:importantForAccessibility="auto"
                 tools:ignore="RtlSymmetry">
 
                 <LinearLayout
                     android:id="@+id/txt_descTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:focusable="false"
-                    android:importantForAccessibility="noHideDescendants"
+                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
-                    android:padding="5dp"
-                    android:layout_alignParentLeft="true">
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:importantForAccessibility="noHideDescendants"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
 
                     <androidtv.livetv.stb.ui.custom_views.CustomTextView
                         android:id="@+id/txt_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="10dp"
-                        android:maxLines="1"
-                        android:maxWidth="200dp"
                         android:focusable="false"
                         android:importantForAccessibility="noHideDescendants"
-                        app:fontAssetName="@string/font_exo_Light"
+                        android:maxLines="1"
+                        android:maxWidth="200dp"
                         android:text="@string/txt_empty"
                         android:textColor="@color/color_white"
-                        android:textSize="25sp" />
+                        android:textSize="25sp"
+                        app:fontAssetName="@string/font_exo_Light" />
 
                     <androidtv.livetv.stb.ui.custom_views.CustomTextView
                         android:id="@+id/amount"
@@ -158,13 +157,13 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
                         android:background="@drawable/rectangle_grey"
-                        android:padding="5dp"
                         android:focusable="false"
                         android:importantForAccessibility="noHideDescendants"
-                        android:textColor="@color/text_color"
-                        app:fontAssetName="@string/font_exo_semi_bold"
+                        android:padding="5dp"
                         android:text="@string/txt_empty"
-                        android:textSize="12sp" />
+                        android:textColor="@color/text_color"
+                        android:textSize="12sp"
+                        app:fontAssetName="@string/font_exo_semi_bold" />
 
                     <androidtv.livetv.stb.ui.custom_views.CustomTextView
                         android:id="@+id/channelNo"
@@ -174,10 +173,10 @@
                         android:focusable="false"
                         android:importantForAccessibility="noHideDescendants"
                         android:padding="3dp"
-                        app:fontAssetName="@string/font_exo_Bold"
                         android:text="@string/txt_empty"
                         android:textColor="@color/red_selector"
-                        android:textSize="30sp" />
+                        android:textSize="30sp"
+                        app:fontAssetName="@string/font_exo_Bold" />
 
                 </LinearLayout>
 
@@ -185,34 +184,34 @@
                 <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/ChannelDescription"
                     android:layout_width="match_parent"
-                    android:layout_below="@+id/txt_descTitle"
                     android:layout_height="60dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/txt_descTitle"
                     android:layout_margin="5dp"
-                    android:textColor="@color/text_color"
-                    android:maxLines="4"
-                    android:minLines="3"
                     android:focusable="false"
                     android:importantForAccessibility="noHideDescendants"
-                    android:layout_alignParentStart="true"
-                    app:fontAssetName="@string/font_exo_Light"
+                    android:maxLines="4"
+                    android:minLines="3"
                     android:paddingBottom="5dp"
+                    android:textColor="@color/text_color"
                     android:textSize="17sp"
-                    android:layout_alignParentLeft="true" />
+                    app:fontAssetName="@string/font_exo_Light" />
 
 
                 <LinearLayout
-                    android:layout_below="@+id/ChannelDescription"
                     android:layout_width="match_parent"
-                    android:layout_alignParentBottom="true"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_below="@+id/ChannelDescription"
+                    android:layout_gravity="bottom"
+                    android:baselineAligned="false"
+                    android:focusable="false"
+                    android:gravity="bottom"
+                    android:importantForAccessibility="auto"
                     android:orientation="horizontal"
                     android:visibility="visible"
-                    android:layout_gravity="bottom"
-                    android:focusable="false"
-                    android:importantForAccessibility="auto"
-                    android:gravity="bottom"
-                    android:weightSum="11"
-                    android:baselineAligned="false">
+                    android:weightSum="11">
 
 
                     <LinearLayout
@@ -220,8 +219,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
-                        android:gravity="center"
                         android:focusable="true"
+                        android:gravity="center"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -230,12 +229,12 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
-                            android:importantForAccessibility="yes"
-                            android:focusable="false"
+                            android:layout_marginStart="10dp"
                             android:clickable="true"
+                            android:focusable="false"
                             android:focusableInTouchMode="true"
-                            android:src="@drawable/main_epg_selector"
-                            android:layout_marginStart="10dp" />
+                            android:importantForAccessibility="yes"
+                            android:src="@drawable/main_epg_selector" />
 
                         <TextView
                             android:id="@+id/txt_epg"
@@ -243,14 +242,14 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
+                            android:layout_marginStart="15dp"
                             android:focusable="false"
-                            android:importantForAccessibility="no"
-                            android:textColor="@color/dvr_text_color"
                             android:gravity="center_vertical"
+                            android:importantForAccessibility="no"
                             android:singleLine="true"
                             android:text="@string/epg"
-                            android:textSize="15sp"
-                            android:layout_marginStart="15dp" />
+                            android:textColor="@color/dvr_text_color"
+                            android:textSize="15sp" />
 
                     </LinearLayout>
 
@@ -259,8 +258,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
-                        android:gravity="center"
                         android:focusable="true"
+                        android:gravity="center"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -269,11 +268,11 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
-                            android:importantForAccessibility="yes"
-                            android:focusable="false"
+                            android:layout_marginStart="10dp"
                             android:clickable="true"
-                            android:src="@drawable/main_dvr_selector"
-                            android:layout_marginStart="10dp" />
+                            android:focusable="false"
+                            android:importantForAccessibility="yes"
+                            android:src="@drawable/main_dvr_selector" />
 
                         <TextView
                             android:id="@+id/txt_dvr"
@@ -281,14 +280,14 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
-                            android:gravity="center_vertical"
-                            android:singleLine="true"
-                            android:textColor="@color/dvr_text_color"
-                            android:text="@string/dvr"
+                            android:layout_marginStart="15dp"
                             android:focusable="false"
+                            android:gravity="center_vertical"
                             android:importantForAccessibility="no"
-                            android:textSize="15sp"
-                            android:layout_marginStart="15dp" />
+                            android:singleLine="true"
+                            android:text="@string/dvr"
+                            android:textColor="@color/dvr_text_color"
+                            android:textSize="15sp" />
 
                     </LinearLayout>
 
@@ -297,8 +296,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2.4"
-                        android:gravity="center_vertical"
                         android:focusable="true"
+                        android:gravity="center_vertical"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
 
@@ -307,10 +306,10 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
-                            android:importantForAccessibility="yes"
+                            android:layout_marginStart="10dp"
                             android:focusable="false"
-                            android:src="@drawable/main_fav_selector"
-                            android:layout_marginStart="10dp" />
+                            android:importantForAccessibility="yes"
+                            android:src="@drawable/main_fav_selector" />
 
                         <androidtv.livetv.stb.ui.custom_views.CustomTextView
                             android:id="@+id/txt_fav_unfav"
@@ -318,16 +317,16 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
+                            android:layout_marginStart="15dp"
+                            android:focusable="false"
                             android:gravity="center"
+                            android:importantForAccessibility="no"
                             android:singleLine="true"
                             android:text="@string/set_fav"
-                            android:textColor="@color/dvr_text_color"
-                            android:focusable="false"
-                            android:importantForAccessibility="no"
-                            app:fontAssetName="@string/font_exo_regular"
                             android:textAllCaps="true"
+                            android:textColor="@color/dvr_text_color"
                             android:textSize="15sp"
-                            android:layout_marginStart="15dp" />
+                            app:fontAssetName="@string/font_exo_regular" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -338,10 +337,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
+                android:background="@color/color_black"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:visibility="visible"
-                android:background="@color/color_black">
+                android:visibility="visible">
 
                 <VideoView
                     android:id="@+id/preview_view"
@@ -357,19 +356,20 @@
         <Button
             android:id="@+id/btn_focus"
             android:layout_width="0dp"
-            android:focusable="true"
-            android:importantForAccessibility="yes"
             android:layout_height="match_parent"
-            android:layout_below="@+id/category_list_container" />
-<FrameLayout
-    android:id="@+id/error_layout"
-    android:layout_below="@+id/category_list_container"
-    android:layout_above="@+id/desc_layout"
-    android:layout_centerInParent="true"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+            android:layout_below="@+id/category_list_container"
+            android:focusable="true"
+            android:importantForAccessibility="yes" />
 
-</FrameLayout>
+        <FrameLayout
+            android:id="@+id/error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/desc_layout"
+            android:layout_below="@+id/category_list_container"
+            android:layout_centerInParent="true">
+
+        </FrameLayout>
     </RelativeLayout>
 </LinearLayout>
 

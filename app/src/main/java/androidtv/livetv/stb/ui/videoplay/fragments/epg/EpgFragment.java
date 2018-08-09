@@ -188,6 +188,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         epgListAdapter.clear();
+        gvDate.setVisibility(View.GONE);
         showNoEpg("Loading");
         epgEntityLive =   viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
                 , String.valueOf(utc.getUtc()), login.getSession()), String.valueOf(channel.getId()));
@@ -197,13 +198,15 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             public void onChanged(@Nullable EpgEntity epgs) {
                 if (epgs != null) {
                     if (epgs.getEpgsList() != null && epgs.getEpgsList().size() > 0) {
-                        setUpAdapter(epgs.getEpgsList());
+                        setUpAdapter(epgs.getEpgsList(),false);
                         cuurentEpgList = epgs.getEpgsList();
                     } else {
                         nOEpg.setVisibility(View.VISIBLE);
                         if (epgs.getError_message() != null && epgs.getError_message().length()>0) {
+                            gvDate.setVisibility(View.GONE);
                            showNoEpg(epgs.getError_message());
                         } else {
+                            gvDate.setVisibility(View.GONE);
                             showNoEpg("No epg found");
                         }
                     }
@@ -213,7 +216,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     }
 
-    private void setUpAdapter(List<Epgs> epgs) {
+    private void setUpAdapter(List<Epgs> epgs,boolean showDate) {
         if (epgs != null) {
             List<Epgs> newList = getFilteredEpgs(epgs);
             if (newList.size() > 0) {
@@ -222,16 +225,18 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                 gvDate.setVisibility(View.VISIBLE);
                 gvEpgDvr.setVisibility(View.VISIBLE);
             } else {
+                if(!showDate) gvDate.setVisibility(View.GONE);
                 showNoEpg("No epg found");
             }
         } else {
+            if(!showDate) gvDate.setVisibility(View.GONE);
             showNoEpg("No epg found");
         }
 
     }
 
     private void showNoEpg(String message) {
-        gvDate.setVisibility(View.GONE);
+
         gvEpgDvr.setVisibility(View.GONE);
         nOEpg.setText(message);
         nOEpg.setVisibility(View.VISIBLE);
@@ -261,7 +266,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onClick(int postion, Date date) {
         currentEpgDate = date;
-        setUpAdapter(cuurentEpgList);
+        setUpAdapter(cuurentEpgList,true);
         gvDate.smoothScrollToPosition(postion);
     }
 

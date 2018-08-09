@@ -11,6 +11,6 @@
         android:bottomRightRadius="15dp"
         android:topRightRadius="15dp" />
 
-    <solid android:color="@color/epg_transp"/>
+    <solid android:color="@color/color_black"/>
 
 </shape>

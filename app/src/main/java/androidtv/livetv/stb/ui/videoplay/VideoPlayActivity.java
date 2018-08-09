@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
@@ -96,7 +97,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private Handler handlerToHideMac;
     private Runnable runnableToHideMac;
     private Runnable runnableToShowMac;
-    private FragmentMenu menuFragment;
+    private FragmentMenu menuFragment = new FragmentMenu();
     private Fragment currentFragment;
     private List<CategoryItem> mCategoryList = new ArrayList<>();
     private List<ChannelItem> mChannelList = new ArrayList<>();
@@ -123,18 +124,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         setContentView(R.layout.activity_video_play);
         lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
-
         hideMenuHandler = new Handler();
-
         macAddress = AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this);
         txtRandomDisplayBoxId.setText(macAddress);
-
         txtRandomDisplayBoxId.setText(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
-
         txtRandomDisplayBoxId.setText(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this));
-
-
-        menuFragment = new FragmentMenu();
         channelChangeObservable = new ChannelChangeObserver();
         channelChangeObservable.addObserver(menuFragment);
         initSurafaceView();
@@ -144,11 +138,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     protected void onStart() {
         super.onStart();
-    }
-
-
-    public void openErrorFragment() {
-        Toast.makeText(this, "Last Playing Channel error ", Toast.LENGTH_LONG).show();
     }
 
     private void initSurafaceView() {
@@ -320,10 +309,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         }
     }
 
+    private void showMenuFragWithError(ErrorFragment errorFragment) {
+
+    menuFragment.setErrorFragMent(errorFragment);
+    openFragment(menuFragment);
+
+    }
+
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
         stopCloseMenuHandler();
+        if(player.isPlaying())
         startCloseMenuHandler();
     }
 
@@ -337,16 +334,22 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 (FrameLayout.LayoutParams) txtRandomDisplayBoxId.getLayoutParams();
 
         runnableToHideMac = () -> {
-            params.setMargins(500, random.nextInt(500),
-                    random.nextInt(200), random.nextInt(200));
-            txtRandomDisplayBoxId.setLayoutParams(params);
+//            params.setMargins(500, random.nextInt(500),
+//                    random.nextInt(200), random.nextInt(200));
+//            txtRandomDisplayBoxId.setLayoutParams(params);
             txtRandomDisplayBoxId.setVisibility(View.INVISIBLE);
             System.out.println("box is invisible");
 
             handlerToShowMac.postDelayed(runnableToShowMac, TimeUnit.SECONDS.toMillis(5));
         };
         runnableToShowMac = () -> {
-            params.setMargins(500, random.nextInt(500),
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+//            params.setMargins(10,random.nextInt(height-20),random.nextInt(width-20),10);
+
+            params.setMargins(0, random.nextInt(500),
                     random.nextInt(200), random.nextInt(200));
 
             txtRandomDisplayBoxId.bringToFront();
@@ -370,7 +373,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannel(ChannelItem item) {
 
+        if(currentFragment instanceof FragmentMenu){
 
+        }else{
+            removeAllFragments();
+        }
         mVideoController = null;
 
         Timber.d("Played Channel:" + item.getName());
@@ -398,7 +405,17 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-    private void setErrorFragment(Exception exception,int what,int extra) {
+    private void removeAllFragments() {
+        for (Fragment fragment:getSupportFragmentManager().getFragments()) {
+            if(fragment instanceof  FragmentMenu){
+               menuFragment = (FragmentMenu) fragment;
+            }else {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+        }
+    }
+
+    public void setErrorFragment(Exception exception,int what,int extra) {
         PlayBackErrorEntity errorEntity = null;
         if(exception != null){
             errorEntity = new PlayBackErrorEntity(1,getString(R.string.err_code_server_unreachable),getString(R.string.err_server_unreachable));
@@ -406,24 +423,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
             errorEntity = new PlayBackErrorEntity(2,sb.toString(),getString(R.string.err_media_error));
         }
-        showMenuBg();
-       showMenuFrag();
-        stopCloseMenuHandler();
         ErrorFragment errorFragment = new ErrorFragment();
         errorFragment.setPlayBackErrorEntity(errorEntity);
-        menuFragment.showErrorFrag(errorFragment);
-    }
-
-    private void showMenuFrag() {
-        Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-        if (menuFrag == null)
-            openFragment(menuFragment);
-        else {
-              getSupportFragmentManager().beginTransaction().show(menuFrag).commit();
-
-
+        showMenuBg();
+        stopCloseMenuHandler();
+        if(menuFragment.isVisible()){
+            menuFragment.showErrorFrag(errorFragment);
+        }else {
+            showMenuFragWithError(errorFragment);
         }
-
     }
 
     private void saveCurrentInPrefs(ChannelItem item) {
@@ -501,13 +509,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     startCloseMenuHandler();
                     if(menuFragment != null){
                         menuFragment.hideErrorFrag();
-                    }
-
-
+                    }else{
+                        menuFragment = (FragmentMenu) getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+                        menuFragment.hideErrorFrag();
+                   }
                 }
-
-
-
                 randomDisplayMacAddress();
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
@@ -528,14 +534,16 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     Timber.d("on error ");
                     VideoPlayActivity.this.hideProgressBar();
                     VideoPlayActivity.this.hideMacDisplayHandler();
+                    VideoPlayActivity.this.stopCloseMenuHandler();
                     try {
                         player.stop();
                     } catch (Exception ignored) {
                     }
                     player.reset();
                     StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                    Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                     if (isDvr) {
+                        Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                         VideoPlayActivity.this.stopCloseMenuHandler();
                         VideoPlayActivity.this.showMenu();
                     } else {

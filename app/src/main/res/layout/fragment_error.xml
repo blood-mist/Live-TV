@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:id="@+id/layout_error"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_margin="20dp"
     android:background="@drawable/round_shape_error"
     android:gravity="center"
     android:orientation="vertical"
@@ -30,15 +29,16 @@
 
     <androidtv.livetv.stb.ui.custom_views.CustomTextView
         android:id="@+id/txt_error_msg"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="@color/white"
+        android:layout_margin="10dp"
         android:gravity="center_vertical|center_horizontal"
         android:padding="20dp"
         app:fontAssetName="@string/font_exo_regular"
         android:text="sadsadjsdfhsajdfhjksdahfkjsa"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:visibility="visible"/>
     <View
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
         android:background="@color/view_line"/>
     <androidtv.livetv.stb.ui.custom_views.CustomTextView
         android:id="@+id/txt_error_code"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
         app:fontAssetName="@string/font_exo_regular"
