@@ -181,6 +181,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             @Override
             public void onChanged(@Nullable Integer integer) {
                 if (integer != null) {
+                    Timber.d("size:"+integer);
                     if (integer > 0) {
                         fetchChannelsFromDBtoUpdate();
                     } else {
@@ -230,6 +231,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void saveChannelDetailstoDb(List<CategoryItem> categoryList, List<ChannelItem> channelList) {
         splashViewModel.insertCatChannelToDB(categoryList, channelList);
+        Timber.d("gotoChannelLoad");
         loadChannelActivity();
     }
 

@@ -167,6 +167,8 @@
     <string name="session_expired">Your previous session expired.Please re-login</string>
     <string name="channel_rm_fav">has been removed from favorites</string>
     <string name="channel_set_fav">has been added to favorites</string>
+    <string name="no_category">No Categories Found</string>
+    <string name="all_channels">All Channels</string>
 
 
 </resources>

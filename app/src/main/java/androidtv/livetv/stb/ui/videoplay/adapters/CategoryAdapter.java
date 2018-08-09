@@ -120,20 +120,21 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     @Override
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
+        int pos=holder.getAdapterPosition();
         CategoriesWithChannels categoryItem = null;
         /**
          * check the position of list
          * if position is 0 the created a category called ALl with
          * id = -1;
          */
-        if (position == 0) {
-            holder.mTitleView.setText("All Channels");
+        if (pos == 0) {
+            holder.mTitleView.setText(R.string.all_channels);
         } else {
             if (categoryItemList != null) {
                 categoryItem = categoryItemList.get(position - 1);
                 holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
             } else {
-                holder.mTitleView.setText("No Categories Found");
+                holder.mTitleView.setText(R.string.no_category);
             }
         }
 
@@ -144,11 +145,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         final CategoriesWithChannels finalCategoryItem = categoryItem;
         holder.mCategoryLayout.setOnClickListener(v -> {
 
-            selectedPos = position;
-            if (position == 0) {
+            selectedPos = pos;
+            if (pos == 0) {
                 mListener.onClickCategory("All Channels", allChannelList);
             } else {
-                mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+                if (finalCategoryItem != null) {
+                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+                }
             }
         });
 

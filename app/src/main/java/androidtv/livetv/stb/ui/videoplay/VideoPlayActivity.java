@@ -489,8 +489,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
                 player.reset();
                 StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                 showMenu();
+                Toast.makeText(VideoPlayActivity.this, "LoginError Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                 return true;
             });
         } catch (Exception e) {

@@ -33,6 +33,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     private int positionSelected;
     private ChannelListClickListener listener;
     private int selectedPos;
+    private RecyclerView recyclerView;
 
     public int getPositionSelected() {
         return positionSelected;
@@ -54,6 +55,15 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         notifyDataSetChanged();
     }
 
+    @Override
+    public void onViewAttachedToWindow(@NonNull MyChannelListViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        if(getPositionSelected()==holder.getAdapterPosition()){
+            holder.relativeLayout.requestFocus();
+
+        }
+    }
+
     @NonNull
     @Override
     public MyChannelListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -69,14 +79,17 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .centerCrop()
                 .into(holder.channelLogo);
-        if(item.getIs_fav()==1)
+        if (item.getIs_fav() == 1)
             holder.fav.setVisibility(View.VISIBLE);
         else
             holder.fav.setVisibility(GONE);
 
-        if(getPositionSelected() == position){
-            holder.relativeLayout.requestFocus();
+        if (position == getPositionSelected()) {
+            holder.relativeLayout.setSelected(true);
+        } else {
+            holder.relativeLayout.setSelected(false);
         }
+
     }
 
     @Override
@@ -89,6 +102,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
         recyclerView.setOnKeyListener((v, keyCode, event) -> {
             RecyclerView.LayoutManager lm = recyclerView.getLayoutManager();
             // Return false if scrolled to the bounds and allow focus to move off the list
@@ -127,8 +141,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     }
 
     public List<ChannelItem> getmList() {
-       Timber.d(mList.size()+":Current Channel List SIze if not null");
-            return mList;
+        return mList;
 
     }
 
@@ -171,4 +184,17 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             });
         }
     }
+
+    public int getSelectedChannelPositionViaId(int channelId) {
+        if (mList != null) {
+            for (int i = 0; i < mList.size(); i++) {
+                ChannelItem item = mList.get(i);
+                if (item.getId() == channelId) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
 }

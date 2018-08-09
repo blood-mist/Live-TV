@@ -122,6 +122,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             holder.itemLayout.setSelected(false);
         }
 
+
     }
 
     @Override

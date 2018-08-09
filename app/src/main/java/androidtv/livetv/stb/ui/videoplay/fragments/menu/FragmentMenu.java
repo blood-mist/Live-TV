@@ -5,9 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -30,6 +27,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,14 +38,11 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.entity.ChannelLinkResponse;
-import androidtv.livetv.stb.entity.FavoriteResponse;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.ui.utc.GetUtc;
@@ -65,10 +63,10 @@ import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
-import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 
 import static android.support.constraint.Constraints.TAG;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
+import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 
 /**
@@ -84,6 +82,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private SharedPreferences lastPlayedPrefs;
     private int selectedCurrentChannelId;
     private int lastPlayedPosition = 0;
+    Gson gson = new Gson();
+    private List<ChannelItem> allChannelItems;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -133,7 +133,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     ImageView btnFav;
 
 
-
     public int getCatId() {
         return catId;
     }
@@ -145,13 +144,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private int catId = -1;
 
 
-    private int currentChannelPosition = -1;
-    private int selectedChannelPosition = -1;
+    private int currentChannelPosition = 0;
+    private int selectedChannelPosition = 0;
     private Login login;
+    int lastPlayedId;
 
     private Handler watchPreviewHandler = new Handler();
 
-    private ChannelItem current;
+    private ChannelItem currentSelected,currentPlayed;
 
 
 
@@ -176,9 +176,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
-
-        setUpRecylerViewCategory();
         playLastPlayedChannel();
+        setUpRecylerViewCategory();
         btnEpg.setNextFocusUpId(categoryList.getId());
         btnDvr.setNextFocusUpId(categoryList.getId());
         btnFav.setNextFocusUpId(categoryList.getId());
@@ -243,290 +242,327 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         });
     }
 
-            private void playLastPlayedChannel () {
-                int lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
+    private void playLastPlayedChannel() {
+        lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
+        selectedCurrentChannelId = lastPlayedId;
+        if (lastPlayedId != -1) {
+            LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
+
+            lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
+                @Override
+                public void onChanged(@Nullable ChannelItem channelItem) {
+                    if (channelItem != null) {
+                        setValues(channelItem);
+                        mListener.playChannel(channelItem);
+                        currentPlayed=channelItem;
+                        lastPlayedChData.removeObserver(this);
+                    }
+                }
+            });
+        } else {
+            openErrorFragment();
+        }
+    }
+
+    private void openErrorFragment() {
+        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
+    }
+
+    /**
+     * get Categories along with channel list from database and populate into their respective adapters
+     */
+    private void setUpRecylerViewCategory() {
+        Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
+        Log.d("frag", "recycle view created");
+        CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
+        categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        categoryList.setAdapter(adapter);
+
+        menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
+            if (categoriesWithChannels != null) {
+                adapter.setCategory(categoriesWithChannels);
+                CategoriesWithChannels item = categoriesWithChannels.get(1);
+                List<ChannelItem> channelItems = item.channelItemList;
+                Log.d(TAG, channelItems.size() + "");
+                io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+
+            }
+        });
+
+
+    }
+
+    private void setUpCategoriesToView(List<ChannelItem> channelItemList, CategoryAdapter adapter) {
+        allChannelItems = channelItemList;
+        adapter.setAllChannelList(channelItemList);
+        io.reactivex.Observable.just(channelItemList).map(this::checkForFavorites).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(favChannelList -> setUpFavToView(favChannelList, adapter));
+        updateCategoryUI(channelItemList);
+    }
+
+    private void updateCategoryUI(List<ChannelItem> channelItemList) {
+        String lastPlayedCategory = lastPlayedPrefs.getString(CATEGORY_NAME, "All Channels");
+        if (lastPlayedCategory.equalsIgnoreCase("All Channels"))
+            onClickCategory("All Channels", channelItemList);
+        else {
+            String channelJson = lastPlayedPrefs.getString(lastPlayedCategory, "");
+            if (channelJson.isEmpty()) {
+                channelItemList = new ArrayList<>();
+            } else {
+                Type type = new TypeToken<List<ChannelItem>>() {
+                }.getType();
+                channelItemList = gson.fromJson(channelJson, type);
+            }
+            onClickCategory(lastPlayedCategory, channelItemList);
+        }
+    }
+
+    private void setUpFavToView(List<ChannelItem> favChannelList, CategoryAdapter adapter) {
+        if (favChannelList.size() != 0) {
+            CategoriesWithChannels favoriteCatCh = new CategoriesWithChannels();
+            favChannelList.sort(Comparator.comparing(ChannelItem::getChannelPriority));
+            CategoryItem catItem = new CategoryItem();
+            catItem.setTitle(CATEGORY_FAVORITE);
+            favoriteCatCh.categoryItem = catItem;
+            favoriteCatCh.channelItemList = favChannelList;
+            adapter.addFavoriteItem(favoriteCatCh);
+        } else {
+            adapter.removeFavoriteItem();
+        }
+    }
+
+    private List<ChannelItem> checkForFavorites(List<ChannelItem> channelItemList) {
+        List<ChannelItem> favChannelList = new ArrayList<>();
+        for (ChannelItem toCheckFavitem : channelItemList) {
+            if (toCheckFavitem.getIs_fav() == IS_FAV) {
+                favChannelList.add(toCheckFavitem);
+            }
+        }
+        return favChannelList;
+
+    }
+
+    private List<ChannelItem> addAllChannels
+            (List<CategoriesWithChannels> categoriesWithChannels) {
+        List<ChannelItem> channelItemList = new ArrayList<>();
+        for (CategoriesWithChannels withChannels : categoriesWithChannels) {
+            channelItemList.addAll(withChannels.channelItemList);
+        }
+        return channelItemList;
+    }
+
+    /**
+     * fetch channelList from category list with embedded channels and populate into the channel Recycler View
+     *
+     * @param items
+     */
+    private void setUpChannelsCategory(List<ChannelItem> items) {
+        if (items != null) {
+            if (items.size() > 0) {
+                adapter = new ChannelListAdapter(getActivity(), this);
+                gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+                gvChannelsList.setAdapter(adapter);
+                gvChannelsList.requestFocus();
+                adapter.setChannelItems(items);
                 if (lastPlayedId != -1) {
-                    LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
-                    lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
-                        @Override
-                        public void onChanged(@Nullable ChannelItem channelItem) {
-                            if (channelItem != null) {
-                                setValues(channelItem);
-                                mListener.playChannel(channelItem);
-                                lastPlayedChData.removeObserver(this);
-                            }
-                        }
-                    });
-                } else {
-                    openErrorFragment();
+                    selectedChannelPosition = adapter.getSelectedChannelPositionViaId(lastPlayedId);
+                    lastPlayedId = -1;
                 }
+                adapter.setPositionSelected(selectedChannelPosition);
+                currentSelected = adapter.getmList().get(selectedChannelPosition);
+                gvChannelsList.getLayoutManager().scrollToPosition(selectedChannelPosition);
+                adapter.notifyDataSetChanged();
             }
+        }
+    }
 
-            private void openErrorFragment () {
-                ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
+    /**
+     * populate channels of clicked category into channel Recycler View
+     *
+     * @param categoryName
+     * @param mListChannels
+     */
+    @Override
+    public void onClickCategory(String categoryName, List<ChannelItem> mListChannels) {
+        String channelJson = gson.toJson(mListChannels);
+        SharedPreferences.Editor categoryEditor = lastPlayedPrefs.edit();
+        categoryEditor.putString(CATEGORY_NAME, categoryName);
+        categoryEditor.putString(categoryName, channelJson);
+        categoryEditor.commit();
+        currentCategoryTitleView.setText(categoryName);
+        if (mListChannels.contains(currentPlayed))
+            selectedChannelPosition = mListChannels.indexOf(currentPlayed);
+        else
+            selectedChannelPosition = 0;
+        setUpChannelsCategory(mListChannels);
+    }
+
+
+    /**
+     * prompt the listener to initialise channel Play Event on channel clicked
+     *
+     * @param position
+     */
+    @Override
+    public void onClickChannel(int position) {
+        currentChannelPosition = position;
+        selectedChannelPosition = position;
+        Timber.d("position:" + currentChannelPosition);
+        selectedCurrentChannelId = adapter.getmList().get(position).getId();
+        mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+        currentSelected = adapter.getmList().get(position);
+        currentPlayed=adapter.getmList().get(position);
+        mListener.playChannel(adapter.getmList().get(position));
+
+    }
+
+
+    /**
+     * update UI events and preview status on channel list navigation
+     *
+     * @param position
+     */
+    @Override
+    public void onChannelFocused(int position) {
+        View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
+        if (currentFocusedView != null)
+            currentFocusedView.setNextFocusRightId(btnEpg.getId());
+        selectedChannelPosition = position;
+        setValues(adapter.getmList().get(position));
+        stopPreview();
+        currentSelected = adapter.getmList().get(position);
+        fetchPreview(adapter.getmList().get(position));
+
+    }
+
+    /**
+     * stop handler and video playback
+     */
+    private void stopPreview() {
+        //TODO stop preview here
+        previewView.stopPlayback();
+        previewContainer.setVisibility(View.INVISIBLE);
+        watchPreviewHandler.removeCallbacksAndMessages(null);
+    }
+
+    /**
+     * fetch preview of the selected channel item from server
+     *
+     * @param channelItem
+     */
+    private void fetchPreview(ChannelItem channelItem) {
+        long utc = GetUtc.getInstance().getTimestamp().getUtc();
+        menuViewModel.getPreviewLink(login.getToken(), utc, String.valueOf(login.getId()),
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()), channelItem.getId()).observe(this, channelLinkResponse -> {
+            if (channelLinkResponse != null) {
+                startPreview(channelLinkResponse.getChannel().getLink());
             }
+        });
 
-            /**
-             * get Categories along with channel list from database and populate into their respective adapters
-             */
-            private void setUpRecylerViewCategory () {
-                Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
-                Log.d("frag", "recycle view created");
-                CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
-                categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-                categoryList.setAdapter(adapter);
+    }
 
-                menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
-                    if (categoriesWithChannels != null) {
-                        adapter.setCategory(categoriesWithChannels);
-                        CategoriesWithChannels item = categoriesWithChannels.get(1);
-                        List<ChannelItem> channelItems = item.channelItemList;
-                        Log.d(TAG, channelItems.size() + "");
-                        io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+    /**
+     * set Handler to stream the fecthed preview link to video view
+     *
+     * @param link
+     */
+    private void startPreview(String link) {
+        //TODO enable preview here
+        watchPreviewHandler.postDelayed(() -> initVideoView(link), TimeUnit.SECONDS.toMillis(5));
+    }
 
-                    }
-                });
+    /**
+     * initialise video view here
+     *
+     * @param link
+     */
+    private void initVideoView(String link) {
+        try {
+            previewView.setVideoPath(link);
+            previewView.setOnPreparedListener(mediaPlayer -> {
+                mediaPlayer.setVolume(0f, 0f);
+                mediaPlayer.start();
+                previewContainer.setVisibility(View.VISIBLE);
+            });
+            previewView.setOnErrorListener((mp, what, extra) -> {
+                previewContainer.setVisibility(View.INVISIBLE);
+//                Toast.makeText(getActivity(), "LoginError Code: \t W"+what+"E"+extra, Toast.LENGTH_SHORT).show();
+                Timber.e("Media LoginError: ", "what = " + what + " extra = " + extra);
+                return true;
+            });
+        } catch (Exception e) {
+            Timber.wtf(e);
+        }
+    }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden)
+            stopPreview();
+        else {
+            updateCategoryUI(allChannelItems);
+        }
+        super.onHiddenChanged(hidden);
+    }
 
-            }
+    @Override
+    public void onDestroyView() {
+        stopPreview();
+        super.onDestroyView();
+    }
 
-            private void setUpCategoriesToView
-            (List < ChannelItem > channelItemList, CategoryAdapter adapter){
-                adapter.setAllChannelList(channelItemList);
-                onClickCategory("All Channels", channelItemList);
-                io.reactivex.Observable.just(channelItemList).map(this::checkForFavorites).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(favChannelList -> setUpFavToView(favChannelList, adapter));
-            }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 
-            private void setUpFavToView (List < ChannelItem > favChannelList, CategoryAdapter
-            adapter){
-                if (favChannelList.size() != 0) {
-                    CategoriesWithChannels favoriteCatCh = new CategoriesWithChannels();
-                    favChannelList.sort(Comparator.comparing(ChannelItem::getChannelPriority));
-                    CategoryItem catItem = new CategoryItem();
-                    catItem.setTitle(CATEGORY_FAVORITE);
-                    favoriteCatCh.categoryItem = catItem;
-                    favoriteCatCh.channelItemList = favChannelList;
-                    adapter.addFavoriteItem(favoriteCatCh);
-                } else {
-                    adapter.removeFavoriteItem();
-                }
-            }
+    @OnClick(R.id.fav)
+    public void onFavClick() {
+        ChannelItem selectedChannel = adapter.getmList().get(selectedChannelPosition);
+        int toFavUnfavId = selectedChannel.getId();
+        int favStatus = selectedChannel.getIs_fav() == 0 ? 1 : 0;
+        menuViewModel.addChannelToFavorite(favStatus, toFavUnfavId);
+        Toast.makeText(getActivity(), selectedChannel.getName() + " " + (favStatus == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
+    }
 
-            private List<ChannelItem> checkForFavorites (List < ChannelItem > channelItemList) {
-                List<ChannelItem> favChannelList = new ArrayList<>();
-                for (ChannelItem toCheckFavitem : channelItemList) {
-                    if (toCheckFavitem.getIs_fav() == IS_FAV) {
-                        favChannelList.add(toCheckFavitem);
-                    }
-                }
-                return favChannelList;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentMenuInteraction) {
+            mListener = (FragmentMenuInteraction) context;
 
-            }
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+        lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
 
-            private List<ChannelItem> addAllChannels
-            (List < CategoriesWithChannels > categoriesWithChannels) {
-                List<ChannelItem> channelItemList = new ArrayList<>();
-                for (CategoriesWithChannels withChannels : categoriesWithChannels) {
-                    channelItemList.addAll(withChannels.channelItemList);
-                }
-                return channelItemList;
-            }
-
-            /**
-             * fetch channelList from category list with embedded channels and populate into the channel Recycler View
-             *
-             * @param items
-             */
-            private void setUpChannelsCategory (List < ChannelItem > items) {
-                if (items != null) {
-                    if (items.size() > 0) {
-                        adapter = new ChannelListAdapter(getActivity(), this);
-                        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        gvChannelsList.setAdapter(adapter);
-                        adapter.setChannelItems(items);
-                        selectedCurrentChannelId = adapter.getmList().get(lastPlayedPosition).getId();
-                        current = adapter.getmList().get(lastPlayedPosition);
-                    }
-                }
-            }
-
-            /**
-             * populate channels of clicked category into channel Recycler View
-             *
-             * @param categoryName
-             * @param mListChannels
-             */
-            @Override
-            public void onClickCategory (String categoryName, List < ChannelItem > mListChannels){
-                currentCategoryTitleView.setText(categoryName);
-                setUpChannelsCategory(mListChannels);
-            }
-
-
-            /**
-             * prompt the listener to initialise channel Play Event on channel clicked
-             *
-             * @param position
-             */
-            @Override
-            public void onClickChannel ( int position){
-//        onChannelFocused(position);
-                currentChannelPosition = position;
-                selectedCurrentChannelId = adapter.getmList().get(position).getId();
-
+    /**
+     * Observe Up & down key press event from activity  and change the currentSelected playing channel accordingly
+     *
+     * @param observable
+     * @param o
+     */
+    @Override
+    public void update(Observable observable, Object o) {
+        if (observable instanceof ChannelChangeObserver) {
+            if (((ChannelChangeObserver) observable).getChannelNext()) {
+                //put condition here so no IoB Exception occurs
+                if (currentChannelPosition < adapter.getItemCount() - 1)
+                    currentChannelPosition++;
+                else
+                    currentChannelPosition = 0;
+                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+            } else if (!((ChannelChangeObserver) observable).getChannelNext()) {
+                if (currentChannelPosition > 0)
+                    currentChannelPosition--;
+                else
+                    currentChannelPosition = adapter.getItemCount() - 1;
                 mListener.playChannel(adapter.getmList().get(currentChannelPosition));
 
-                current = adapter.getmList().get(position);
-                mListener.playChannel(adapter.getmList().get(position));
-
             }
-
-
-            /**
-             * update UI events and preview status on channel list navigation
-             *
-             * @param position
-             */
-            @Override
-            public void onChannelFocused ( int position){
-                gvChannelsList.findViewHolderForLayoutPosition(position).itemView.setNextFocusRightId(btnEpg.getId());
-                selectedChannelPosition = position;
-                setValues(adapter.getmList().get(position));
-                stopPreview();
-                current = adapter.getmList().get(position);
-                fetchPreview(adapter.getmList().get(position));
-
-            }
-
-            /**
-             * stop handler and video playback
-             */
-            private void stopPreview () {
-                //TODO stop preview here
-                previewView.stopPlayback();
-                previewContainer.setVisibility(View.INVISIBLE);
-                watchPreviewHandler.removeCallbacksAndMessages(null);
-            }
-
-            /**
-             * fetch preview of the selected channel item from server
-             *
-             * @param channelItem
-             */
-            private void fetchPreview (ChannelItem channelItem){
-                long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                menuViewModel.getPreviewLink(login.getToken(), utc, String.valueOf(login.getId()),
-                        LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()), channelItem.getId()).observe(this, channelLinkResponse -> {
-                    if (channelLinkResponse != null) {
-                        startPreview(channelLinkResponse.getChannel().getLink());
-                    }
-                });
-
-            }
-
-            /**
-             * set Handler to stream the fecthed preview link to video view
-             *
-             * @param link
-             */
-            private void startPreview (String link){
-                //TODO enable preview here
-                watchPreviewHandler.postDelayed(() -> initVideoView(link), TimeUnit.SECONDS.toMillis(5));
-            }
-
-            /**
-             * initialise video view here
-             *
-             * @param link
-             */
-            private void initVideoView (String link){
-                try {
-                    previewView.setVideoPath(link);
-                    previewView.setOnPreparedListener(mediaPlayer -> {
-                        mediaPlayer.setVolume(0f, 0f);
-                        mediaPlayer.start();
-                        previewContainer.setVisibility(View.VISIBLE);
-                    });
-                    previewView.setOnErrorListener((mp, what, extra) -> {
-                        previewContainer.setVisibility(View.INVISIBLE);
-//                Toast.makeText(getActivity(), "LoginError Code: \t W"+what+"E"+extra, Toast.LENGTH_SHORT).show();
-                        Timber.e("Media LoginError: ", "what = " + what + " extra = " + extra);
-                        return true;
-                    });
-                } catch (Exception e) {
-                    Timber.wtf(e);
-                }
-            }
-
-            @Override
-            public void onHiddenChanged ( boolean hidden){
-                if (hidden)
-                    stopPreview();
-                super.onHiddenChanged(hidden);
-            }
-
-            @Override
-            public void onDestroyView () {
-                stopPreview();
-                super.onDestroyView();
-            }
-
-            @Override
-            public void onDetach () {
-                super.onDetach();
-            }
-
-            @OnClick(R.id.fav)
-            public void onFavClick () {
-                ChannelItem selectedChannel = adapter.getmList().get(selectedChannelPosition);
-                int toFavUnfavId = selectedChannel.getId();
-                int favStatus = selectedChannel.getIs_fav() == 0 ? 1 : 0;
-                menuViewModel.addChannelToFavorite(favStatus, toFavUnfavId);
-                Toast.makeText(getActivity(), selectedChannel.getName() + " " + (favStatus == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onAttach (Context context){
-                super.onAttach(context);
-                if (context instanceof FragmentMenuInteraction) {
-                    mListener = (FragmentMenuInteraction) context;
-
-                } else {
-                    throw new RuntimeException(context.toString()
-                            + " must implement OnFragmentInteractionListener");
-                }
-                lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-            }
-
-            /**
-             * Observe Up & down key press event from activity  and change the current playing channel accordingly
-             *
-             * @param observable
-             * @param o
-             */
-            @Override
-            public void update (Observable observable, Object o){
-                if (observable instanceof ChannelChangeObserver) {
-                    if (((ChannelChangeObserver) observable).getChannelNext()) {
-                        //put condition here so no IoB Exception occurs
-                        if (currentChannelPosition < adapter.getItemCount() - 1)
-                            currentChannelPosition++;
-                        else
-                            currentChannelPosition = 0;
-                        mListener.playChannel(adapter.getmList().get(currentChannelPosition));
-                    } else if (!((ChannelChangeObserver) observable).getChannelNext()) {
-                        if (currentChannelPosition > 0)
-                            currentChannelPosition--;
-                        else
-                            currentChannelPosition = adapter.getItemCount() - 1;
-                        mListener.playChannel(adapter.getmList().get(currentChannelPosition));
-
-                    }
-                }
-            }
-
-
-
+        }
+    }
 
 
     private void setValues(ChannelItem item) {
@@ -541,29 +577,27 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
 
-
-
     @OnClick(R.id.layout_epg)
-    public void OnEpgClick(){
+    public void OnEpgClick() {
         EpgFragment fragment = new EpgFragment();
         fragment.setSelectedChannelId(selectedCurrentChannelId);
         mListener.load(fragment, "epg");
     }
 
     @OnClick(R.id.layout_dvr)
-    public void OnDvrClick(){
+    public void OnDvrClick() {
         DvrFragment fragment = new DvrFragment();
-        fragment.setCurrentChannel(current);
-        mListener.load(fragment,"Dvr");
+        fragment.setCurrentChannel(currentSelected);
+        mListener.load(fragment, "Dvr");
     }
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
+
         void load(Fragment epgFragment, String tag);
 
 
     }
-
 
 
 }
