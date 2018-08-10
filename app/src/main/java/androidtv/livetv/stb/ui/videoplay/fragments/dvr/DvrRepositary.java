@@ -152,7 +152,7 @@ public class DvrRepositary {
 
                     @Override
                     public void onError(Throwable e) {
-                      dvrStartDate.postValue(null);
+                      dvrStartDate.postValue(new DvrStartDateTimeEntity());
                     }
 
                     @Override

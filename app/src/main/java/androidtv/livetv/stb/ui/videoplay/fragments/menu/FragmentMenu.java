@@ -254,7 +254,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     if (channelItem != null) {
                         setValues(channelItem);
                         mListener.playChannel(channelItem);
-
                         lastPlayedChData.removeObserver(this);
                     }
                 }

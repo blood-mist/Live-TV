@@ -23,6 +23,17 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
     private Context mContext;
     private List<Epgs> mList;
     private OnClickDvrList listener;
+    private Epgs playingEpg;
+    private int selectedFocusedPosition;
+
+    public int getSelectedFocusedPosition() {
+        return selectedFocusedPosition;
+    }
+
+    public void setSelectedFocusedPosition(int selectedFocusedPosition) {
+        this.selectedFocusedPosition = selectedFocusedPosition;
+        notifyDataSetChanged();
+    }
 
     public DvrListAdapter(Context context, OnClickDvrList lis) {
         this.mContext = context;
@@ -59,12 +70,17 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
             holder.LayoutTxtImgHor.setTag("10");
 
         }
+
+        if(selectedFocusedPosition == position){
+            holder.LayoutTxtImgHor.requestFocus();
+        }
+
         holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
+                if (hasFocus) {
                     holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
-                } else{
+                } else {
                     holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
                 }
             }
@@ -72,15 +88,20 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(v.getTag() == "12"){
+                if (v.getTag() == "12") {
                     listener.onAirClick(epg);
-                }else {
-                    listener.clickDvr(epg);
+                } else {
+                    listener.clickDvr(epg,position);
                     v.requestFocus();
 
                 }
             }
         });
+        if (playingEpg != null) {
+            if (epg.getId() == playingEpg.getId()) {
+                holder.LayoutTxtImgHor.requestFocus();
+            }
+        }
 
 
     }
@@ -100,16 +121,40 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
     }
 
     public void clear() {
-        if(mList != null && mList.size()>0){
+        if (mList != null && mList.size() > 0) {
             mList.clear();
             notifyDataSetChanged();
         }
     }
 
+    public void setEpg(Epgs currentPlayedEpg) {
+        this.playingEpg = currentPlayedEpg;
+        notifyDataSetChanged();
+    }
+
+    public int getPosition(Epgs currentPlayedEpg) {
+            if (mList != null && mList.size() > 0) {
+                for (int i = 0; i < mList.size(); i++) {
+                    Epgs epg = mList.get(i);
+                    if (currentPlayedEpg != null) {
+                        if (currentPlayedEpg.getId() != null && epg.getId().equals(currentPlayedEpg.getId())){
+                            return i;
+                        }
+                    }
+                }
+
+            return mList.size() - 1;
+        } else {
+            return 0;
+        }
+    }
+
 
     public interface OnClickDvrList {
-        void clickDvr(Epgs epg);
+        void clickDvr(Epgs epg,int position);
+
         void onOnAirSetup(Epgs epg);
+
         void onAirClick(Epgs epgs);
     }
 

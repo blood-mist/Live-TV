@@ -30,21 +30,19 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
     public void setPositionClicked(int positionClicked) {
         this.positionClicked = positionClicked;
         notifyDataSetChanged();
-
     }
 
     public int getPositionClicked() {
         return positionClicked;
     }
 
-    private int positionClicked;
+    private int positionClicked = -1;
 
     public DateListAdapter(Context context, List<Date> lis, DateClickLis listener) {
         this.mContext = context;
         this.dateList = lis;
         this.listener = listener;
     }
-
 
     @NonNull
     @Override
@@ -61,12 +59,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
         holder.layoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (position == positionClicked) {
-                    holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
-                    holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
-                    // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
-                    holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#8F5B282C"));
-                } else if (hasFocus) {
+             if (hasFocus) {
                     holder.prgmDetails.setFont(mContext.getResources().getString(R.string.font_exo_Bold));
                     holder.prgmDetails.setScaleX(1.05f);
                     holder.prgmDetails.setScaleY(1.05f);
@@ -83,19 +76,15 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
             }
         });
 
-        if (positionClicked == position) {
+        if (getPositionClicked() == position) {
             holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
             holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
-            // holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#80013C56"));
-            holder.layoutTxtImgHor.setBackgroundColor(Color.parseColor("#9e1e27"));
+            holder.mainLayout.setBackgroundColor(Color.parseColor("#9e1e27"));
             holder.layoutTxtImgHor.requestFocus();
-
-
         } else {
-
             holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Light));
             holder.prgmDetails.setTextColor(Color.parseColor("#ddefde"));
-            holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
+            holder.mainLayout.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
 
         }
 

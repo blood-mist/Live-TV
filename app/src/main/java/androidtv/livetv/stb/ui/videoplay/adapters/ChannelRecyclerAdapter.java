@@ -133,6 +133,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
         if(selectedChannelId == channel.getId()){
             setSelectedChannel(position);
+            holder.itemLayout.requestFocus();
             holder.itemLayout.setSelected(true);
             onChannelClicked(channel,position);
         }
@@ -181,6 +182,8 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    view.requestFocus();
+                    itemLayout.setSelected(true);
                     onChannelClicked(channelList.get(getAdapterPosition()),getAdapterPosition());
 
                 }

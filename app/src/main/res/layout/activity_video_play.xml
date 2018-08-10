@@ -72,6 +72,7 @@
     <FrameLayout
         android:id="@+id/container_movie_player"
         android:layout_width="match_parent"
+
         android:layout_height="match_parent">
 
         <ImageView
@@ -88,15 +89,7 @@
             android:layout_gravity="center"
             android:src="@drawable/play_white_transparent"
             android:visibility="gone" />
-        <com.wang.avi.AVLoadingIndicatorView
-            android:id="@+id/progressBar1"
-            style="@style/AVLoadingIndicatorView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            app:indicatorColor="@color/color_white"
-            app:indicatorName="BallSpinFadeLoaderIndicator" />
+
 
 
     </FrameLayout>
@@ -117,6 +110,15 @@
         android:textSize="50sp"
         android:visibility="gone"
         android:maxLength="4"/>
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progressBar1"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:indicatorColor="@color/color_white"
+        app:indicatorName="BallSpinFadeLoaderIndicator" />
 
 
 </FrameLayout>
