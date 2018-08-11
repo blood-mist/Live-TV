@@ -178,23 +178,14 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             super(itemView);
             channelImage=itemView.findViewById(R.id.img);
             itemLayout = itemView.findViewById(R.id.relativeLayout);
-            itemLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onChannelClicked(channelList.get(getAdapterPosition()),getAdapterPosition());
+            itemLayout.setOnClickListener(view -> onChannelClicked(channelList.get(getAdapterPosition()),getAdapterPosition()));
 
+            itemView.setOnFocusChangeListener((view, b) -> {
+                if (b) {
+                    itemLayout.setSelected(true);
                 }
-            });
-
-            itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View view, boolean b) {
-                    if (b) {
-                        itemLayout.setSelected(true);
-                    }
-                    else{
-                        itemLayout.setSelected(false);
-                    }
+                else{
+                    itemLayout.setSelected(false);
                 }
             });
 

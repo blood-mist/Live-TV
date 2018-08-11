@@ -420,11 +420,13 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                             loadUnauthorized("404", getString(R.string.mac_not_registered), "N/A");
                         } else {
                             Toast.makeText(this, loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage(), Toast.LENGTH_LONG).show();
-                            showLogin(userEmail);
+                            LoginFileUtils.deleteLoginFile();
+                            checkForValidMacAddress();
                         }
 
                     } else {
                         showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), userEmail);
+                        LoginFileUtils.deleteLoginFile();
                     }
 
                 }

@@ -3,6 +3,7 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.Index;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -65,7 +66,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static android.support.constraint.Constraints.TAG;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
@@ -82,7 +82,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private ChannelListAdapter adapter;
     private SharedPreferences lastPlayedPrefs;
     private int selectedCurrentChannelId;
-    private int lastPlayedPosition = 0;
+
     Gson gson = new Gson();
     private List<ChannelItem> allChannelItems;
 
@@ -147,6 +147,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private int currentChannelPosition = 0;
     private int selectedChannelPosition = 0;
+    private int lastPlayedPosition = 0;
     private Login login;
     int lastPlayedId;
 
@@ -177,6 +178,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         Log.d("frag", "view created");
         playLastPlayedChannel();
         setUpRecylerViewCategory();
+        categoryList.setNextFocusDownId(gvChannelsList.getId());
         btnEpg.setNextFocusUpId(categoryList.getId());
         btnDvr.setNextFocusUpId(categoryList.getId());
         btnFav.setNextFocusUpId(categoryList.getId());
@@ -186,8 +188,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 btnFav.setScaleY(1.4f);
                 txtFavUnfav.setScaleX(1.3f);
                 txtFavUnfav.setScaleY(1.3f);
-                txtFavUnfav.setTextColor(getResources().getColor(R.color.white));
-                btnFav.setColorFilter(getResources().getColor(R.color.white));
+                txtFavUnfav.setTextColor(getResources().getColor(R.color.red_selector));
+                btnFav.setColorFilter(getResources().getColor(R.color.red_selector));
 
             } else {
                 txtFavUnfav.setTextColor(getResources().getColor(R.color.dvr_text_color));
@@ -205,8 +207,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 btnDvr.setScaleY(1.4f);
                 txtDvr.setScaleX(1.3f);
                 txtDvr.setScaleY(1.3f);
-                txtDvr.setTextColor(getResources().getColor(R.color.white));
-                btnDvr.setColorFilter(getResources().getColor(R.color.white));
+                txtDvr.setTextColor(getResources().getColor(R.color.red_selector));
+                btnDvr.setColorFilter(getResources().getColor(R.color.red_selector));
 
             } else {
                 txtDvr.setTextColor(getResources().getColor(R.color.dvr_text_color));
@@ -226,8 +228,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 btnEpg.setScaleY(1.4f);
                 txtEpg.setScaleX(1.3f);
                 txtEpg.setScaleY(1.3f);
-                txtDvr.setTextColor(getResources().getColor(R.color.white));
-                btnDvr.setColorFilter(getResources().getColor(R.color.white));
+                txtEpg.setTextColor(getResources().getColor(R.color.red_selector));
+                btnEpg.setColorFilter(getResources().getColor(R.color.red_selector));
 
             } else {
                 txtEpg.setTextColor(getResources().getColor(R.color.dvr_text_color));
@@ -239,57 +241,58 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
             }
         });
-        }
 
-        private void playLastPlayedChannel () {
-            lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
-            selectedCurrentChannelId = lastPlayedId;
-            if (lastPlayedId != -1) {
-                LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
+    }
 
-                lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
-                    @Override
-                    public void onChanged(@Nullable ChannelItem channelItem) {
-                        if (channelItem != null) {
-                            setValues(channelItem);
-                            mListener.playChannel(channelItem);
-                            currentPlayed = channelItem;
-                            lastPlayedChData.removeObserver(this);
-                        }
+    private void playLastPlayedChannel() {
+        lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
+        selectedCurrentChannelId = lastPlayedId;
+        if (lastPlayedId != -1) {
+            LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
+
+            lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
+                @Override
+                public void onChanged(@Nullable ChannelItem channelItem) {
+                    if (channelItem != null) {
+                        setValues(channelItem);
+                        mListener.playChannel(channelItem);
+                        currentPlayed = channelItem;
+                        lastPlayedChData.removeObserver(this);
                     }
-                });
-            } else {
-                openErrorFragment();
-            }
-        }
-
-        private void openErrorFragment () {
-            ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
-        }
-
-        /**
-         * get Categories along with channel list from database and populate into their respective adapters
-         */
-        private void setUpRecylerViewCategory () {
-            Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
-            Log.d("frag", "recycle view created");
-            CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
-            categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-            categoryList.setAdapter(adapter);
-
-            menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
-                if (categoriesWithChannels != null) {
-                    adapter.setCategory(categoriesWithChannels);
-                    CategoriesWithChannels item = categoriesWithChannels.get(1);
-                    List<ChannelItem> channelItems = item.channelItemList;
-                    Log.d(TAG, channelItems.size() + "");
-                    io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
-
                 }
             });
-
-
+        } else {
+            openErrorFragment();
         }
+    }
+
+    private void openErrorFragment() {
+        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
+    }
+
+    /**
+     * get Categories along with channel list from database and populate into their respective adapters
+     */
+    private void setUpRecylerViewCategory() {
+        Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
+        Log.d("frag", "recycle view created");
+        CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
+        categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        categoryList.setAdapter(adapter);
+
+        menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
+            if (categoriesWithChannels != null && categoriesWithChannels.size() != 0) {
+                adapter.setCategory(categoriesWithChannels);
+                CategoriesWithChannels item = categoriesWithChannels.get(1);
+                List<ChannelItem> channelItems = item.channelItemList;
+                Log.d("channelSize", channelItems.size() + "");
+                io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
+
+            }
+        });
+
+
+    }
 
 
     private void setUpCategoriesToView(List<ChannelItem> channelItemList, CategoryAdapter adapter) {
@@ -306,7 +309,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         else {
             String channelJson = lastPlayedPrefs.getString(lastPlayedCategory, "");
             if (channelJson.isEmpty()) {
-                channelItemList = new ArrayList<>();
+                if (lastPlayedCategory.equalsIgnoreCase(CATEGORY_FAVORITE))
+                    onClickCategory("All Channels", channelItemList);
+                else
+                    channelItemList = new ArrayList<>();
             } else {
                 Type type = new TypeToken<List<ChannelItem>>() {
                 }.getType();
@@ -315,6 +321,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             onClickCategory(lastPlayedCategory, channelItemList);
         }
     }
+
 
     private void setUpFavToView(List<ChannelItem> favChannelList, CategoryAdapter adapter) {
         if (favChannelList.size() != 0) {
@@ -367,7 +374,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     lastPlayedId = -1;
                 }
                 adapter.setPositionSelected(selectedChannelPosition);
-                currentSelected = adapter.getmList().get(selectedChannelPosition);
+                try {
+                    currentSelected = adapter.getmList().get(selectedChannelPosition);
+                }catch (Exception e){
+                    currentSelected=adapter.getmList().get(0);
+
+                }
                 gvChannelsList.getLayoutManager().scrollToPosition(selectedChannelPosition);
                 adapter.notifyDataSetChanged();
             }
@@ -382,14 +394,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     @Override
     public void onClickCategory(String categoryName, List<ChannelItem> mListChannels) {
-        String channelJson = gson.toJson(mListChannels);
-        SharedPreferences.Editor categoryEditor = lastPlayedPrefs.edit();
-        categoryEditor.putString(CATEGORY_NAME, categoryName);
-        categoryEditor.putString(categoryName, channelJson);
-        categoryEditor.commit();
         currentCategoryTitleView.setText(categoryName);
-        if (mListChannels.contains(currentPlayed))
+        if (mListChannels.contains(currentPlayed)) {
             selectedChannelPosition = mListChannels.indexOf(currentPlayed);
+            String channelJson = gson.toJson(mListChannels);
+            SharedPreferences.Editor categoryEditor = lastPlayedPrefs.edit();
+            categoryEditor.putString(CATEGORY_NAME, categoryName);
+            categoryEditor.putString(categoryName, channelJson);
+            categoryEditor.commit();
+        }
         else
             selectedChannelPosition = 0;
         setUpChannelsCategory(mListChannels);
@@ -522,6 +535,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         int favStatus = selectedChannel.getIs_fav() == 0 ? 1 : 0;
         menuViewModel.addChannelToFavorite(favStatus, toFavUnfavId);
         Toast.makeText(getActivity(), selectedChannel.getName() + " " + (favStatus == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
+        gvChannelsList.getAdapter().notifyDataSetChanged();
     }
 
     @Override

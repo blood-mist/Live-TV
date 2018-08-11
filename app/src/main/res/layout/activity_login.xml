@@ -43,7 +43,7 @@
             android:layout_alignTop="@+id/label_userName"
             android:layout_toEndOf="@+id/label_userName"
             android:layout_toRightOf="@+id/label_userName"
-            android:ems="10"
+            android:ems="15"
             android:padding="10dp"
             android:textColor="@color/signup_form_text_color"
             android:textSize="20sp" />
@@ -69,7 +69,7 @@
             android:layout_toEndOf="@+id/loginPasswordLabel"
             android:layout_toRightOf="@+id/loginPasswordLabel"
             android:background="@drawable/edittext_selector"
-            android:ems="10"
+            android:ems="15"
             android:hint="@string/hint_password"
             android:inputType="textPassword"
             android:padding="10dp"

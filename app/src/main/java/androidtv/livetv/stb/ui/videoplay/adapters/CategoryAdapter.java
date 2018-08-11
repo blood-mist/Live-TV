@@ -179,10 +179,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     }
 
     public void removeFavoriteItem() {
+        mListener.onClickCategory("All Channels", allChannelList);
         for (CategoriesWithChannels toCheckFavExists : categoryItemList) {
             if (toCheckFavExists.categoryItem.getTitle().equalsIgnoreCase(CATEGORY_FAVORITE)) {
                 categoryItemList.remove(toCheckFavExists);
                 notifyItemRemoved(1);
+                mListener.onClickCategory("All Channels", allChannelList);
                 break;
             }
         }

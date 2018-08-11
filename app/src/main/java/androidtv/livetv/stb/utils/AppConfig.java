@@ -12,7 +12,7 @@ public class AppConfig {
     }
      public static String getMac(){
 
-      return "ccd3e222652e";
+      return "ccd3e2226503";
 //      return "abcd";
      }
 }
