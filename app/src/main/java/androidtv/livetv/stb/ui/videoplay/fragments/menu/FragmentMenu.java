@@ -528,7 +528,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentChannelPosition--;
                 else
                     currentChannelPosition = adapter.getItemCount() - 1;
-                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+                   mListener.playChannel(adapter.getmList().get(currentChannelPosition));
 
             }
         }

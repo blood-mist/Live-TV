@@ -142,6 +142,8 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         currentEpgDate = Calendar.getInstance().getTime();
+        String currentDate = androidtv.livetv.stb.utils.DateUtils.dateAndTime.format(Calendar.getInstance().getTime());
+        txtDateView.setText(currentDate);
         adapter = new ChannelRecyclerAdapter(getContext(), this);
         adapter.setSelectedChannelId(selectedChannelId);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -156,6 +158,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         dateListAdapter = new DateListAdapter(getActivity(), getDateList(), this);
         gvDate.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvDate.setAdapter(dateListAdapter);
+        dateListAdapter.setPositionClicked(0);
         epgListAdapter = new EpgListAdapter(getActivity(), this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
@@ -182,6 +185,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         if(epgEntityLive != null && epgEntityLive.hasActiveObservers()){
             epgEntityLive.removeObservers(this);
         }
+
         resetOnAir(channel);
         currentSelectedChannel = channel;
         Log.d("channel",channel.getName());
@@ -202,6 +206,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                         cuurentEpgList = epgs.getEpgsList();
                     } else {
                         nOEpg.setVisibility(View.VISIBLE);
+
                         if (epgs.getError_message() != null && epgs.getError_message().length()>0) {
                             gvDate.setVisibility(View.GONE);
                            showNoEpg(epgs.getError_message());
@@ -273,7 +278,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onEpgClicked(Epgs epg) {
-        mListener.playChannel(adapter.getChannel(epg.getChannelID()));
+        mListener.playChannelFromOnAir(adapter.getChannel(epg.getChannelID()),true);
     }
 
     @Override
@@ -294,7 +299,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 //            @Override
 //            public void run() {
         String name = channel.getName();
-                txtChannelName.setText(name);
+
                 txtPrgmName.setText("N/A");
                 txtPrgmTime.setText("N/A");
 //            }
@@ -321,6 +326,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     }
 
     public interface FragmentEpgInteraction {
-        void playChannel(ChannelItem channelItem);
+        void playChannelFromOnAir(ChannelItem channel ,boolean onAir);
     }
 }

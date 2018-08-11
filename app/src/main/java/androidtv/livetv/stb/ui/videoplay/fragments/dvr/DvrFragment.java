@@ -141,14 +141,15 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                 onChannelClickInteraction(adapter.getChannelById(currentChannel.getId()),adapter.getChannelPositionById(currentChannel.getId()));
             }
         });
+
+        View focusChannelChlid = null;
+        gvChannelList.setNextFocusDownId(gvDate.getId());
         gvChannelList.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                Log.d( "onFocusChange: ","channelFocus");
+
             }
         });
-
-        gvChannelList.setNextFocusDownId(gvDate.getId());
 
     }
 
@@ -184,6 +185,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
                     } else {
                         //TODO Show Error
+
                         gvEpgDvr.setVisibility(View.GONE);
                         gvDate.setVisibility(View.GONE);
                         nOEpg.setText("Dvr not available for this channel");
@@ -307,7 +309,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         currentPlayedEpg = epg;
         currentEpgSelectedPosition = position;
         dvrListAdapter.setEpg(currentPlayedEpg);
-        gvEpgDvr.getChildAt(position).requestFocus();
+
     }
 
     @Override
@@ -328,7 +330,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onAirClick(Epgs epgs) {
-        mListener.playChannel(adapter.getChannel(epgs.getChannelID()));
+        mListener.playChannelFromOnAir(adapter.getChannel(epgs.getChannelID()),true);
     }
 
     public void setCurrentChannel(ChannelItem currentChannel) {
@@ -338,7 +340,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     }
 
     public interface FragmentDvrInteraction {
-        void playChannel(ChannelItem channel);
+        void playChannelFromOnAir(ChannelItem channel ,boolean onAir);
         void playDvr(Epgs epgs,ChannelItem item);
     }
 

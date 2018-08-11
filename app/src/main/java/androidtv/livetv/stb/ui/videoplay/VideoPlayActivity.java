@@ -116,6 +116,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private ChannelItem currentDvrChannelItem;
     private String nextVideoNameDvr;
+    private boolean fromOnAir  = false;
 
 
     @Override
@@ -384,17 +385,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannel(ChannelItem item) {
         saveCurrentInPrefs(item);
-        if (currentFragment instanceof FragmentMenu) {
-
-        } else {
-            removeAllFragments();
-        }
         mVideoController = null;
-
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
         showProgressBar();
-
         long utc = GetUtc.getInstance().getTimestamp().getUtc();
         Login login = GlobalVariables.login;
         videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
@@ -411,20 +405,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
             }
         });
-        saveCurrentInPrefs(item);
+
 
 
     }
 
-    private void removeAllFragments() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment instanceof FragmentMenu) {
-                menuFragment = (FragmentMenu) fragment;
-            } else {
-                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            }
-        }
-    }
+
 
     public void setErrorFragment(Exception exception, int what, int extra) {
         PlayBackErrorEntity errorEntity = null;
@@ -442,7 +428,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         if (menuFragment.isVisible()) {
             menuFragment.showErrorFrag(errorFragment);
         } else {
-            showMenuFragWithError(errorFragment);
+            menuFragment.setErrorFragMent(errorFragment);
+            showMenu();
         }
     }
 
@@ -514,17 +501,24 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     mVideoController.setAnchorView(videoSurfaceContainer);
                     mVideoController.setMediaPlayer(controller, player);
                     mVideoController.show();
+                    recordedStatus.setVisibility(View.VISIBLE);
+                }else{
+                    recordedStatus.setVisibility(View.GONE);
                 }
+
                 if (isDvr) {
                     hideMenuUI();
                 } else {
                     startCloseMenuHandler();
-                    if (menuFragment != null) {
+                    if(menuFragment.isVisible()){
                         menuFragment.hideErrorFrag();
-                    } else {
-                        menuFragment = (FragmentMenu) getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-                        menuFragment.hideErrorFrag();
+                    }else{
+                        menuFragment.setErrorFragMent(null);
                     }
+
+
+
+
                 }
                 randomDisplayMacAddress();
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -547,6 +541,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     VideoPlayActivity.this.hideProgressBar();
                     VideoPlayActivity.this.hideMacDisplayHandler();
                     VideoPlayActivity.this.stopCloseMenuHandler();
+                    VideoPlayActivity.this.showDvrMenu();
                     try {
                         player.stop();
                     } catch (Exception ignored) {
@@ -557,7 +552,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     if (isDvr) {
                         Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                         VideoPlayActivity.this.stopCloseMenuHandler();
-                        VideoPlayActivity.this.showMenu();
+
                     } else {
                         VideoPlayActivity.this.setErrorFragment(null, what, extra);
                     }
@@ -664,6 +659,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void showProgressBar() {
         progressBar.smoothToShow();
+    }
+
+    @Override
+    public void playChannelFromOnAir(ChannelItem channel, boolean onAir) {
+        fromOnAir = onAir;
+        getSupportFragmentManager().popBackStack();
+        playChannel(channel);
     }
 
     @Override

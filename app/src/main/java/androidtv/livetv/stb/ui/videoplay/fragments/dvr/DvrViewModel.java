@@ -49,6 +49,7 @@ public class DvrViewModel extends AndroidViewModel {
     }
 
     public LiveData<DvrStartDateTimeEntity> getStartTime(String token, long utc, String userId, String hashValue, int hasDvr, String channelId){
+        dvrStartDateTimeEntityMediatorLiveData.postValue(null);
         dvrStartDateTimeEntityMediatorLiveData.addSource(
                 dvrRepositary.getStartTime(token, utc, userId, hashValue, hasDvr, channelId)
                 , new Observer<DvrStartDateTimeEntity>() {
