@@ -25,6 +25,7 @@ public class EpgViewModel extends AndroidViewModel {
         epgRepositary = EpgRepositary.getInstance(application);
         channelListMediator = new MediatorLiveData<>();
         epLiveData = new MediatorLiveData<>();
+        epLiveData.setValue(null);
         channelListMediator.addSource(epgRepositary.getAllChannels(), channelItems -> channelListMediator.postValue(channelItems));
     }
 
@@ -34,6 +35,7 @@ public class EpgViewModel extends AndroidViewModel {
     }
 
     public LiveData<EpgEntity> getEpgs(String token, long utc, String userId , String hashValue, String channelId){
+        epLiveData.postValue(null);
         epLiveData.addSource(epgRepositary.getEpgs(token, utc, userId, hashValue, channelId), new Observer<EpgEntity>() {
             @Override
             public void onChanged(@Nullable EpgEntity epgs) {

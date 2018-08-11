@@ -28,6 +28,7 @@ public class DvrViewModel extends AndroidViewModel {
         channelListMediator = new MediatorLiveData<>();
         epLiveData = new MediatorLiveData<>();
         dvrStartDateTimeEntityMediatorLiveData = new MediatorLiveData<>();
+        dvrStartDateTimeEntityMediatorLiveData.setValue(null);
         channelListMediator.addSource(dvrRepositary.getAllChannels(), channelItems -> channelListMediator.postValue(channelItems));
 
     }
@@ -48,7 +49,10 @@ public class DvrViewModel extends AndroidViewModel {
     }
 
     public LiveData<DvrStartDateTimeEntity> getStartTime(String token, long utc, String userId, String hashValue, int hasDvr, String channelId){
-        dvrStartDateTimeEntityMediatorLiveData.addSource(dvrRepositary.getStartTime(token, utc, userId, hashValue, hasDvr, channelId), new Observer<DvrStartDateTimeEntity>() {
+        dvrStartDateTimeEntityMediatorLiveData.postValue(null);
+        dvrStartDateTimeEntityMediatorLiveData.addSource(
+                dvrRepositary.getStartTime(token, utc, userId, hashValue, hasDvr, channelId)
+                , new Observer<DvrStartDateTimeEntity>() {
             @Override
             public void onChanged(@Nullable DvrStartDateTimeEntity dvrStartDateTimeEntity) {
                 dvrStartDateTimeEntityMediatorLiveData.postValue(dvrStartDateTimeEntity);

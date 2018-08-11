@@ -109,9 +109,11 @@
             android:focusable="false"
             android:importantForAccessibility="auto"
             android:orientation="horizontal"
+
             android:padding="10dp"
             android:weightSum="6"
             android:baselineAligned="false">
+
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -192,6 +194,7 @@
                     android:focusable="false"
                     android:importantForAccessibility="noHideDescendants"
                     android:maxLines="3"
+
                     android:paddingBottom="5dp"
                     android:textColor="@color/text_color"
                     android:textSize="17sp"
@@ -331,7 +334,6 @@
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
-
         </LinearLayout>
 
         <FrameLayout

@@ -56,6 +56,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
             holder.onAirText.setText("ON AIR");
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
             listener.onOnAirSetup(epg);
+            holder.LayoutTxtImgHor.requestFocus();
         }else{
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
             holder.alarmPlay.setImageResource(R.drawable.icon_alarm);

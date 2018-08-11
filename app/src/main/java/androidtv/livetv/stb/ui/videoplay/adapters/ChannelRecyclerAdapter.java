@@ -133,6 +133,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
         if(selectedChannelId == channel.getId()){
             setSelectedChannel(position);
+            holder.itemLayout.requestFocus();
             holder.itemLayout.setSelected(true);
             onChannelClicked(channel,position);
         }
@@ -178,7 +179,14 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             super(itemView);
             channelImage=itemView.findViewById(R.id.img);
             itemLayout = itemView.findViewById(R.id.relativeLayout);
-            itemLayout.setOnClickListener(view -> onChannelClicked(channelList.get(getAdapterPosition()),getAdapterPosition()));
+            itemLayout.setOnClickListener(new View.OnClickListener() {
+                                              @Override
+                                              public void onClick(View view) {
+                                                  view.requestFocus();
+                                                  itemLayout.setSelected(true);
+                                                  onChannelClicked(channelList.get(getAdapterPosition()), getAdapterPosition());
+                                              }
+                                          });
 
             itemView.setOnFocusChangeListener((view, b) -> {
                 if (b) {

@@ -154,12 +154,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private Handler watchPreviewHandler = new Handler();
 
     private ChannelItem currentSelected, currentPlayed;
-
+    private ChannelItem current;
+    private ErrorFragment errorFragment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         menuViewModel = ViewModelProviders.of(this).get(MenuViewModel.class);
+        playLastPlayedChannel();
+        errorFragment = null;
     }
 
     @Override
@@ -176,7 +179,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
-        playLastPlayedChannel();
         setUpRecylerViewCategory();
         categoryList.setNextFocusDownId(gvChannelsList.getId());
         btnEpg.setNextFocusUpId(categoryList.getId());
@@ -249,7 +251,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedCurrentChannelId = lastPlayedId;
         if (lastPlayedId != -1) {
             LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
-
             lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
                 @Override
                 public void onChanged(@Nullable ChannelItem channelItem) {
@@ -267,14 +268,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     private void openErrorFragment() {
-        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).openErrorFragment();
+
+        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).setErrorFragment(null,0,0);
     }
 
     /**
      * get Categories along with channel list from database and populate into their respective adapters
      */
     private void setUpRecylerViewCategory() {
-        Toast.makeText(getActivity(), "Setting recycleing view for category", Toast.LENGTH_SHORT).show();
         Log.d("frag", "recycle view created");
         CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -293,6 +294,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
 
     }
+
 
 
     private void setUpCategoriesToView(List<ChannelItem> channelItemList, CategoryAdapter adapter) {
@@ -384,7 +386,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 adapter.notifyDataSetChanged();
             }
         }
+
     }
+
 
     /**
      * populate channels of clicked category into channel Recycler View
@@ -407,7 +411,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             selectedChannelPosition = 0;
         setUpChannelsCategory(mListChannels);
     }
-
 
     /**
      * prompt the listener to initialise channel Play Event on channel clicked
@@ -483,11 +486,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         watchPreviewHandler.postDelayed(() -> initVideoView(link), TimeUnit.SECONDS.toMillis(5));
     }
 
-    /**
+   /**
      * initialise video view here
      *
      * @param link
-     */
+     **/
     private void initVideoView(String link) {
         try {
             previewView.setVideoPath(link);
@@ -512,7 +515,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (hidden)
             stopPreview();
         else {
+            if(errorFragment != null)
+                showErrorFrag(errorFragment);
             updateCategoryUI(allChannelItems);
+
         }
         super.onHiddenChanged(hidden);
     }
@@ -552,6 +558,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     /**
+<<<<<<< HEAD
      * Observe Up & down key press event from activity  and change the currentSelected playing channel accordingly
      *
      * @param observable
@@ -572,7 +579,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentChannelPosition--;
                 else
                     currentChannelPosition = adapter.getItemCount() - 1;
-                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+                   mListener.playChannel(adapter.getmList().get(currentChannelPosition));
 
             }
         }
@@ -602,6 +609,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void OnDvrClick() {
         DvrFragment fragment = new DvrFragment();
         fragment.setCurrentChannel(currentSelected);
+
         mListener.load(fragment, "Dvr");
     }
 
@@ -611,14 +619,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public void hideErrorFrag() {
         ErrorFragment menuFrag = (ErrorFragment) getChildFragmentManager().findFragmentById(R.id.error_layout);
-        if (menuFrag != null)
+        if (menuFrag != null) {
             getChildFragmentManager().beginTransaction().hide(menuFrag).commit();
+            errorFragment = null;
+        }
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-
+    public void setErrorFragMent(ErrorFragment errorFragment) {
+        this.errorFragment = errorFragment;
     }
+
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
@@ -627,6 +637,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
 
     }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
 
-
+    }
 }
