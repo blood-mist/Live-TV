@@ -185,7 +185,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         if(epgEntityLive != null && epgEntityLive.hasActiveObservers()){
             epgEntityLive.removeObservers(this);
         }
-
+        txtChannelName.setText(channel.getName());
         resetOnAir(channel);
         currentSelectedChannel = channel;
         Log.d("channel",channel.getName());
@@ -300,8 +300,8 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 //            public void run() {
         String name = channel.getName();
 
-                txtPrgmName.setText("N/A");
-                txtPrgmTime.setText("N/A");
+                txtPrgmName.setText("");
+                txtPrgmTime.setText("");
 //            }
 //        });
 

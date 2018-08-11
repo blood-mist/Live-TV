@@ -159,6 +159,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         menuViewModel = ViewModelProviders.of(this).get(MenuViewModel.class);
+        playLastPlayedChannel();
         errorFragment = null;
     }
 
@@ -179,7 +180,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         Log.d("frag", "view created");
 
         setUpRecylerViewCategory();
-        playLastPlayedChannel();
+
         layoutEpg.setNextFocusUpId(categoryList.getId());
         layoutDvr.setNextFocusUpId(categoryList.getId());
         layoutFav.setNextFocusUpId(categoryList.getId());
@@ -258,8 +259,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     }
                 }
             });
-        } else {
-            openErrorFragment();
         }
     }
 
