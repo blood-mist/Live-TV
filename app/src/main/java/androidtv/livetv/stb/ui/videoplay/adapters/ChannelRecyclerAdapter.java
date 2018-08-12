@@ -52,6 +52,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
     public void setSelectedChannel(int selectedChannelPos) {
         this.selectedChannel = selectedChannelPos;
+        notifyDataSetChanged();
 
     }
 
@@ -124,8 +125,18 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(holder.channelImage);
+        holder.itemLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.requestFocus();
+                setSelectedChannel(position);
+                holder.itemLayout.setSelected(true);
+                onChannelClicked(channelList.get(position), position);
+            }
+        });
 
         if (position == getSelectedChannel()) {
+            holder.itemLayout.requestFocus();
             holder.itemLayout.setSelected(true);
         } else {
             holder.itemLayout.setSelected(false);
@@ -179,23 +190,9 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             super(itemView);
             channelImage=itemView.findViewById(R.id.img);
             itemLayout = itemView.findViewById(R.id.relativeLayout);
-            itemLayout.setOnClickListener(new View.OnClickListener() {
-                                              @Override
-                                              public void onClick(View view) {
-                                                  view.requestFocus();
-                                                  itemLayout.setSelected(true);
-                                                  onChannelClicked(channelList.get(getAdapterPosition()), getAdapterPosition());
-                                              }
-                                          });
 
-            itemView.setOnFocusChangeListener((view, b) -> {
-                if (b) {
-                    itemLayout.setSelected(true);
-                }
-                else{
-                    itemLayout.setSelected(false);
-                }
-            });
+
+
 
         }
     }

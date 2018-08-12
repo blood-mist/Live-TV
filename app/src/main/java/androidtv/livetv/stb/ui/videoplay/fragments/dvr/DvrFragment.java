@@ -136,7 +136,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             public void onChanged(@Nullable List<ChannelItem> channelItems) {
                 adapter.setChannelList(channelItems);
                 adapter.setSelectedChannel(adapter.getChannelPositionById(currentChannel.getId()));
-                gvChannelList.smoothScrollToPosition(adapter.getChannelPositionById(currentChannel.getId()));
+                gvChannelList.scrollToPosition((adapter.getChannelPositionById(currentChannel.getId())));
                 gvChannelList.requestFocus();
                 onChannelClickInteraction(adapter.getChannelById(currentChannel.getId()),adapter.getChannelPositionById(currentChannel.getId()));
             }
@@ -295,7 +295,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     public void onClick(int postion, Date date) {
         currentEpgDate = date;
         setUpAdapter(cuurentEpgList);
-        gvDate.getChildAt(postion).requestFocus();
+//        gvDate.getChildAt(postion).requestFocus();
         gvDate.smoothScrollToPosition(postion);
     }
 

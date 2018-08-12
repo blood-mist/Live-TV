@@ -58,7 +58,7 @@
                         android:gravity="center"
                         android:text="@string/txt_empty"
                         android:textColor="#fff"
-                        android:textSize="25sp"/>
+                        style="@style/Base.TextAppearance.AppCompat.Large"/>
 
                     <TextView
                         android:id="@+id/txt_on_air"
@@ -90,7 +90,8 @@
                             android:gravity="center"
                             android:text="@string/txt_empty"
                             android:textColor="#fff"
-                            android:textSize="25sp"/>
+                            android:visibility="gone"
+                            style="@style/Base.TextAppearance.AppCompat.Medium"/>
 
                         <TextView
                             android:id="@+id/txt_date"
@@ -99,7 +100,7 @@
                             android:gravity="center"
                             android:text="@string/txt_empty"
                             android:textColor="@color/date_defocused"
-                            android:textSize="25sp"/>
+                            style="@style/Base.TextAppearance.AppCompat.Medium"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -116,7 +117,7 @@
                             android:gravity="center"
                             android:text="@string/txt_empty"
                             android:textColor="@color/date_defocused"
-                            android:textSize="25sp"/>
+                            style="@style/Base.TextAppearance.AppCompat.Medium"/>
 
                         <TextView
                             android:id="@+id/txt_on_air_prgm_name"
@@ -124,8 +125,10 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/txt_empty"
+                            android:maxLines="2"
+                            android:ellipsize="end"
                             android:textColor="#fff"
-                            android:textSize="25sp"/>
+                            style="@style/Base.TextAppearance.AppCompat.Medium"/>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -181,7 +184,7 @@
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:textColor="@color/color_white"
-                                android:textSize="22sp"
+                                style="@style/Base.TextAppearance.AppCompat.Large"
                                 android:layout_centerInParent="true"
                                 app:fontAssetName="@string/font_exo_semi_bold"
                                 android:text="Loading..."/>

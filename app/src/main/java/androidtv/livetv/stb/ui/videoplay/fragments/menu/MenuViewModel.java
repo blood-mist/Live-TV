@@ -21,6 +21,7 @@ public class MenuViewModel extends AndroidViewModel {
     private MediatorLiveData<ChannelLinkResponse> previewData;
     private MediatorLiveData<ChannelItem> lastPlayedData;
     private MediatorLiveData<FavoriteResponse> favoriteData;
+    private MediatorLiveData<List<ChannelItem>> liveFavItems;
 
 
     public MenuViewModel(@NonNull Application application) {
@@ -37,6 +38,9 @@ public class MenuViewModel extends AndroidViewModel {
 
         favoriteData=new MediatorLiveData<>();
         favoriteData.setValue(null);
+
+        liveFavItems = new MediatorLiveData<>();
+        liveFavItems.addSource(menuRepository.getFavChannels(), channelItems -> liveFavItems.postValue(channelItems));
 
     }
 
@@ -56,6 +60,10 @@ public class MenuViewModel extends AndroidViewModel {
 
     public void addChannelToFavorite( int favStatus,int channel_id) {
         menuRepository.addChannelToFav(favStatus,channel_id);
+    }
+
+    public LiveData<List<ChannelItem>> getFavChannels(){
+       return liveFavItems;
     }
 }
 

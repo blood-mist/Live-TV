@@ -152,6 +152,11 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItems) {
                 adapter.setChannelList(channelItems);
+                adapter.setChannelList(channelItems);
+                adapter.setSelectedChannel(adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
+                gvChannelList.scrollToPosition((adapter.getChannelPositionById(getCurrentSelectedChannel().getId())));
+                gvChannelList.requestFocus();
+                onChannelClickInteraction(adapter.getChannelById(getCurrentSelectedChannel().getId()),adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
 
             }
         });
@@ -162,7 +167,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         epgListAdapter = new EpgListAdapter(getActivity(), this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
-        onChannelClickInteraction(getCurrentSelectedChannel(),0);
+
 
 
     }

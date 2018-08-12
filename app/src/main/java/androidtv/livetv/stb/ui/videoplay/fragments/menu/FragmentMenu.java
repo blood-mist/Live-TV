@@ -85,6 +85,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     Gson gson = new Gson();
     private List<ChannelItem> allChannelItems;
+    private boolean isFirstRun = true;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -180,11 +181,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
         setUpRecylerViewCategory();
+
         categoryList.setNextFocusDownId(gvChannelsList.getId());
-        btnEpg.setNextFocusUpId(categoryList.getId());
-        btnDvr.setNextFocusUpId(categoryList.getId());
-        btnFav.setNextFocusUpId(categoryList.getId());
-        btnFav.setOnFocusChangeListener((view12, hasFocus) -> {
+        layoutEpg.setNextFocusUpId(categoryList.getId());
+        layoutDvr.setNextFocusUpId(categoryList.getId());
+        layoutFav.setNextFocusUpId(categoryList.getId());
+        gvChannelsList.setNextFocusRightId(layoutEpg.getId());
+        layoutFav.setOnFocusChangeListener((view12, hasFocus) -> {
             if (hasFocus) {
                 btnFav.setScaleX(1.4f);
                 btnFav.setScaleY(1.4f);
@@ -203,7 +206,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }
         });
 
-        btnDvr.setOnFocusChangeListener((view1, hasFocus) -> {
+        layoutDvr.setOnFocusChangeListener((view1, hasFocus) -> {
             if (hasFocus) {
                 btnDvr.setScaleX(1.4f);
                 btnDvr.setScaleY(1.4f);
@@ -224,7 +227,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
         });
 
-        btnEpg.setOnFocusChangeListener((view1, hasFocus) -> {
+        layoutEpg.setOnFocusChangeListener((view1, hasFocus) -> {
             if (hasFocus) {
                 btnEpg.setScaleX(1.4f);
                 btnEpg.setScaleY(1.4f);
@@ -277,20 +280,34 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     private void setUpRecylerViewCategory() {
         Log.d("frag", "recycle view created");
-        CategoryAdapter adapter = new CategoryAdapter(getActivity(), this);
+        CategoryAdapter categoryAdapter = new CategoryAdapter(getActivity(), this);
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
-        categoryList.setAdapter(adapter);
+        categoryList.setAdapter(categoryAdapter);
 
-        menuViewModel.getCategoriesWithChannels().observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
+        LiveData<List<CategoriesWithChannels>> liveData =    menuViewModel.getCategoriesWithChannels();
+        liveData.observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
             if (categoriesWithChannels != null && categoriesWithChannels.size() != 0) {
-                adapter.setCategory(categoriesWithChannels);
+                categoryAdapter.setCategory(categoriesWithChannels);
                 CategoriesWithChannels item = categoriesWithChannels.get(1);
                 List<ChannelItem> channelItems = item.channelItemList;
                 Log.d("channelSize", channelItems.size() + "");
-                io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, adapter));
-
+                io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, categoryAdapter));
             }
         });
+
+        /*menuViewModel.getFavChannels().observe(this, new android.arch.lifecycle.Observer<List<ChannelItem>>() {
+            @Override
+            public void onChanged(@Nullable List<ChannelItem> channelItems) {
+                if(channelItems != null){
+                    if(channelItems.size()>0){
+                       setUpFavToView(channelItems,categoryAdapter);
+
+                    }
+                }
+            }
+        });
+*/
+
 
 
     }
@@ -328,9 +345,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private void setUpFavToView(List<ChannelItem> favChannelList, CategoryAdapter adapter) {
         if (favChannelList.size() != 0) {
             CategoriesWithChannels favoriteCatCh = new CategoriesWithChannels();
-            favChannelList.sort(Comparator.comparing(ChannelItem::getChannelPriority));
+           // favChannelList.sort(Comparator.comparing(ChannelItem::getChannelPriority));
             CategoryItem catItem = new CategoryItem();
             catItem.setTitle(CATEGORY_FAVORITE);
+            catItem.setId(999999);
             favoriteCatCh.categoryItem = catItem;
             favoriteCatCh.channelItemList = favChannelList;
             adapter.addFavoriteItem(favoriteCatCh);
@@ -438,14 +456,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     @Override
     public void onChannelFocused(int position) {
-        View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
-        if (currentFocusedView != null)
-            currentFocusedView.setNextFocusRightId(btnEpg.getId());
-        selectedChannelPosition = position;
-        setValues(adapter.getmList().get(position));
-        stopPreview();
-        currentSelected = adapter.getmList().get(position);
-        fetchPreview(adapter.getmList().get(position));
+            View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
+            if (currentFocusedView != null)
+                currentFocusedView.setNextFocusRightId(layoutEpg.getId());
+            selectedChannelPosition = position;
+            setValues(adapter.getmList().get(position));
+            stopPreview();
+            currentSelected = adapter.getmList().get(position);
+            fetchPreview(adapter.getmList().get(position));
+
 
     }
 
@@ -534,14 +553,17 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onDetach();
     }
 
-    @OnClick(R.id.fav)
-    public void onFavClick() {
+    @OnClick(R.id.layout_fav)
+    public void onFavClick(View view) {
         ChannelItem selectedChannel = adapter.getmList().get(selectedChannelPosition);
         int toFavUnfavId = selectedChannel.getId();
         int favStatus = selectedChannel.getIs_fav() == 0 ? 1 : 0;
         menuViewModel.addChannelToFavorite(favStatus, toFavUnfavId);
         Toast.makeText(getActivity(), selectedChannel.getName() + " " + (favStatus == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
-        gvChannelsList.getAdapter().notifyDataSetChanged();
+        adapter.getmList().get(selectedChannelPosition).setIs_fav(favStatus);
+        gvChannelsList.getAdapter().notifyItemChanged(selectedChannelPosition);
+        view.requestFocus();
+
     }
 
     @Override
@@ -632,13 +654,18 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
-
         void load(Fragment epgFragment, String tag);
 
 
     }
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
     }
 }

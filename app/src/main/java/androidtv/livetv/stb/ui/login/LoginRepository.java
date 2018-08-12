@@ -77,7 +77,10 @@ public class LoginRepository {
         loginData = new MediatorLiveData<>();
         channelCountData = new MediatorLiveData<>();
         channelCountData.setValue(null);
-        channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> channelCountData.postValue(integer));
+        channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> {
+            channelCountData.removeSource(catChannelDao.getCatTableSize());
+            channelCountData.postValue(integer);
+        });
         channelListData = new MediatorLiveData<>();
         channelListData.setValue(null);
         channelListData.addSource(catChannelDao.getChannels(), channelItemList -> {

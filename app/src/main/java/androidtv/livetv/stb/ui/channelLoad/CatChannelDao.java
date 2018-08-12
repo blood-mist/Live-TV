@@ -57,5 +57,8 @@ public interface CatChannelDao {
     @Query("SELECT * FROM CATEGORY_TABLE")
     LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
 
+    @Query("SELECT * FROM CHANNEL_TABLE WHERE is_fav = 1")
+    LiveData<List<ChannelItem>> getFavChannels();
+
 
 }

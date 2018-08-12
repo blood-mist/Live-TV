@@ -416,7 +416,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void setErrorFragment(Exception exception, int what, int extra) {
         PlayBackErrorEntity errorEntity = null;
         if (exception != null) {
-            errorEntity = new PlayBackErrorEntity(1, getString(R.string.err_code_server_unreachable), getString(R.string.err_server_unreachable));
+            errorEntity = new PlayBackErrorEntity(1, "", exception.getMessage());
         } else {
             StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
             errorEntity = new PlayBackErrorEntity(2, sb.toString(), getString(R.string.err_media_error));
@@ -431,7 +431,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             menuFragment.showErrorFrag(errorFragment);
         } else {
             menuFragment.setErrorFragMent(errorFragment);
-            showMenu();
+            showDvrMenu();
         }
     }
 

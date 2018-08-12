@@ -172,10 +172,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     }
 
     public void addFavoriteItem(CategoriesWithChannels item) {
-        if (!categoryItemList.contains(item)) {
-            categoryItemList.add(0, item);
-            notifyItemInserted(1);
+        for (CategoriesWithChannels toCheckFavExists : categoryItemList) {
+            if (toCheckFavExists.categoryItem.getTitle().equalsIgnoreCase(CATEGORY_FAVORITE)) {
+                categoryItemList.remove(toCheckFavExists);
+                notifyItemRemoved(1);
+            }
         }
+
+        categoryItemList.add(0,item);
+        notifyItemInserted(1);
+
     }
 
     public void removeFavoriteItem() {

@@ -80,9 +80,15 @@ public class VideoPlayRepository {
                             ChannelLinkResponse response = channelLinkResponseResponse.body();
                              if(response.getChannel() != null){
                                 wrapper.setChannelLinkResponse(response);
+                             }else{
+                                 String messgae = "Something went wrong";
+                                 if(response.getError_message().length()>0){
+                                     messgae = response.getError_message();
+                                 }
+                                 wrapper.setException(new Exception(messgae));
                              }
                         } else {
-                            wrapper.setException(new Exception());
+                            wrapper.setException(new Exception("Server problem!"));
                         }
 
                         responseMediatorLiveData.postValue(wrapper);

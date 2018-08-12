@@ -221,7 +221,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:gravity="center"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
@@ -232,8 +232,8 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
-                            android:clickable="true"
-                            android:focusable="true"
+                            android:clickable="false"
+                            android:focusable="false"
                             android:focusableInTouchMode="true"
                             android:importantForAccessibility="yes"
                             android:src="@drawable/epg" />
@@ -260,7 +260,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:gravity="center"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
@@ -271,8 +271,8 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
-                            android:clickable="true"
-                            android:focusable="true"
+                            android:clickable="false"
+                            android:focusable="false"
                             android:importantForAccessibility="yes"
                             android:src="@drawable/dvr" />
 
@@ -298,7 +298,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2.4"
-                        android:focusable="false"
+                        android:focusable="true"
                         android:gravity="center_vertical"
                         android:importantForAccessibility="auto"
                         android:orientation="horizontal">
@@ -309,8 +309,8 @@
                             android:layout_height="20dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
-                            android:focusable="true"
-                            android:clickable="true"
+                            android:focusable="false"
+                            android:clickable="false"
                             android:importantForAccessibility="yes"
                             android:src="@drawable/set_fav" />
 

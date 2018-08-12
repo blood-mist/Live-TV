@@ -3,7 +3,8 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class MenuRepository {
     private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
     private CatChannelDao catChannelDao;
     private MediatorLiveData<ChannelItem> lastChannelData;
+    private MediatorLiveData<List<ChannelItem>> favLiveData;
 
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
@@ -39,9 +41,10 @@ public class MenuRepository {
         videoPlayApiInterface = retrofitInstance.create(ApiInterface.class);
         categoryData = new MediatorLiveData<>();
         catChannelData=new MediatorLiveData<>();
+        favLiveData = new MediatorLiveData<>();
         catChannelData.addSource(catChannelDao.getCategoriesWithChannels(), categoriesWithChannels -> catChannelData.postValue(categoriesWithChannels));
         categoryData.addSource(catChannelDao.getCategories(), categoryItems -> categoryData.postValue(categoryItems));
-
+        favLiveData.addSource(catChannelDao.getFavChannels(), channelItems -> favLiveData.postValue(channelItems));
 
     }
 
@@ -111,6 +114,10 @@ public class MenuRepository {
         });
         return lastChannelData;
 
+    }
+
+    public LiveData<List<ChannelItem>> getFavChannels(){
+        return favLiveData;
     }
 
     public void addChannelToFav(int favStatus,int channel_id) {
