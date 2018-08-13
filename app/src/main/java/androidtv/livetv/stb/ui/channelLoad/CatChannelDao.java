@@ -47,7 +47,7 @@ public interface CatChannelDao {
     LiveData<Integer> getChannelTableSize();
 
     @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
-    void updateFav(int is_fav, int channel_id);
+    long updateFav(int is_fav, int channel_id);
 
 
     @Query("SELECT * FROM CHANNEL_TABLE  WHERE channel_id=:channel_id")

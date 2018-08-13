@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.Index;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -31,6 +32,10 @@ import android.widget.VideoView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,6 +49,7 @@ import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.ui.utc.GetUtc;
@@ -167,6 +173,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Timber.d("onCreateView");
@@ -270,9 +282,27 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(FavEvent event) {
+        if (event.getSuccessStatus() != -1) {
+            Toast.makeText(getActivity(), event.getChannelItem().getName() + " " + (event.getFavStatus() == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
+            adapter.getmList().get(selectedChannelPosition).setIs_fav(event.getFavStatus());
+            gvChannelsList.getAdapter().notifyItemChanged(selectedChannelPosition);
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.err_unexpected), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
     private void openErrorFragment() {
 
-        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).setErrorFragment(null,0,0);
+        ((VideoPlayActivity) Objects.requireNonNull(getActivity())).setErrorFragment(null, 0, 0);
     }
 
     /**
@@ -284,13 +314,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         categoryList.setAdapter(categoryAdapter);
 
-        LiveData<List<CategoriesWithChannels>> liveData =    menuViewModel.getCategoriesWithChannels();
+        LiveData<List<CategoriesWithChannels>> liveData = menuViewModel.getCategoriesWithChannels();
         liveData.observe(this, (List<CategoriesWithChannels> categoriesWithChannels) -> {
             if (categoriesWithChannels != null && categoriesWithChannels.size() != 0) {
                 categoryAdapter.setCategory(categoriesWithChannels);
-                CategoriesWithChannels item = categoriesWithChannels.get(1);
-                List<ChannelItem> channelItems = item.channelItemList;
-                Log.d("channelSize", channelItems.size() + "");
                 io.reactivex.Observable.just(categoriesWithChannels).map(this::addAllChannels).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> setUpCategoriesToView(channelItemList, categoryAdapter));
             }
         });
@@ -309,16 +336,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 */
 
 
-
     }
-
 
 
     private void setUpCategoriesToView(List<ChannelItem> channelItemList, CategoryAdapter adapter) {
         allChannelItems = channelItemList;
         adapter.setAllChannelList(channelItemList);
-        io.reactivex.Observable.just(channelItemList).map(this::checkForFavorites).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(favChannelList -> setUpFavToView(favChannelList, adapter));
-        updateCategoryUI(channelItemList);
+        io.reactivex.Observable.just(channelItemList).map(this::checkForFavorites).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(favChannelList -> setUpFavToView(channelItemList, favChannelList, adapter));
     }
 
     private void updateCategoryUI(List<ChannelItem> channelItemList) {
@@ -342,19 +366,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
 
-    private void setUpFavToView(List<ChannelItem> favChannelList, CategoryAdapter adapter) {
-        if (favChannelList.size() != 0) {
-            CategoriesWithChannels favoriteCatCh = new CategoriesWithChannels();
-           // favChannelList.sort(Comparator.comparing(ChannelItem::getChannelPriority));
-            CategoryItem catItem = new CategoryItem();
-            catItem.setTitle(CATEGORY_FAVORITE);
-            catItem.setId(999999);
-            favoriteCatCh.categoryItem = catItem;
-            favoriteCatCh.channelItemList = favChannelList;
-            adapter.addFavoriteItem(favoriteCatCh);
-        } else {
-            adapter.removeFavoriteItem();
-        }
+    private void setUpFavToView(List<ChannelItem> allChannelItems, List<ChannelItem> favChannelList, CategoryAdapter adapter) {
+        adapter.addFavoriteItem(favChannelList);
+        adapter.notifyDataSetChanged();
+        updateCategoryUI(allChannelItems);
     }
 
     private List<ChannelItem> checkForFavorites(List<ChannelItem> channelItemList) {
@@ -396,8 +411,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 adapter.setPositionSelected(selectedChannelPosition);
                 try {
                     currentSelected = adapter.getmList().get(selectedChannelPosition);
-                }catch (Exception e){
-                    currentSelected=adapter.getmList().get(0);
+                } catch (Exception e) {
+                    currentSelected = adapter.getmList().get(0);
 
                 }
                 gvChannelsList.getLayoutManager().scrollToPosition(selectedChannelPosition);
@@ -424,8 +439,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             categoryEditor.putString(CATEGORY_NAME, categoryName);
             categoryEditor.putString(categoryName, channelJson);
             categoryEditor.commit();
-        }
-        else
+        } else
             selectedChannelPosition = 0;
         setUpChannelsCategory(mListChannels);
     }
@@ -456,14 +470,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     @Override
     public void onChannelFocused(int position) {
-            View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
-            if (currentFocusedView != null)
-                currentFocusedView.setNextFocusRightId(layoutEpg.getId());
-            selectedChannelPosition = position;
-            setValues(adapter.getmList().get(position));
-            stopPreview();
-            currentSelected = adapter.getmList().get(position);
-            fetchPreview(adapter.getmList().get(position));
+        View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
+        if (currentFocusedView != null)
+            currentFocusedView.setNextFocusRightId(layoutEpg.getId());
+        selectedChannelPosition = position;
+        setValues(adapter.getmList().get(position));
+        stopPreview();
+        currentSelected = adapter.getmList().get(position);
+        fetchPreview(adapter.getmList().get(position));
 
 
     }
@@ -505,15 +519,17 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         watchPreviewHandler.postDelayed(() -> initVideoView(link), TimeUnit.SECONDS.toMillis(5));
     }
 
-   /**
+    /**
      * initialise video view here
      *
      * @param link
      **/
     private void initVideoView(String link) {
         try {
-            previewView.setVideoPath(link);
+            String previewLink="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+            previewView.setVideoPath(previewLink);
             previewView.setOnPreparedListener(mediaPlayer -> {
+                mediaPlayer.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
                 mediaPlayer.setVolume(0f, 0f);
                 mediaPlayer.start();
                 previewContainer.setVisibility(View.VISIBLE);
@@ -534,7 +550,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (hidden)
             stopPreview();
         else {
-            if(errorFragment != null)
+            if (errorFragment != null)
                 showErrorFrag(errorFragment);
             updateCategoryUI(allChannelItems);
 
@@ -556,14 +572,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @OnClick(R.id.layout_fav)
     public void onFavClick(View view) {
         ChannelItem selectedChannel = adapter.getmList().get(selectedChannelPosition);
-        int toFavUnfavId = selectedChannel.getId();
         int favStatus = selectedChannel.getIs_fav() == 0 ? 1 : 0;
-        menuViewModel.addChannelToFavorite(favStatus, toFavUnfavId);
-        Toast.makeText(getActivity(), selectedChannel.getName() + " " + (favStatus == 0 ? getString(R.string.channel_rm_fav) : getString(R.string.channel_set_fav)), Toast.LENGTH_LONG).show();
-        adapter.getmList().get(selectedChannelPosition).setIs_fav(favStatus);
-        gvChannelsList.getAdapter().notifyItemChanged(selectedChannelPosition);
-        view.requestFocus();
-
+        menuViewModel.addChannelToFavorite(favStatus, selectedChannel);
     }
 
     @Override
@@ -580,7 +590,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     /**
-<<<<<<< HEAD
      * Observe Up & down key press event from activity  and change the currentSelected playing channel accordingly
      *
      * @param observable
@@ -601,7 +610,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentChannelPosition--;
                 else
                     currentChannelPosition = adapter.getItemCount() - 1;
-                   mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
 
             }
         }
@@ -654,10 +663,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
+
         void load(Fragment epgFragment, String tag);
 
 
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
 

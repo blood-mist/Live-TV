@@ -17,6 +17,7 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
 
+import static android.view.View.GONE;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 
 
@@ -30,11 +31,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     private List<CategoriesWithChannels> categoryItemList;
     private OnListClickListener mListener;
     private int selectedPos;
-    private List<ChannelItem> allChannelList;
+    private List<ChannelItem> allChannelList, allFavList;
 
     public void setAllChannelList(List<ChannelItem> allChannelList) {
         this.allChannelList = allChannelList;
     }
+
 
     /**
      * Constructer
@@ -86,6 +88,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
 
     }
 
+
     public void setCategory(List<CategoriesWithChannels> categoryItems) {
         categoryItemList = categoryItems;
         notifyDataSetChanged();
@@ -120,7 +123,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     @Override
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
-        int pos=holder.getAdapterPosition();
+        int pos = holder.getAdapterPosition();
         CategoriesWithChannels categoryItem = null;
         /**
          * check the position of list
@@ -130,14 +133,26 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         if (pos == 0) {
             holder.mTitleView.setText(R.string.all_channels);
         } else {
-            if (categoryItemList != null) {
-                categoryItem = categoryItemList.get(position - 1);
-                holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
+            if (allFavList != null && allFavList.size() > 0) {
+                if (pos == 1) {
+                    holder.mTitleView.setText(CATEGORY_FAVORITE);
+                } else {
+                    if (categoryItemList != null) {
+                        categoryItem = categoryItemList.get(position - 2);
+                        holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
+                    } else {
+                        holder.mTitleView.setText(R.string.no_category);
+                    }
+                }
             } else {
-                holder.mTitleView.setText(R.string.no_category);
+                if (categoryItemList != null) {
+                    categoryItem = categoryItemList.get(position - 1);
+                    holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
+                } else {
+                    holder.mTitleView.setText(R.string.no_category);
+                }
             }
         }
-
 
         /**
          * final object created.
@@ -146,12 +161,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         holder.mCategoryLayout.setOnClickListener(v -> {
 
             selectedPos = pos;
-            if (pos == 0) {
-                mListener.onClickCategory("All Channels", allChannelList);
-            } else {
-                if (finalCategoryItem != null) {
-                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
-                }
+            switch (pos) {
+                case 0:
+                    mListener.onClickCategory("All Channels", allChannelList);
+                    break;
+                case 1:
+                    mListener.onClickCategory(CATEGORY_FAVORITE, allFavList);
+                    break;
+                default:
+                    if (finalCategoryItem != null) {
+                        mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+                    }
+                    break;
             }
         });
 
@@ -171,30 +192,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
 
     }
 
-    public void addFavoriteItem(CategoriesWithChannels item) {
-        for (CategoriesWithChannels toCheckFavExists : categoryItemList) {
-            if (toCheckFavExists.categoryItem.getTitle().equalsIgnoreCase(CATEGORY_FAVORITE)) {
-                categoryItemList.remove(toCheckFavExists);
-                notifyItemRemoved(1);
-            }
-        }
-
-        categoryItemList.add(0,item);
-        notifyItemInserted(1);
-
-    }
-
-    public void removeFavoriteItem() {
-        mListener.onClickCategory("All Channels", allChannelList);
-        for (CategoriesWithChannels toCheckFavExists : categoryItemList) {
-            if (toCheckFavExists.categoryItem.getTitle().equalsIgnoreCase(CATEGORY_FAVORITE)) {
-                categoryItemList.remove(toCheckFavExists);
-                notifyItemRemoved(1);
-                mListener.onClickCategory("All Channels", allChannelList);
-                break;
-            }
-        }
-
+    public void addFavoriteItem(List<ChannelItem> favoriteList) {
+        this.allFavList = favoriteList;
     }
 
 
@@ -203,12 +202,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     @Override
     public int getItemCount() {
-        if (categoryItemList != null)
+        if (categoryItemList != null && allFavList != null && allFavList.size() > 0)
+            return categoryItemList.size() + 2;
+        else if (categoryItemList != null)
             return categoryItemList.size() + 1;
         else
             return 0;
     }
-
 
     /**
      * interface for  clicklistener

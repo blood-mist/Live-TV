@@ -170,9 +170,12 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             splashError.dismiss();
             switch (errorCode) {
                 case INVALID_HASH:
+                    splashViewModel.deleteloginData();
                     showLogin(GlobalVariables.login.getEmail());
                     break;
                 case INVALID_USER:
+                    splashViewModel.deleteloginData();
+                    splashViewModel.deleteLoginFile();
                     checkValidUser();
                     break;
 

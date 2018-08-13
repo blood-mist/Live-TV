@@ -338,23 +338,25 @@
 
         <FrameLayout
             android:id="@+id/preview_container"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_alignParentRight="true"
-            android:background="@color/color_black"
+            android:layout_width="250dp"
+            android:minWidth="200dp"
+            android:layout_height="150dp"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="80dp"
-            android:layout_marginEnd="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="153dp"
+            android:layout_marginEnd="21dp"
+            android:background="@color/color_black"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="10dp">
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="21dp">
 
             <VideoView
                 android:id="@+id/preview_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content" />
 
         </FrameLayout>
         <Button

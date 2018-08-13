@@ -171,4 +171,11 @@ public class SplashViewModel extends AndroidViewModel {
 
     }
 
+    public void deleteloginData() {
+        splashRepository.deleteLoginFromDB();
+    }
+
+    public void deleteLoginFile() {
+        splashRepository.deleteLoginFile();
+    }
 }

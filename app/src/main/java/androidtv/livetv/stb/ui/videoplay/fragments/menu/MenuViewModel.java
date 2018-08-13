@@ -58,8 +58,8 @@ public class MenuViewModel extends AndroidViewModel {
         return lastPlayedData;
     }
 
-    public void addChannelToFavorite( int favStatus,int channel_id) {
-        menuRepository.addChannelToFav(favStatus,channel_id);
+    public void addChannelToFavorite( int favStatus,ChannelItem channel) {
+        menuRepository.addChannelToFav(favStatus,channel);
     }
 
     public LiveData<List<ChannelItem>> getFavChannels(){

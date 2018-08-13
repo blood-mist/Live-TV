@@ -578,4 +578,11 @@ public class SplashRepository {
         LoginFileUtils.reWriteLoginDetailsToFile(macAddress,
                 login.getEmail(), new MyEncryption().getEncryptedToken(userPassword), login.getSession(), String.valueOf(login.getId()));
     }
+
+    public void deleteLoginFile(){
+        Completable.fromRunnable(LoginFileUtils::deleteLoginFile).subscribeOn(Schedulers.io()).subscribe();
+    }
+    public void deleteLoginFromDB() {
+        Completable.fromRunnable(()-> mLoginDao.deleteAll()).subscribeOn(Schedulers.io()).subscribe();
+    }
 }
