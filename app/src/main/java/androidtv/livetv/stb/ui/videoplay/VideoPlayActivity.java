@@ -54,6 +54,7 @@ import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.ui.videoplay.videocontroller.MyVideoController;
 import androidtv.livetv.stb.ui.videoplay.videocontroller.VideoControllerView;
 import androidtv.livetv.stb.utils.AppConfig;
+import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DeviceUtils;
 import androidtv.livetv.stb.utils.LinkConfig;
@@ -416,7 +417,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void setErrorFragment(Exception exception, int what, int extra) {
         PlayBackErrorEntity errorEntity = null;
         if (exception != null) {
-            errorEntity = new PlayBackErrorEntity(1, "", exception.getMessage());
+            errorEntity =errorEntity = DataUtils.getErrorEntity(this,exception);
         } else {
             StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
             errorEntity = new PlayBackErrorEntity(2, sb.toString(), getString(R.string.err_media_error));

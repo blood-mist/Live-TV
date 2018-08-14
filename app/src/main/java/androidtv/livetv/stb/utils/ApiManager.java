@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
@@ -28,7 +30,7 @@ public class ApiManager {
                     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
                     // set your desired log level
                     logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-                    OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
+                    OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).addInterceptor(logging).build();
 
                      retrofit = new Retrofit.Builder()
                             .baseUrl(dynamicEndPoint.getUrl())

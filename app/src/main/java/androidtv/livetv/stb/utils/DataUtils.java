@@ -1,13 +1,21 @@
 package androidtv.livetv.stb.utils;
 
+import android.content.Context;
+
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
+
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.EpgItem;
 import androidtv.livetv.stb.entity.Epgs;
+import androidtv.livetv.stb.entity.PlayBackErrorEntity;
 
 public class DataUtils {
     public static List<Epgs> getEpgsListFrom(List<EpgItem> epgItemList, String channelId) {
@@ -80,6 +88,25 @@ public class DataUtils {
         return dates;
 
 
+    }
+
+    public static PlayBackErrorEntity getErrorEntity(Context context, Exception exception) {
+        String message = exception.getMessage();
+        String code = "";
+        if(exception instanceof ConnectException){
+            message = context.getResources().getString(R.string.err_server_unreachable);
+            code = context.getResources().getString(R.string.err_code_server_unreachable);
+
+        }else if(exception instanceof HttpException){
+            message = context.getResources().getString(R.string.err_json_exception);
+            code = context.getResources().getString(R.string.err_code_json_exception);
+
+        }else if(exception instanceof UnknownHostException){
+            message = context.getResources().getString(R.string.err_server_unreachable);
+            code = context.getResources().getString(R.string.err_code_server_unreachable);
+        }
+
+        return new PlayBackErrorEntity(1,code,message);
     }
 
 

@@ -5,7 +5,7 @@ package androidtv.livetv.stb.utils;
  */
 
 public class AppConfig {
-    private static boolean isFromDevelopment =true;
+    private static boolean isFromDevelopment =false;
 
     public static boolean isDevelopment() {
         return isFromDevelopment;
