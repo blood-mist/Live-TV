@@ -4,10 +4,12 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import java.util.List;
 
+import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
@@ -31,9 +33,11 @@ public class VideoPlayRepository {
     private ApiInterface videoPlayApiInterface;
     private MediatorLiveData<List<ChannelItem>> channelList;
     private CatChannelDao catChannelDao;
+    private Context context;
 
 
     public VideoPlayRepository(Application application) {
+        this.context = application.getApplicationContext();
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         videoPlayApiInterface = retrofitInstance.create(ApiInterface.class);
@@ -81,14 +85,14 @@ public class VideoPlayRepository {
                              if(response.getChannel() != null){
                                 wrapper.setChannelLinkResponse(response);
                              }else{
-                                 String messgae = "Something went wrong";
+                                 String messgae = context.getResources().getString(R.string.err_code_json_exception);
                                  if(response.getError_message().length()>0){
                                      messgae = response.getError_message();
                                  }
                                  wrapper.setException(new Exception(messgae));
                              }
                         } else {
-                            wrapper.setException(new Exception("Server problem!"));
+                            wrapper.setException(new Exception(context.getResources().getString(R.string.err_server_unreachable)));
                         }
 
                         responseMediatorLiveData.postValue(wrapper);

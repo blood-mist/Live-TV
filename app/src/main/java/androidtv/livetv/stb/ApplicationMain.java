@@ -37,6 +37,8 @@ public class ApplicationMain extends Application {
         });
     }
 
+
+
     private void handleUncaughtException(Thread thread, Throwable e) {
         try {
             e.printStackTrace();
@@ -89,4 +91,7 @@ final class CrashReportingTree extends Timber.Tree {
             }
         }
     }
+
+
+
 }

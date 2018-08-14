@@ -261,7 +261,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     }
 
-    private void playLastPlayedChannel() {
+    public void playLastPlayedChannel() {
         lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
         selectedCurrentChannelId = lastPlayedId;
         if (lastPlayedId != -1) {
