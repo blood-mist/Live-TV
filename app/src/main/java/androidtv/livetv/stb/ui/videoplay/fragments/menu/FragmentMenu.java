@@ -527,7 +527,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private void initVideoView(String link) {
         try {
             String previewLink="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-            previewView.setVideoPath(previewLink);
+            previewView.setVideoPath(link);
             previewView.setOnPreparedListener(mediaPlayer -> {
                 mediaPlayer.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
                 mediaPlayer.setVolume(0f, 0f);
