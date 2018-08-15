@@ -59,7 +59,8 @@ public class LinkConfig {
     public static final int INVALID_USER=102;
     public static final String CHANNEL_ID ="channel_id" ;
     public static final String CATEGORY_FAVORITE = "Favorites";
-     public static final String CATEGORY_NAME="category_name";
+     public static final String PLAYED_CATEGORY_NAME ="last_played_category_name";
+     public static final String SELECTED_CATEGORY_NAME ="selected_category_name";
     public static String getHashCode(String utc) {
       /*  String sessionId = null;
         try {

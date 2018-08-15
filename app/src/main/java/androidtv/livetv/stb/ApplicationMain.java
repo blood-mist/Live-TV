@@ -29,12 +29,7 @@ public class ApplicationMain extends Application {
             Timber.plant(new CrashReportingTree());
         }
 
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable e) {
-                handleUncaughtException(thread, e);
-            }
-        });
+        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(thread, e));
     }
 
     private void handleUncaughtException(Thread thread, Throwable e) {

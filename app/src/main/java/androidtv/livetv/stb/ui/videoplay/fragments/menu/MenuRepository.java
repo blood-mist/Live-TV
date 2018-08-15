@@ -26,6 +26,7 @@ import androidtv.livetv.stb.entity.FavoriteResponse;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
+import androidtv.livetv.stb.utils.DisposableManager;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -90,7 +91,7 @@ public class MenuRepository {
                 .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        DisposableManager.add(d);
                     }
 
                     @Override

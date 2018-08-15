@@ -18,6 +18,7 @@ import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.splash.SplashRepository;
 import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
+import androidtv.livetv.stb.utils.DisposableManager;
 import io.reactivex.Completable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -70,7 +71,7 @@ public class VideoPlayRepository {
                 .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-
+                        DisposableManager.addVideoPlayDisposable(d);
                     }
 
                     @Override

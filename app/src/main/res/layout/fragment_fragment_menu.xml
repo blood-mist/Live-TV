@@ -89,8 +89,8 @@
                     android:layout_gravity="center"
                     android:background="@color/transp"
                     android:importantForAccessibility="auto"
-                    android:nextFocusDown="@id/gv_channels"
                     android:nextFocusLeft="@id/gv_channels"
+                    android:nextFocusDown="@id/layout_epg"
                     android:paddingBottom="8dp"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
@@ -210,7 +210,7 @@
                     android:baselineAligned="false"
                     android:focusable="false"
                     android:gravity="bottom"
-                    android:importantForAccessibility="auto"
+                    android:importantForAccessibility="yes"
                     android:orientation="horizontal"
                     android:visibility="visible"
                     android:weightSum="11">
@@ -223,7 +223,8 @@
                         android:layout_weight="2"
                         android:focusable="true"
                         android:gravity="center"
-                        android:importantForAccessibility="auto"
+                        android:clickable="true"
+                        android:importantForAccessibility="yes"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -234,8 +235,8 @@
                             android:layout_marginStart="10dp"
                             android:clickable="false"
                             android:focusable="false"
-                            android:focusableInTouchMode="true"
-                            android:importantForAccessibility="yes"
+                            android:focusableInTouchMode="false"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/epg" />
 
                         <TextView
@@ -262,7 +263,8 @@
                         android:layout_weight="2"
                         android:focusable="true"
                         android:gravity="center"
-                        android:importantForAccessibility="auto"
+                        android:clickable="true"
+                        android:importantForAccessibility="yes"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -273,7 +275,7 @@
                             android:layout_marginStart="10dp"
                             android:clickable="false"
                             android:focusable="false"
-                            android:importantForAccessibility="yes"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/dvr" />
 
                         <TextView
@@ -300,7 +302,9 @@
                         android:layout_weight="2.4"
                         android:focusable="true"
                         android:gravity="center_vertical"
-                        android:importantForAccessibility="auto"
+                        android:importantForAccessibility="yes"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -311,7 +315,7 @@
                             android:layout_marginStart="10dp"
                             android:focusable="false"
                             android:clickable="false"
-                            android:importantForAccessibility="yes"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/set_fav" />
 
                         <androidtv.livetv.stb.ui.custom_views.CustomTextView

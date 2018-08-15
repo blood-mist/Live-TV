@@ -41,7 +41,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
     public void setPositionSelected(int positionSelected) {
         this.positionSelected = positionSelected;
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     public ChannelListAdapter(Context context, ChannelListClickListener lis) {
@@ -99,12 +99,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
                 holder.channelLogo.setScaleX(1.2f);
                 holder.channelLogo.setScaleY(1.05f);
                 holder.channelLogo.setAlpha(1f);
-                holder.view.setVisibility(View.INVISIBLE);
+//                holder.view.setVisibility(View.INVISIBLE);
             } else {
                 holder.channelLogo.setScaleX(1f);
                 holder.channelLogo.setScaleY(1f);
                 holder.channelLogo.setAlpha(0.37f);
-                holder.view.setVisibility(View.VISIBLE);
+//                holder.view.setVisibility(View.VISIBLE);
             }
         });
     }

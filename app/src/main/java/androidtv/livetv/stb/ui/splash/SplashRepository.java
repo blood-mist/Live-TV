@@ -3,10 +3,12 @@ package androidtv.livetv.stb.ui.splash;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +21,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
@@ -27,7 +30,9 @@ import androidtv.livetv.stb.entity.CatChannelError;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginError;
@@ -53,6 +58,9 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.internal.observers.SubscriberCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
@@ -70,6 +78,7 @@ public class SplashRepository {
     private static final String KEY_LOGIN_SUCCESS = "login";
     public static final String KEY_CATEGORY = "category";
     private static final String KEY_MAC_INVALID = "error_code";
+    private static final long  DATA_INSERTION_FAILED= (long) -1;
     private static SplashRepository sInstance;
     private MediatorLiveData<MacInfo> macInfoMediatorLiveData;
     private MediatorLiveData<GeoAccessInfo> geoAccessLiveData;
@@ -452,10 +461,14 @@ public class SplashRepository {
 
 
     private void insertCatChannelsToDatabase(List<CategoryItem> categoryList, List<ChannelItem> channels) {
-        Completable.fromRunnable(() -> {
-            catChannelDao.insertCategory(categoryList);
-            catChannelDao.insertChannels(channels);
-        }).subscribeOn(Schedulers.io()).subscribe().dispose();
+      new insertChannelDataTask(categoryList,channels,catChannelDao).execute();
+
+    }
+
+
+
+    public void callChannelLoad(){
+
     }
 
     public LiveData<Integer> getRowCount() {
@@ -585,4 +598,33 @@ public class SplashRepository {
     public void deleteLoginFromDB() {
         Completable.fromRunnable(()-> mLoginDao.deleteAll()).subscribeOn(Schedulers.io()).subscribe();
     }
+
+    private static class insertChannelDataTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  List<CategoryItem> categoryItemList;
+        private List<ChannelItem> channelItemList;
+        private CatChannelDao dao;
+        boolean inserted=false;
+
+        insertChannelDataTask(List<CategoryItem> categoryItemList,List<ChannelItem> channelItemList,CatChannelDao dao) {
+            this.categoryItemList=categoryItemList;
+            this.channelItemList=channelItemList;
+            this.dao=dao;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... updateResult) {
+            long[] categoryResult=dao.insertCategory(categoryItemList);
+            long[] channelResult=dao.insertChannels(channelItemList);
+           return Arrays.asList(categoryResult).contains(DATA_INSERTION_FAILED) || Arrays.asList(channelResult).contains(DATA_INSERTION_FAILED);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isInserted) {
+            super.onPostExecute(isInserted);
+            EventBus.getDefault().post(new ChannelInserted(isInserted));
+        }
+    }
 }
+

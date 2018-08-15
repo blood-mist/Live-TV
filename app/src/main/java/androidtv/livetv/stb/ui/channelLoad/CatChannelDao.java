@@ -19,13 +19,13 @@ import androidtv.livetv.stb.entity.Epgs;
 @Dao
 public interface CatChannelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertCategory(List<CategoryItem> categoryItemList);
+    long[] insertCategory(List<CategoryItem> categoryItemList);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEpgs(List<Epgs> epgList);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertChannels(List<ChannelItem> channelItemList);
+    long[] insertChannels(List<ChannelItem> channelItemList);
 
     @Query("SELECT * FROM CATEGORY_TABLE")
     LiveData<List<CategoryItem>> getCategories();

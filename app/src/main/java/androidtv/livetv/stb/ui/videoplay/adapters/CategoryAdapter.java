@@ -161,18 +161,19 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         holder.mCategoryLayout.setOnClickListener(v -> {
 
             selectedPos = pos;
-            switch (pos) {
-                case 0:
-                    mListener.onClickCategory("All Channels", allChannelList);
-                    break;
-                case 1:
-                    mListener.onClickCategory(CATEGORY_FAVORITE, allFavList);
-                    break;
-                default:
-                    if (finalCategoryItem != null) {
+            if (pos == 0)
+                mListener.onClickCategory("All Channels", allChannelList);
+            else {
+                if (allFavList != null && allFavList.size() > 0) {
+                    if (pos == 1)
+                        mListener.onClickCategory(CATEGORY_FAVORITE, allFavList);
+                    else if (finalCategoryItem != null)
                         mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
-                    }
-                    break;
+
+                } else if (finalCategoryItem != null)
+                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+
+
             }
         });
 
@@ -183,6 +184,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             if (hasFocus) {
                 holder.mTitleView.setSelected(true);
                 holder.mCategoryLayout.setScaleY(1.02f);
+                mListener.onSelectCategory(pos);
             } else {
                 holder.mTitleView.setSelected(false);
                 holder.mCategoryLayout.setScaleX(1.0f);
@@ -216,6 +218,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     public interface OnListClickListener {
 
         void onClickCategory(String categoryName, List<ChannelItem> channels);
+        void onSelectCategory(int position);
     }
 
 }

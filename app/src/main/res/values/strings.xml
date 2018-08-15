@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroidTV LiveTV</string>
+    <string name="app_name">Live TV</string>
     <string name="loading_app">Loading . . .</string>
     <string name="label_version">Version:</string>
     <string name="app_icon">For App Icon</string>

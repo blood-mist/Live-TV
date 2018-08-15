@@ -12,6 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +28,7 @@ import androidtv.livetv.stb.entity.AppVersionInfo;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.LoginError;
@@ -92,10 +97,28 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     @Override
     protected void onStart() {
         super.onStart();
+        EventBus.getDefault().register(this);
         appVersion.setText(BuildConfig.VERSION_NAME);
         splashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
         checkIfLoginDetailsAvailable();
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ChannelInserted event) {
+        if (!event.isInserted()) {
+            loadChannelActivity();
+
+        } else {
+            Toast.makeText(SplashActivity.this, getString(R.string.err_unexpected), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     private void checkIfLoginDetailsAvailable() {
@@ -240,7 +263,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     private void saveChannelDetailstoDb(List<CategoryItem> categoryList, List<ChannelItem> channelList) {
         splashViewModel.insertCatChannelToDB(categoryList, channelList);
         Timber.d("gotoChannelLoad");
-        loadChannelActivity();
     }
 
     private void loadChannelActivity() {

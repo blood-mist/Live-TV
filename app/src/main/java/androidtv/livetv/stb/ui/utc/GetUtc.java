@@ -23,13 +23,11 @@ public class GetUtc {
     }
 
     public static GetUtc getInstance() {
-        GetUtc getUtc= new GetUtc(apiInterface);
-        return getUtc;
+        return new GetUtc(apiInterface);
 
     }
 
-    public synchronized TimeStampEntity getTimestamp(){
-        synchronized (this) {
+    public  TimeStampEntity getTimestamp(){
             timeStampEntity = new TimeStampEntity();
             Retrofit utcRetrofit = ApiManager.getAdapter();
             apiInterface = utcRetrofit.create(ApiInterface.class);
@@ -63,6 +61,5 @@ public class GetUtc {
             return timeStampEntity;
         }
 
-    }
 
 }
