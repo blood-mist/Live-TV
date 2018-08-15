@@ -72,5 +72,9 @@ public class VideoPlayViewModel extends AndroidViewModel {
         return channelListData;
     }
 
+    public void nukeLoginTable(){
+        videoPlayRepository.deleteLoginLable();
+    }
+
 
 }

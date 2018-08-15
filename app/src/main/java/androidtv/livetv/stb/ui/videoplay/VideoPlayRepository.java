@@ -1,13 +1,20 @@
 package androidtv.livetv.stb.ui.videoplay;
 
+import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.content.Intent;
+import android.drm.DrmStore;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
+import java.util.Observable;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.db.AndroidTvDatabase;
@@ -16,12 +23,18 @@ import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
+import androidtv.livetv.stb.entity.FavEvent;
+import androidtv.livetv.stb.entity.LoginDataDelete;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
+import androidtv.livetv.stb.ui.splash.SplashActivity;
 import androidtv.livetv.stb.ui.splash.SplashRepository;
 import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
+import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import retrofit2.Response;
@@ -69,7 +82,7 @@ public class VideoPlayRepository {
     public LiveData<ChannelLinkResponseWrapper> getChannelLink(String token, long utc, String userId, String hashValue, String macAddress, String channelId) {
         MediatorLiveData<ChannelLinkResponseWrapper> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue,macAddress, channelId);
+        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue, macAddress, channelId);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
                     @Override
@@ -82,15 +95,23 @@ public class VideoPlayRepository {
                         ChannelLinkResponseWrapper wrapper = new ChannelLinkResponseWrapper();
                         if (channelLinkResponseResponse.code() == 200) {
                             ChannelLinkResponse response = channelLinkResponseResponse.body();
-                             if(response.getChannel() != null){
+                            if (response.getChannel() != null) {
                                 wrapper.setChannelLinkResponse(response);
-                             }else{
-                                 String messgae = context.getResources().getString(R.string.err_code_json_exception);
-                                 if(response.getError_message().length()>0){
-                                     messgae = response.getError_message();
-                                 }
-                                 wrapper.setException(new Exception(messgae));
-                             }
+                            } else {
+                                String messgae = context.getResources().getString(R.string.err_code_json_exception);
+                                if (response.getError_message().length() > 0) {
+                                    messgae = response.getError_message();
+                                }
+                                if (response.getError_code() > 0) {
+                                    int code = response.getError_code();
+                                    if (code == 401 || code == 402 || code == 403 || code == 404) {
+                                        MaxTvUnhandledException exception = new MaxTvUnhandledException(code, messgae);
+                                        wrapper.setException(exception);
+                                    }
+                                } else {
+                                    wrapper.setException(new Exception(messgae));
+                                }
+                            }
                         } else {
                             wrapper.setException(new Exception(context.getResources().getString(R.string.err_server_unreachable)));
                         }
@@ -117,7 +138,7 @@ public class VideoPlayRepository {
     public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, String userId, String hashValue, String channelId, String date, String startTime) {
         MediatorLiveData<DvrLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getDvrLink(token, utc, userId, hashValue, channelId,date,startTime);
+        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getDvrLink(token, utc, userId, hashValue, channelId, date, startTime);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new io.reactivex.Observer<Response<DvrLinkResponse>>() {
                     @Override
@@ -153,7 +174,7 @@ public class VideoPlayRepository {
     public LiveData<DvrLinkResponse> getNextDvrLink(String token, long utc, String userId, String hashValue, String channelId, String nextProgram) {
         MediatorLiveData<DvrLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getNextDvrLink(token, utc, userId, hashValue, channelId,nextProgram);
+        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getNextDvrLink(token, utc, userId, hashValue, channelId, nextProgram);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new io.reactivex.Observer<Response<DvrLinkResponse>>() {
                     @Override
@@ -185,7 +206,31 @@ public class VideoPlayRepository {
         return responseMediatorLiveData;
     }
 
+  public void deleteLoginLable(){
+        new DeleteLoginTableAsynTask(catChannelDao).execute();
+  }
 
+    private static class DeleteLoginTableAsynTask extends AsyncTask<Void, Void, Integer> {
+
+        private CatChannelDao catChannelDao;
+
+        public DeleteLoginTableAsynTask(CatChannelDao catChannelDao){
+            this.catChannelDao = catChannelDao;
+        }
+
+
+
+        @Override
+        protected Integer doInBackground(Void... updateResult) {
+            return catChannelDao.nukeLoginTable();
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            EventBus.getDefault().post(new LoginDataDelete(integer));
+        }
+    }
 
 
 }

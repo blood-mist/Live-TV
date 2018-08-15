@@ -15,6 +15,9 @@ import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
+import androidtv.livetv.stb.entity.LoginDataDelete;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 
 @Dao
 public interface CatChannelDao {
@@ -59,6 +62,11 @@ public interface CatChannelDao {
 
     @Query("SELECT * FROM CHANNEL_TABLE WHERE is_fav = 1")
     LiveData<List<ChannelItem>> getFavChannels();
+
+    @Query("DELETE FROM LOGIN_TABLE")
+    int  nukeLoginTable();
+
+
 
 
 }
