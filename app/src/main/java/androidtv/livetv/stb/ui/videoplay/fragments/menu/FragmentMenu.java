@@ -667,6 +667,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void OnEpgClick() {
         EpgFragment fragment = new EpgFragment();
         fragment.setCurrentSelectedChannel(currentSelected);
+        fragment.setAllChannelList(allChannelItems);
         mListener.load(fragment, "epg");
     }
 
@@ -674,7 +675,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void OnDvrClick() {
         DvrFragment fragment = new DvrFragment();
         fragment.setCurrentChannel(currentSelected);
-
+        fragment.setAllChannelList(allChannelItems);
         mListener.load(fragment, "Dvr");
     }
 
@@ -697,11 +698,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
-
         void load(Fragment epgFragment, String tag);
 
-
     }
+
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

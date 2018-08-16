@@ -18,6 +18,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidtv.livetv.stb.BuildConfig;
@@ -30,6 +32,7 @@ import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.LoginError;
 import androidtv.livetv.stb.ui.login.LoginActivity;
@@ -92,15 +95,45 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                 Arrays.asList(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE));
 
 
+
+        }
+
+    private void checkEpgTable() {
+        splashViewModel.getAllEpgs().observe(this, new Observer<List<Epgs>>() {
+            @Override
+            public void onChanged(@Nullable List<Epgs> epgs) {
+                 checkAndRemoveEpgs(epgs);
+            }
+        });
     }
 
-    @Override
+    private void checkAndRemoveEpgs(List<Epgs> epgs) {
+        Date currentDate = Calendar.getInstance().getTime();
+        if(epgs != null && epgs.size()>0){
+            for (Epgs epg:epgs) {
+                if(epg.getStartTime().before(currentDate)){
+                    long diff = currentDate.getTime() - epg.getStartTime().getTime();
+                    long seconds = diff / 1000;
+                    long minutes = seconds / 60;
+                    long hours = minutes / 60;
+                    long days = hours / 24;
+                    if(days > 2){
+                        splashViewModel.deleteEpg(epg.getId());
+                    }
+                }
+            }
+        }
+    }
+
+
+        @Override
     protected void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
         appVersion.setText(BuildConfig.VERSION_NAME);
         splashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
         checkIfLoginDetailsAvailable();
+        checkEpgTable();
 
     }
 

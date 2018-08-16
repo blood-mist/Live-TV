@@ -137,6 +137,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         channelChangeObservable = new ChannelChangeObserver();
         channelChangeObservable.addObserver(menuFragment);
         initSurafaceView();
+
     }
 
     @Override
@@ -170,17 +171,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
-                if (player.isPlaying()) {
                     if (currentFragment instanceof EpgFragment) {
                         getSupportFragmentManager().popBackStack();
+                        currentFragment = null;
                     } else {
                         if (currentFragment instanceof DvrFragment) {
                             if (!isDvrPlaying) {
                                 getSupportFragmentManager().popBackStack();
+                                currentFragment = null;
                             }
+                        }else if(player.isPlaying()){
+                            showMenu();
                         }
-                    }
-                    showMenu();
 
 
                 }

@@ -7,7 +7,9 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
+import java.util.Date;
 import java.util.List;
 
 import androidtv.livetv.stb.entity.ChannelItem;
@@ -16,9 +18,15 @@ import androidtv.livetv.stb.entity.Epgs;
 
 public class EpgViewModel extends AndroidViewModel {
 
+    public EpgRepositary getEpgRepositary() {
+        return epgRepositary;
+    }
+
     private EpgRepositary epgRepositary;
     private MediatorLiveData<List<ChannelItem>> channelListMediator;
     private MediatorLiveData<EpgEntity> epLiveData;
+    private MediatorLiveData<List<Epgs>> liveAllEpgs;
+
 
     public EpgViewModel(@NonNull Application application) {
         super(application);
@@ -26,6 +34,8 @@ public class EpgViewModel extends AndroidViewModel {
         channelListMediator = new MediatorLiveData<>();
         epLiveData = new MediatorLiveData<>();
         epLiveData.setValue(null);
+        liveAllEpgs = new MediatorLiveData<>();
+        liveAllEpgs.addSource(epgRepositary.getAllEpgs(), epgs -> liveAllEpgs.postValue(epgs));
         channelListMediator.addSource(epgRepositary.getAllChannels(), channelItems -> channelListMediator.postValue(channelItems));
     }
 
@@ -36,15 +46,10 @@ public class EpgViewModel extends AndroidViewModel {
 
     public LiveData<EpgEntity> getEpgs(String token, long utc, String userId , String hashValue, String channelId){
         epLiveData.postValue(null);
-        epLiveData.addSource(epgRepositary.getEpgs(token, utc, userId, hashValue, channelId), new Observer<EpgEntity>() {
-            @Override
-            public void onChanged(@Nullable EpgEntity epgs) {
-                epLiveData.postValue(epgs);
-            }
-        });
+        return epgRepositary.getEpgs(token, utc, userId, hashValue, channelId);
 
-        return epLiveData;
     }
+
 
 
 }
