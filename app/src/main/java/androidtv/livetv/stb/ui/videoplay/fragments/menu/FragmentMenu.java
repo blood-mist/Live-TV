@@ -260,7 +260,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     }
 
-    private void playLastPlayedChannel() {
+    public void playLastPlayedChannel() {
         lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
         selectedCurrentChannelId = lastPlayedId;
         if (lastPlayedId != -1) {
@@ -455,7 +455,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 //            String channelJson = gson.toJson(mListChannels);
 //            categoryEditor.putString(categoryName, channelJson);
         } else
-            selectedChannelPosition = 0;
+            selectedChannelPosition = -1;
         categoryEditor.commit();
         setUpChannelsCategory(mListChannels);
     }

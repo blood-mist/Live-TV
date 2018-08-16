@@ -10,14 +10,14 @@ import androidtv.livetv.stb.BuildConfig;
 
 public class AppConfig {
     private static boolean isFromDevelopment = BuildConfig.DEBUG;
-
     public static boolean isDevelopment() {
         return isFromDevelopment;
     }
      public static String getMac(){
 
 //      return "ccd3e2226503";
-//      return "abcd";
-         return "ccd3e222652e";
+//    return "abcd";
+    return "ccd3e222652e";
+//    return "aabbccddeeff";
      }
 }

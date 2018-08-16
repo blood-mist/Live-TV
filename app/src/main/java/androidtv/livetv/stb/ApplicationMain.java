@@ -32,6 +32,8 @@ public class ApplicationMain extends Application {
         Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(thread, e));
     }
 
+
+
     private void handleUncaughtException(Thread thread, Throwable e) {
         try {
             e.printStackTrace();
@@ -84,4 +86,7 @@ final class CrashReportingTree extends Timber.Tree {
             }
         }
     }
+
+
+
 }
