@@ -35,7 +35,10 @@ public class VideoPlayViewModel extends AndroidViewModel {
 
 
     public LiveData<ChannelLinkResponseWrapper> getChannelLink(String token, long utc, int id, String hashCode, String macAddress, int channelId) {
+
        return videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode),macAddress, String.valueOf(channelId));
+
+
     }
 
     public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, int id, String hashCode, int channelId, String date, String startTime) {
@@ -45,6 +48,7 @@ public class VideoPlayViewModel extends AndroidViewModel {
     public LiveData<DvrLinkResponse> getNextDvrLink(String token, long utc, int id, String hashCode, int channelId, String nextprogram) {
         return videoPlayRepository.getNextDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),nextprogram);
     }
+
 
     public LiveData<List<ChannelItem>> getAllChannels() {
         return channelListData;

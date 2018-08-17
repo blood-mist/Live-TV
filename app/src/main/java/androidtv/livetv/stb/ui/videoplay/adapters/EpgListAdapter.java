@@ -57,7 +57,9 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
             listener.onOnAirSetup(epg);
             holder.LayoutTxtImgHor.requestFocus();
+            holder.LayoutTxtImgHor.setTag("click");
         }else{
+            holder.LayoutTxtImgHor.setTag("no");
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
             holder.alarmPlay.setImageResource(R.drawable.icon_alarm);
             holder.onAirText.setText("");
@@ -78,6 +80,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(v.getTag().equals("click"))
                 listener.onEpgClicked(epg);
             }
         });

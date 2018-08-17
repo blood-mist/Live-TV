@@ -32,6 +32,7 @@ import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
@@ -80,6 +81,7 @@ public class SplashRepository {
     private static final String KEY_MAC_INVALID = "error_code";
     private static final long  DATA_INSERTION_FAILED= (long) -1;
     private static SplashRepository sInstance;
+    private final MediatorLiveData liveDateEpgs;
     private MediatorLiveData<MacInfo> macInfoMediatorLiveData;
     private MediatorLiveData<GeoAccessInfo> geoAccessLiveData;
     private MediatorLiveData<VersionResponseWrapper> appInfoLiveData;
@@ -101,6 +103,7 @@ public class SplashRepository {
         catChannelDao = db.catChannelDao();
         userCredentialData = new MediatorLiveData<>();
         userCredentialData.setValue(null);
+        liveDateEpgs = new MediatorLiveData();
         apiInterface = retrofitInstance.create(ApiInterface.class);
         rowCountData = new MediatorLiveData<>();
         rowCountData.setValue(null);
@@ -111,6 +114,7 @@ public class SplashRepository {
 
 
         });
+        liveDateEpgs.addSource(catChannelDao.getAllEpgs(), epgs -> liveDateEpgs.postValue(epgs));
         channelCountData = new MediatorLiveData<>();
         channelCountData.setValue(null);
         channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> channelCountData.postValue(integer));
@@ -599,6 +603,10 @@ public class SplashRepository {
         Completable.fromRunnable(()-> mLoginDao.deleteAll()).subscribeOn(Schedulers.io()).subscribe();
     }
 
+    public LiveData<List<Epgs>> getAllEpg() {
+        return liveDateEpgs;
+    }
+
     private static class insertChannelDataTask extends AsyncTask<Void, Void, Boolean> {
 
         private  List<CategoryItem> categoryItemList;
@@ -625,6 +633,10 @@ public class SplashRepository {
             super.onPostExecute(isInserted);
             EventBus.getDefault().post(new ChannelInserted(isInserted));
         }
+    }
+
+    public void deleteEpg(String id) {
+        Completable.fromRunnable(() -> catChannelDao.deleteEpg(id)).subscribeOn(Schedulers.io()).subscribe();
     }
 }
 

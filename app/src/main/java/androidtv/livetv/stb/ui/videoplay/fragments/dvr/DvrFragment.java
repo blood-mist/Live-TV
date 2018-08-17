@@ -58,23 +58,13 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private int selectedChannelId = 0;
     private Epgs currentPlayedEpg;
     private int currentEpgSelectedPosition = -1;
+    private List<ChannelItem> allChannelItems;
 
     public DvrFragment() {
         // Required empty public constructor
     }
 
-    /*gvChannelList = (RecyclerView) view.findViewById(R.id.channel_list);
-    gvEpgDvr = (GridView) view.findViewById(R.id.gv_prgms);
-    txtPrgmTime = (TextView) view.findViewById(R.id.txt_on_air_prgm_time);
-    txtPrgmName = (TextView) view.findViewById(R.id.txt_on_air_prgm_name);
-    gvDate = (GridView) view.findViewById(R.id.gv_date);
-    layoutDateEpg = (LinearLayout) view.findViewById(R.id.layout_date_epg);
-    txtChannelName = (TextView) view.findViewById(R.id.txt_channel_name);
 
-
-    txtOnAir = (TextView) view.findViewById(R.id.txt_on_air);
-    txtDayView = (TextView) view.findViewById(R.id.txt_day);
-    txtDateView = (TextView) view.findViewById(R.id.txt_date);*/
 
      @BindView(R.id.channel_list)
      RecyclerView gvChannelList;
@@ -131,17 +121,11 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         gvEpgDvr.setAdapter(dvrListAdapter);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gvChannelList.setAdapter(adapter);
-        viewModel.getChannels().observe(this, new Observer<List<ChannelItem>>() {
-            @Override
-            public void onChanged(@Nullable List<ChannelItem> channelItems) {
-                adapter.setChannelList(channelItems);
-                adapter.setSelectedChannel(adapter.getChannelPositionById(currentChannel.getId()));
-                gvChannelList.scrollToPosition((adapter.getChannelPositionById(currentChannel.getId())));
-                gvChannelList.requestFocus();
-                onChannelClickInteraction(adapter.getChannelById(currentChannel.getId()),adapter.getChannelPositionById(currentChannel.getId()));
-            }
-        });
-
+        adapter.setChannelList(allChannelItems);
+        adapter.setSelectedChannel(adapter.getChannelPositionById(currentChannel.getId()));
+        gvChannelList.scrollToPosition((adapter.getChannelPositionById(currentChannel.getId())));
+        gvChannelList.requestFocus();
+        onChannelClickInteraction(adapter.getChannelById(currentChannel.getId()),adapter.getChannelPositionById(currentChannel.getId()));
         View focusChannelChlid = null;
         gvChannelList.setNextFocusDownId(gvDate.getId());
         gvChannelList.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -337,6 +321,10 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         this.currentChannel = currentChannel;
 
 
+    }
+
+    public void setAllChannelList(List<ChannelItem> allChannelItems) {
+        this.allChannelItems =allChannelItems;
     }
 
     public interface FragmentDvrInteraction {

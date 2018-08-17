@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
 
+import java.util.Date;
 import java.util.List;
 
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
@@ -52,7 +53,6 @@ public interface CatChannelDao {
     @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
     long updateFav(int is_fav, int channel_id);
 
-
     @Query("SELECT * FROM CHANNEL_TABLE  WHERE channel_id=:channel_id")
     LiveData<ChannelItem> getLastPlayedChannel(int channel_id);
 
@@ -66,7 +66,10 @@ public interface CatChannelDao {
     @Query("DELETE FROM LOGIN_TABLE")
     int  nukeLoginTable();
 
+    @Query("SELECT * FROM EPG_TABLE")
+    LiveData<List<Epgs>> getAllEpgs();
 
 
-
+    @Query("DELETE FROM EPG_TABLE WHERE epg_id = :id")
+    void deleteEpg(String id);
 }

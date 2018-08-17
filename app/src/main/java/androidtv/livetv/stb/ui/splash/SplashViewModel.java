@@ -4,18 +4,16 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
-import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.entity.LoginResponseWrapper;
 import androidtv.livetv.stb.entity.MacInfo;
 import androidtv.livetv.stb.entity.UserCheckWrapper;
@@ -44,6 +42,7 @@ public class SplashViewModel extends AndroidViewModel {
 
     private MediatorLiveData<Login> userCredentialData;
     private MediatorLiveData<Integer> chSizeMediatorData;
+    private MediatorLiveData<List<Epgs>> liveAllEpgs;
 
     public SplashViewModel(@NonNull Application application) {
         super(application);
@@ -90,7 +89,8 @@ public class SplashViewModel extends AndroidViewModel {
             if (channelItemList != null) {
                 channelListData.removeSource(channelLiveData);
                 channelListData.setValue(channelItemList);
-
+                liveAllEpgs = new MediatorLiveData<>();
+                liveAllEpgs.addSource(splashRepository.getAllEpg(), epgs -> liveAllEpgs.postValue(epgs));
             }
         });
 
@@ -158,5 +158,15 @@ public class SplashViewModel extends AndroidViewModel {
 
     public void deleteLoginFile() {
         splashRepository.deleteLoginFile();
+    }
+
+
+    public LiveData<List<Epgs>> getAllEpgs() {
+        return liveAllEpgs;
+
+    }
+
+    public void deleteEpg(String id) {
+        splashRepository.deleteEpg(id);
     }
 }

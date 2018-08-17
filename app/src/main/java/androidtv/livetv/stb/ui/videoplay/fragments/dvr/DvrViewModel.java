@@ -38,28 +38,13 @@ public class DvrViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Epgs>> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
-        epLiveData.addSource(dvrRepositary.getEpgs(token, utc, userId, hashValue, channelId), new Observer<List<Epgs>>() {
-            @Override
-            public void onChanged(@Nullable List<Epgs> epgs) {
-                epLiveData.postValue(epgs);
-            }
-        });
+      return dvrRepositary.getEpgs(token, utc, userId, hashValue, channelId);
 
-        return epLiveData;
     }
 
     public LiveData<DvrStartDateTimeEntity> getStartTime(String token, long utc, String userId, String hashValue, int hasDvr, String channelId){
-        dvrStartDateTimeEntityMediatorLiveData.postValue(null);
-        dvrStartDateTimeEntityMediatorLiveData.addSource(
-                dvrRepositary.getStartTime(token, utc, userId, hashValue, hasDvr, channelId)
-                , new Observer<DvrStartDateTimeEntity>() {
-            @Override
-            public void onChanged(@Nullable DvrStartDateTimeEntity dvrStartDateTimeEntity) {
-                dvrStartDateTimeEntityMediatorLiveData.postValue(dvrStartDateTimeEntity);
-            }
-        });
+        return dvrRepositary.getStartTime(token, utc, userId, hashValue, hasDvr, channelId);
 
-        return dvrStartDateTimeEntityMediatorLiveData;
     }
 
 }

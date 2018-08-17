@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -28,7 +29,10 @@ import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 import retrofit2.Response;
@@ -40,6 +44,7 @@ public class EpgRepositary {
     private MediatorLiveData<List<ChannelItem>> channelList;
     private MediatorLiveData<List<Epgs>> epLiveData;
     private CatChannelDao catChannelDao;
+    private MediatorLiveData<List<Epgs>> liveDateEpgs;
 
     public EpgRepositary(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
@@ -47,10 +52,11 @@ public class EpgRepositary {
         epgApiInterface = retrofitInstance.create(EpgApiInterface.class);
         catChannelDao = db.catChannelDao();
         channelList = new MediatorLiveData<>();
+        liveDateEpgs = new MediatorLiveData<>();
         channelList.addSource(catChannelDao.getChannels(), channelItems -> channelList.postValue(channelItems));
 
-
     }
+
 
     public static EpgRepositary getInstance(final Application application) {
         if (mInstance == null) {
@@ -69,72 +75,66 @@ public class EpgRepositary {
 
     public LiveData<EpgEntity> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
         MediatorLiveData<EpgEntity> responseMediatorLiveData = new MediatorLiveData<>();
-        responseMediatorLiveData.setValue(null);
-        List<Epgs> epgsList = new ArrayList<>();
-        io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
-        call.subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread()).
-                unsubscribeOn(Schedulers.io()).
-                subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+        responseMediatorLiveData.postValue(null);
+         List<Epgs> epgsList = new ArrayList<>();
+        responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
+            @Override
+            public void onChanged(@Nullable List<Epgs> epgs) {
+                EpgEntity epgEntity = new EpgEntity();
+                if (epgs.size() > 0) {
+                    epgEntity.setEpgsList(epgs);
 
-                    }
-
-                    @Override
-                    public void onNext(Response<EpgResponse> epgResponseResponse) {
-                        if (epgResponseResponse.code() == 200) {
-                            EpgResponse response = epgResponseResponse.body();
-                            if (response != null) {
-                                EpgEntity epgEntity = new EpgEntity();
-                                if (response.getError_code() <= 0) {
-                                    List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
-                                    if (epgs != null && epgs.size() > 0) {
-                                        insertToDb(epgs);
-                                    }
+                } else {
+                    io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
+                    call.subscribeOn(Schedulers.io())
+                            .observeOn(Schedulers.newThread()).
+                            unsubscribeOn(Schedulers.io()).
+                            subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
+                                @Override
+                                public void onSubscribe(Disposable d) {
 
                                 }
-                            }
-                                responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
-                                    @Override
-                                    public void onChanged(@Nullable List<Epgs> epgs) {
-                                        EpgEntity epgEntity = new EpgEntity();
-                                        if (epgs.size() > 0) {
-                                            epgEntity.setEpgsList(epgs);
-                                        } else {
-                                            epgEntity.setError_message("No Epg Found!");
-                                        }
-                                        responseMediatorLiveData.postValue(epgEntity);
-                                    }
-                                });
-                            }
 
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
-                            responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
                                 @Override
-                                public void onChanged(@Nullable List<Epgs> epgs) {
-                                    EpgEntity epgEntity = new EpgEntity();
-                                    if(epgs.size()>0){
-                                        epgEntity.setEpgsList(epgs);
-                                    }else{
-                                        epgEntity.setError_message("No Epg Found!");
+                                public void onNext(Response<EpgResponse> epgResponseResponse) {
+                                    if (epgResponseResponse.code() == 200) {
+                                        EpgResponse response = epgResponseResponse.body();
+                                        if (response != null) {
+                                            EpgEntity epgEntity = new EpgEntity();
+                                            if (response.getError_code() <= 0) {
+                                                List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
+                                                if (epgs != null && epgs.size() > 0) {
+                                                    insertToDb(epgs);
+                                                }
+
+                                            }
+                                        }
                                     }
-                                    responseMediatorLiveData.postValue(epgEntity);
+
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                }
+
+                                @Override
+                                public void onComplete() {
                                 }
                             });
-                        }
-                    }
 
-                    @Override
-                    public void onComplete() {
+                }
+                responseMediatorLiveData.postValue(epgEntity);
+            }
+        });
 
-                    }
-                });
+
+
+
+
+
+
+
 
         return responseMediatorLiveData;
 
@@ -145,9 +145,9 @@ public class EpgRepositary {
     }
 
 
-
-
-
+    public LiveData<List<Epgs>> getAllEpgs() {
+        return liveDateEpgs;
+    }
 
 
 }
