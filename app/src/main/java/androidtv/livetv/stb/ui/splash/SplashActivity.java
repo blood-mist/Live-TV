@@ -98,7 +98,10 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void checkEpgTable() {
-        splashViewModel.getAllEpgs().observe(this, epgs -> checkAndRemoveEpgs(epgs));
+        splashViewModel.getAllEpgs().observe(this, epgs ->{
+                if(epgs!=null)
+                checkAndRemoveEpgs(epgs);
+        });
     }
 
     private void checkAndRemoveEpgs(List<Epgs> epgs) {
