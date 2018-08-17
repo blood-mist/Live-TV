@@ -321,20 +321,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }
         });
 
-        /*menuViewModel.getFavChannels().observe(this, new android.arch.lifecycle.Observer<List<ChannelItem>>() {
-            @Override
-            public void onChanged(@Nullable List<ChannelItem> channelItems) {
-                if(channelItems != null){
-                    if(channelItems.size()>0){
-                       setUpFavToView(channelItems,categoryAdapter);
-
-                    }
-                }
-            }
-        });
-*/
-
-
     }
 
 
@@ -460,11 +446,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @Override
     public void onSelectCategory(int position) {
-        View currentFocusedView = categoryList.findViewHolderForLayoutPosition(position).itemView.findViewById(R.id.channelCategory_layout);
+        View currentFocusedView = categoryList.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.channelCategory_layout);
         if (currentFocusedView != null) {
-            View firstChannelView = gvChannelsList.findViewHolderForLayoutPosition(0).itemView;
+            View firstChannelView = gvChannelsList.findViewHolderForAdapterPosition(0).itemView;
             if (firstChannelView != null)
-                currentFocusedView.setNextFocusDownId(getId());
+                currentFocusedView.setNextFocusDownId(firstChannelView.getId());
         }
         /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
 
