@@ -154,7 +154,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         if (menuFragment == null) {
             menuFragment = new FragmentMenu();
         }
-        openFragment(menuFragment);
+        showMenu();
 
     }
 
@@ -318,12 +318,24 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     public void onBackPressed() {
-        Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-        if (menuFrag != null)
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
-        else
-            finish();
-        super.onBackPressed();
+        if (currentFragment instanceof EpgFragment) {
+            getSupportFragmentManager().popBackStack();
+            currentFragment = null;
+        } else {
+            if (currentFragment instanceof DvrFragment) {
+                if (!isDvrPlaying) {
+                    getSupportFragmentManager().popBackStack();
+                    currentFragment = null;
+                }
+            } else if (player.isPlaying()) {
+                if(menuFragment.isVisible()){
+                    super.onBackPressed();
+                }else{
+                    showMenu();
+                }
+            }
+        }
+
     }
 
     private void showMenu() {
@@ -496,6 +508,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             player.pause();
         }
         super.onPause();
+        this.finish();
         Log.d("activity_state", "onPause");
     }
 
@@ -503,8 +516,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     protected void onResume() {
         super.onResume();
         Log.d("activity_state", "onResume");
-        if (player != null && player.getCurrentPosition() > 0)
-            player.start();
+      /*  if (player != null && player.getCurrentPosition() > 0)
+            player.start();*/
 
     }
 
