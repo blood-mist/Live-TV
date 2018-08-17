@@ -22,6 +22,11 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -162,7 +167,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragment(Fragment fragment) {
         Log.d("frag", "called from activity");
         currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, currentFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
     }
 
 
@@ -265,7 +270,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         });
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, currentFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
 
     }
 
@@ -307,7 +312,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragmentWithBackStack(Fragment fragment, String tag) {
         hideProgressBar();
         currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
 
     }
 
@@ -315,7 +320,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void onBackPressed() {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag != null)
-            getSupportFragmentManager().beginTransaction().hide(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
         else
             finish();
         super.onBackPressed();
@@ -327,9 +332,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             openFragment(menuFragment);
         else {
             if (menuFrag.isHidden()) {
-                getSupportFragmentManager().beginTransaction().show(menuFrag).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
             } else {
-                getSupportFragmentManager().beginTransaction().hide(menuFrag).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
             }
         }
     }
@@ -340,7 +345,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             openFragment(menuFragment);
         else {
 
-            getSupportFragmentManager().beginTransaction().show(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
         }
     }
 
@@ -386,8 +391,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             int width = displayMetrics.widthPixels;
 //            params.setMargins(10,random.nextInt(height-20),random.nextInt(width-20),10);
 
-            params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() + 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() + 200),
-                    random.nextInt(500), random.nextInt(500));
+            params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
+                    random.nextInt(100), random.nextInt(100));
 
             txtRandomDisplayBoxId.bringToFront();
             txtRandomDisplayBoxId.setLayoutParams(params);
@@ -635,7 +640,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         if (menuFrag == null)
             openFragment(menuFragment);
         else {
-            getSupportFragmentManager().beginTransaction().show(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
 
 
         }
@@ -668,7 +673,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void hideMenuUI() {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag != null)
-            getSupportFragmentManager().beginTransaction().hide(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
     }
 
     private void showMenuBg() {
