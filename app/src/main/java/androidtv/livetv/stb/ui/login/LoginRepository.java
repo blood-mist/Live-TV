@@ -3,10 +3,12 @@ package androidtv.livetv.stb.ui.login;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
@@ -24,6 +27,7 @@ import androidtv.livetv.stb.entity.CatChannelError;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginError;
@@ -32,6 +36,7 @@ import androidtv.livetv.stb.entity.LoginInfo;
 import androidtv.livetv.stb.entity.LoginInvalidResponse;
 import androidtv.livetv.stb.entity.LoginResponseWrapper;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
+import androidtv.livetv.stb.ui.splash.SplashRepository;
 import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.AppConfig;
@@ -52,6 +57,7 @@ import retrofit2.Retrofit;
 import timber.log.Timber;
 
 import static androidtv.livetv.stb.ui.splash.SplashRepository.KEY_CATEGORY;
+import static androidtv.livetv.stb.utils.LinkConfig.DATA_INSERTION_FAILED;
 import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
 
 public class LoginRepository {
@@ -301,10 +307,7 @@ public class LoginRepository {
     }
 
     private void insertCatChannelsToDatabase(List<CategoryItem> categoryList, List<ChannelItem> channels) {
-        Completable.fromRunnable(() -> {
-            catChannelDao.insertCategory(categoryList);
-            catChannelDao.insertChannels(channels);
-        }).subscribeOn(Schedulers.io()).subscribe().dispose();
+        new insertChannelDataTask(categoryList,channels,catChannelDao).execute();
     }
 
     public LiveData<Integer> getChannelCount() {
@@ -313,5 +316,33 @@ public class LoginRepository {
 
     public LiveData<List<ChannelItem>> getChannelList() {
         return channelListData;
+    }
+
+    private static class insertChannelDataTask extends AsyncTask<Void, Void, Boolean> {
+
+        private  List<CategoryItem> categoryItemList;
+        private List<ChannelItem> channelItemList;
+        private CatChannelDao dao;
+        boolean inserted=false;
+
+        insertChannelDataTask(List<CategoryItem> categoryItemList,List<ChannelItem> channelItemList,CatChannelDao dao) {
+            this.categoryItemList=categoryItemList;
+            this.channelItemList=channelItemList;
+            this.dao=dao;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... updateResult) {
+            long[] categoryResult=dao.insertCategory(categoryItemList);
+            long[] channelResult=dao.insertChannels(channelItemList);
+            return Arrays.asList(categoryResult).contains(DATA_INSERTION_FAILED) || Arrays.asList(channelResult).contains(DATA_INSERTION_FAILED);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isInserted) {
+            super.onPostExecute(isInserted);
+            EventBus.getDefault().post(new ChannelInserted(isInserted));
+        }
     }
 }

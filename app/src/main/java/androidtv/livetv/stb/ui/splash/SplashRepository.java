@@ -69,6 +69,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import timber.log.Timber;
 
+import static androidtv.livetv.stb.utils.LinkConfig.DATA_INSERTION_FAILED;
 import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
 
 public class SplashRepository {
@@ -79,7 +80,6 @@ public class SplashRepository {
     private static final String KEY_LOGIN_SUCCESS = "login";
     public static final String KEY_CATEGORY = "category";
     private static final String KEY_MAC_INVALID = "error_code";
-    private static final long  DATA_INSERTION_FAILED= (long) -1;
     private static SplashRepository sInstance;
     private final MediatorLiveData liveDateEpgs;
     private MediatorLiveData<MacInfo> macInfoMediatorLiveData;

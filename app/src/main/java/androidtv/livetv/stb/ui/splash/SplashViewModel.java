@@ -93,7 +93,10 @@ public class SplashViewModel extends AndroidViewModel {
         });
         liveAllEpgs = new MediatorLiveData<>();
         liveAllEpgs.setValue(null);
-        liveAllEpgs.addSource(splashRepository.getAllEpg(), epgs -> liveAllEpgs.setValue(epgs));
+        liveAllEpgs.addSource(splashRepository.getAllEpg(), epgs ->{
+            liveAllEpgs.setValue(epgs);
+            liveAllEpgs.removeSource(splashRepository.getAllEpg());
+        } );
 
     }
 

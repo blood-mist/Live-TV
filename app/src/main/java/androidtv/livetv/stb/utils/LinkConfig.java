@@ -61,6 +61,7 @@ public class LinkConfig {
     public static final String CATEGORY_FAVORITE = "Favorites";
      public static final String PLAYED_CATEGORY_NAME ="last_played_category_name";
      public static final String SELECTED_CATEGORY_NAME ="selected_category_name";
+    public static final long  DATA_INSERTION_FAILED= (long) -1;
     public static String getHashCode(String utc) {
       /*  String sessionId = null;
         try {

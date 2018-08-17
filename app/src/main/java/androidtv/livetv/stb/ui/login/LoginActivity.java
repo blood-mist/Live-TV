@@ -14,11 +14,16 @@ import android.widget.Toast;
 
 import com.wang.avi.AVLoadingIndicatorView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CatChannelInfo;
 import androidtv.livetv.stb.entity.CategoryItem;
+import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.LoginError;
@@ -80,10 +85,27 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        EventBus.getDefault().register(this);
         txtUsername.setText(username);
-
         login.setOnClickListener(view -> initLogin());
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ChannelInserted event) {
+        if (!event.isInserted()) {
+            loadChannelActivity();
+
+        } else {
+            Toast.makeText(LoginActivity.this, getString(R.string.err_unexpected), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     private void initLogin() {
@@ -184,7 +206,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
-        Completable.fromRunnable(() -> {
             for(int i=0;i<channels.size();i++) {
                 for(ChannelItem dbCHannelItem:channelItemList) {
                     if(channels.get(i).getId()==dbCHannelItem.getId()) {
@@ -194,12 +215,10 @@ public class LoginActivity extends AppCompatActivity {
             }
             saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
 
-        }).subscribeOn(Schedulers.io()).subscribe().dispose();
     }
 
     private void saveChannelDetailstoDb(List<CategoryItem> categoryList, List<ChannelItem> channelList) {
         loginViewModel.insertCatChannelToDB(categoryList, channelList);
-        loadChannelActivity();
     }
 
     private void showErrorDialog(int errorCode, String message) {

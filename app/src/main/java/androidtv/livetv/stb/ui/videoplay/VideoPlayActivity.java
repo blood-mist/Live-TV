@@ -487,19 +487,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     protected void onPause() {
-        if (player.isPlaying()) {
-            player.pause();
-        }
         super.onPause();
         Log.d("activity_state", "onPause");
+        try {
+            player.stop();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("activity_state", "onResume");
-        if (player != null && player.getCurrentPosition() > 0)
-            player.start();
 
     }
 

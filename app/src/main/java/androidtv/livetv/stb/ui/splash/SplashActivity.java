@@ -136,7 +136,11 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     @Override
     protected void onResume() {
         super.onResume();
-        checkIfLoginDetailsAvailable();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -153,6 +157,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
+        finish();
         super.onStop();
     }
 
@@ -207,7 +212,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 break;
                         }
                     }
-                    categoryChannelData.removeObserver(this);
 
                 }
             }
@@ -273,7 +277,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
-        Completable.fromRunnable(() -> {
             for (int i = 0; i < channels.size(); i++) {
                 for (ChannelItem dbCHannelItem : channelItemList) {
                     if (channels.get(i).getId() == dbCHannelItem.getId()) {
@@ -282,10 +285,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                 }
             }
             saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
-
-        }).subscribeOn(Schedulers.io()).subscribe().dispose();
-//        channels.forEach(channelItem -> channelItemList.stream().filter(channelItem1 -> channelItem1.getId() == channelItem.getId()).findAny().ifPresent(channelItem1 -> channelItem.setIs_fav(channelItem1.getIs_fav())));
-
 
     }
 
