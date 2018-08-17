@@ -20,17 +20,11 @@ import androidtv.livetv.stb.entity.DvrLinkResponse;
 public class VideoPlayViewModel extends AndroidViewModel {
 
     private VideoPlayRepository videoPlayRepository;
-    private MediatorLiveData<ChannelLinkResponseWrapper> channelLinkResponseMediatorLiveData;
-    private MediatorLiveData<DvrLinkResponse> dvrLinkResponseMediatorLiveData;
     private MediatorLiveData<List<ChannelItem>> channelListData;
 
     public VideoPlayViewModel(@NonNull Application application) {
         super(application);
         videoPlayRepository = VideoPlayRepository.getInstance(application);
-        channelLinkResponseMediatorLiveData = new MediatorLiveData<>();
-        dvrLinkResponseMediatorLiveData = new MediatorLiveData<>();
-        channelLinkResponseMediatorLiveData.setValue(null);
-
         channelListData = new MediatorLiveData<>();
         channelListData.setValue(null);
         LiveData<List<ChannelItem>> allChannelsData = videoPlayRepository.getAllChannels();
@@ -41,31 +35,15 @@ public class VideoPlayViewModel extends AndroidViewModel {
 
 
     public LiveData<ChannelLinkResponseWrapper> getChannelLink(String token, long utc, int id, String hashCode, String macAddress, int channelId) {
-        LiveData<ChannelLinkResponseWrapper> fetchChannels = videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode),macAddress, String.valueOf(channelId));
-        channelLinkResponseMediatorLiveData.addSource(fetchChannels, channelLinkResponse -> channelLinkResponseMediatorLiveData.setValue(channelLinkResponse));
-        return channelLinkResponseMediatorLiveData;
+       return videoPlayRepository.getChannelLink(token, utc, String.valueOf(id), String.valueOf(hashCode),macAddress, String.valueOf(channelId));
     }
 
     public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, int id, String hashCode, int channelId, String date, String startTime) {
-        dvrLinkResponseMediatorLiveData.addSource(videoPlayRepository.getDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),date,startTime),
-                new Observer<DvrLinkResponse>() {
-                    @Override
-                    public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-                        dvrLinkResponseMediatorLiveData.setValue(channelLinkResponse);
-                    }
-                });
-        return dvrLinkResponseMediatorLiveData;
+       return videoPlayRepository.getDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),date,startTime);
     }
 
     public LiveData<DvrLinkResponse> getNextDvrLink(String token, long utc, int id, String hashCode, int channelId, String nextprogram) {
-        dvrLinkResponseMediatorLiveData.addSource(videoPlayRepository.getNextDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),nextprogram),
-                new Observer<DvrLinkResponse>() {
-                    @Override
-                    public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-                        dvrLinkResponseMediatorLiveData.setValue(channelLinkResponse);
-                    }
-                });
-        return dvrLinkResponseMediatorLiveData;
+        return videoPlayRepository.getNextDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),nextprogram);
     }
 
     public LiveData<List<ChannelItem>> getAllChannels() {

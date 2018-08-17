@@ -12,8 +12,9 @@
         android:name=".ApplicationMain"
         android:allowBackup="true"
         android:icon="@drawable/live_tv"
+        android:logo="@drawable/live_tv"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/live_tv"
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/AppTheme">
@@ -41,8 +42,8 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".ui.videoplay.VideoPlayActivity"></activity>
-        <activity android:name=".ui.channelLoad.ChannelLoadActivity"></activity>
+        <activity android:name=".ui.videoplay.VideoPlayActivity" />
+        <activity android:name=".ui.channelLoad.ChannelLoadActivity" />
     </application>
 
 </manifest>

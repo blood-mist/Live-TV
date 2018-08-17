@@ -149,6 +149,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             menuFragment = new FragmentMenu();
         }
         openFragment(menuFragment);
+
     }
 
     private void initSurafaceView() {
@@ -161,7 +162,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("frag", "called from activity");
         currentFragment = fragment;
         getSupportFragmentManager().beginTransaction().replace(R.id.container_movie_player, currentFragment).commit();
-
     }
 
 
@@ -440,14 +440,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void setErrorFragment(Exception exception, int what, int extra) {
         PlayBackErrorEntity errorEntity = null;
         if (exception != null) {
-            if(exception instanceof MaxTvUnhandledException){
+            if (exception instanceof MaxTvUnhandledException) {
                 {
                     loadSplash();
                     return;
                 }
 
-            }else
-            errorEntity = errorEntity = DataUtils.getErrorEntity(this, exception);
+            } else
+                errorEntity = errorEntity = DataUtils.getErrorEntity(this, exception);
         } else {
             StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
             errorEntity = new PlayBackErrorEntity(2, sb.toString(), getString(R.string.err_media_error));
@@ -496,8 +496,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     protected void onResume() {
         super.onResume();
         Log.d("activity_state", "onResume");
-        menuFragment.playLastPlayedChannel();
-
+        if (player != null && player.getCurrentPosition() > 0)
+            player.start();
 
     }
 
@@ -511,6 +511,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         } catch (Exception e) {
             e.printStackTrace();
         }
+        finish();
     }
 
     @Override
@@ -760,11 +761,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(LoginDataDelete event) {
-       int vav= event.getLongVa();
-       Intent i = new Intent(VideoPlayActivity.this,SplashActivity.class);
-       i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-       startActivity(i);
-       finish();
+        int vav = event.getLongVa();
+        Intent i = new Intent(VideoPlayActivity.this, SplashActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+        finish();
 
     }
 }

@@ -100,8 +100,12 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         EventBus.getDefault().register(this);
         appVersion.setText(BuildConfig.VERSION_NAME);
         splashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
-        checkIfLoginDetailsAvailable();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkIfLoginDetailsAvailable();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -165,7 +169,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                     } else {
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
-                                showErrorDialog(INVALID_HASH, getString(R.string.session_expired));
+                               proceedToLoginViaFile(GlobalVariables.login.getEmail());
                                 break;
                             case INVALID_USER:
                                 showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -24,9 +25,6 @@ public class SplashViewModel extends AndroidViewModel {
 
 
     private SplashRepository splashRepository;
-
-    private MediatorLiveData<MacInfo> mObservableMacInfo;
-
     private MediatorLiveData<GeoAccessInfo> geoAccessInfoLiveData;
     private MediatorLiveData<LoginResponseWrapper> fileLoginData;
     private LiveData<Login> loginLiveData;
@@ -50,7 +48,6 @@ public class SplashViewModel extends AndroidViewModel {
     public SplashViewModel(@NonNull Application application) {
         super(application);
         splashRepository = SplashRepository.getInstance(application);
-        mObservableMacInfo = new MediatorLiveData<>();
         geoAccessInfoLiveData = new MediatorLiveData<>();
         appInfoLiveData = new MediatorLiveData<>();
         userCheckLiveData = new MediatorLiveData<>();
@@ -62,7 +59,6 @@ public class SplashViewModel extends AndroidViewModel {
         channelListData = new MediatorLiveData<>();
         chSizeMediatorData.setValue(null);
         tableCountData.setValue(null);
-        mObservableMacInfo.setValue(null);
         geoAccessInfoLiveData.setValue(null);
         appInfoLiveData.setValue(null);
         userCheckLiveData.setValue(null);
@@ -74,77 +70,71 @@ public class SplashViewModel extends AndroidViewModel {
         loginTableSizeData = splashRepository.getRowCount();
         channelTableSizeData = splashRepository.getChannelCount();
         channelLiveData = splashRepository.getChannelList();
-
-
-    }
-
-
-    public LiveData<MacInfo> checkIfValidMacAddress(String macAddress) {
-        LiveData<MacInfo> getMacInfo = splashRepository.isMacRegistered(macAddress);
-        mObservableMacInfo.addSource(getMacInfo, mObservableMacInfo::setValue);
-        return mObservableMacInfo;
-
-    }
-
-
-    public LiveData<GeoAccessInfo> checkIfGeoAccessEnabled() {
-        LiveData<GeoAccessInfo> getGeoAccessStatus = splashRepository.isGeoAccessEnabled();
-        geoAccessInfoLiveData.addSource(getGeoAccessStatus, geoAccessInfoLiveData::setValue);
-        return geoAccessInfoLiveData;
-    }
-
-    public LiveData<VersionResponseWrapper> checkVersion(String macAddress, int versionCode, String versionName, String applicationId) {
-        LiveData<VersionResponseWrapper> getAppDetails = splashRepository.isNewVersionAvailable(macAddress, versionCode, versionName, applicationId);
-        appInfoLiveData.addSource(getAppDetails, versionResponseWrapper -> appInfoLiveData.setValue(versionResponseWrapper));
-        return appInfoLiveData;
-
-    }
-
-
-    public LiveData<UserCheckWrapper> checkIfUserRegistered(String macAddress) {
-        LiveData<UserCheckWrapper> checkUserActivation = splashRepository.isUserRegistered(macAddress);
-        userCheckLiveData.addSource(checkUserActivation, userCheckWrapper -> {
-            if (userCheckWrapper != null) {
-                userCheckLiveData.setValue(userCheckWrapper);
-            }
-        });
-        return userCheckLiveData;
-    }
-
-
-    public LiveData<Login> checkDatainDb() {
-        userCredentialData.addSource(loginLiveData, login -> {
-            if (login != null)
-                userCredentialData.setValue(login);
-        });
-        return userCredentialData;
-    }
-
-    public LiveData<CatChannelWrapper> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
-        LiveData<CatChannelWrapper> catChannelInfoLiveData = splashRepository.getChannels(token, utc, userId, hashValue);
-        catChannelData.addSource(catChannelInfoLiveData, catChannelWrapper -> catChannelData.setValue(catChannelWrapper));
-        return catChannelData;
-
-    }
-
-    public LiveData<Integer> checkIfDataExists() {
         tableCountData.addSource(loginTableSizeData, integer -> {
             if (integer != null) {
                 tableCountData.setValue(integer);
             }
         });
+        userCredentialData.addSource(loginLiveData, login -> {
+            if (login != null)
+                userCredentialData.setValue(login);
+        });
+        chSizeMediatorData.addSource(channelTableSizeData, integer -> {
+            if (integer != null) {
+                chSizeMediatorData.setValue(integer);
+                chSizeMediatorData.removeSource(channelTableSizeData);
+            }
+        });
+
+        channelListData.addSource(channelLiveData, channelItemList -> {
+            if (channelItemList != null) {
+                channelListData.removeSource(channelLiveData);
+                channelListData.setValue(channelItemList);
+
+            }
+        });
+
+    }
+
+
+    public LiveData<MacInfo> checkIfValidMacAddress(String macAddress) {
+        return splashRepository.isMacRegistered(macAddress);
+
+    }
+
+
+    public LiveData<GeoAccessInfo> checkIfGeoAccessEnabled() {
+        return splashRepository.isGeoAccessEnabled();
+    }
+
+    public LiveData<VersionResponseWrapper> checkVersion(String macAddress, int versionCode, String versionName, String applicationId) {
+        return splashRepository.isNewVersionAvailable(macAddress, versionCode, versionName, applicationId);
+
+    }
+
+
+    public LiveData<UserCheckWrapper> checkIfUserRegistered(String macAddress) {
+        return splashRepository.isUserRegistered(macAddress);
+    }
+
+
+    public LiveData<Login> checkDatainDb() {
+        return userCredentialData;
+    }
+
+    public LiveData<CatChannelWrapper> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
+        return splashRepository.getChannels(token, utc, userId, hashValue);
+
+
+    }
+
+    public LiveData<Integer> checkIfDataExists() {
         return tableCountData;
 
 
     }
 
     public LiveData<Integer> checkChannelsInDB() {
-        chSizeMediatorData.addSource(channelTableSizeData, integer -> {
-            if(integer!=null) {
-                chSizeMediatorData.setValue(integer);
-                chSizeMediatorData.removeSource(channelTableSizeData);
-            }
-        });
         return chSizeMediatorData;
     }
 
@@ -153,21 +143,12 @@ public class SplashViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<ChannelItem>> getAllChannelsInDBToCompare() {
-        channelListData.addSource(channelLiveData, channelItemList -> {
-            if (channelItemList != null) {
-                channelListData.removeSource(channelLiveData);
-                channelListData.setValue(channelItemList);
-
-            }
-        });
         return channelListData;
     }
 
 
     public LiveData<LoginResponseWrapper> loginFromFile(String userEmail, String userPassword, String macAddress) {
-        LiveData<LoginResponseWrapper> loginFromFileData = splashRepository.getLoginResponse(userEmail, userPassword, macAddress);
-        fileLoginData.addSource(loginFromFileData, fileLoginData::setValue);
-        return fileLoginData;
+        return splashRepository.getLoginResponse(userEmail, userPassword, macAddress);
 
     }
 

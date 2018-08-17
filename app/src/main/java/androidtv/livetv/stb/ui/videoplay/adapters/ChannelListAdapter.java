@@ -87,11 +87,11 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             holder.fav.setVisibility(GONE);
 
 
-        if (position == getPositionSelected()) {
+    /*    if (position == getPositionSelected()) {
             holder.relativeLayout.setSelected(true);
         } else {
             holder.relativeLayout.setSelected(false);
-        }
+        }*/
 
         holder.relativeLayout.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {

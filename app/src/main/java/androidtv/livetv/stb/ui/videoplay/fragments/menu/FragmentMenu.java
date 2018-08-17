@@ -455,7 +455,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 //            String channelJson = gson.toJson(mListChannels);
 //            categoryEditor.putString(categoryName, channelJson);
         } else
-            selectedChannelPosition = -1;
+            selectedChannelPosition = 0;
         categoryEditor.commit();
         setUpChannelsCategory(mListChannels);
     }
@@ -464,8 +464,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onSelectCategory(int position) {
         View currentFocusedView = categoryList.findViewHolderForLayoutPosition(position).itemView.findViewById(R.id.channelCategory_layout);
         if (currentFocusedView != null)
-            currentFocusedView.setNextFocusDownId(layoutEpg.getId());
-      /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
+            currentFocusedView.setNextFocusDownId(gvChannelsList.findViewHolderForLayoutPosition(0).itemView.getId());
+        /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
 
 
     }
@@ -503,7 +503,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedChannelPosition = position;
         setValues(adapter.getmList().get(position));
         currentSelected = adapter.getmList().get(position);
-        startPreview(adapter.getmList().get(position));
+        if (currentPlayed!=null && currentSelected !=null && !currentPlayed.equals(currentSelected))
+            startPreview(adapter.getmList().get(position));
 
 
     }
@@ -563,9 +564,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 previewContainer.setVisibility(View.VISIBLE);
             });
             previewView.setOnErrorListener((mp, what, extra) -> {
+                mp.reset();
                 previewContainer.setVisibility(View.INVISIBLE);
 //                Toast.makeText(getActivity(), "LoginError Code: \t W"+what+"E"+extra, Toast.LENGTH_SHORT).show();
-                Timber.e("Media LoginError: ", "what = " + what + " extra = " + extra);
+                Timber.e("Media", "what = " + what + " extra = " + extra);
                 return true;
             });
         } catch (Exception e) {

@@ -20,9 +20,7 @@ import androidtv.livetv.stb.entity.LoginResponseWrapper;
 
 public class LoginViewModel extends AndroidViewModel {
     private  LoginRepository loginRepository;
-    private MediatorLiveData<LoginResponseWrapper> loginLiveData;
     private MediatorLiveData<Login> loginData;
-    private MediatorLiveData<CatChannelWrapper> catChannelData;
     private LiveData<Login>loginDBData;
     private MediatorLiveData<Integer> chSizeMediatorData;
     private LiveData<Integer> channelTableSizeData;
@@ -32,50 +30,22 @@ public class LoginViewModel extends AndroidViewModel {
     public LoginViewModel(@NonNull Application application) {
         super(application);
         loginRepository=LoginRepository.getInstance(application);
-        loginLiveData=new MediatorLiveData<>();
-        catChannelData=new MediatorLiveData<>();
         loginData=new MediatorLiveData<>();
         chSizeMediatorData = new MediatorLiveData<>();
         loginData.setValue(null);
-        loginLiveData.setValue(null);
-        catChannelData.setValue(null);
         chSizeMediatorData.setValue(null);
         loginDBData =loginRepository.getData();
         channelTableSizeData = loginRepository.getChannelCount();
         channelListData = new MediatorLiveData<>();
         channelListData.setValue(null);
         channelLiveData = loginRepository.getChannelList();
-
-
-
-    }
-    public LiveData<LoginResponseWrapper> performLogin(String userEmail, String userPassword, String macAddress) {
-        LiveData<LoginResponseWrapper> getLoginResponse=loginRepository.signIn(userEmail,userPassword,macAddress);
-        loginLiveData.addSource(getLoginResponse, loginLiveData::setValue);
-        return loginLiveData;
-
-    }
-
-    public LiveData<Login> getLoginInfoFromDB() {
         loginData.addSource(loginDBData, login -> loginData.setValue(login));
-        return  loginData;
-    }
-    public LiveData<CatChannelWrapper> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
-        LiveData<CatChannelWrapper> fetchChFrmServer=loginRepository.getChannels(token, utc, userId, hashValue);
-        catChannelData.addSource(fetchChFrmServer, catChannelWrapper -> catChannelData.setValue(catChannelWrapper));
-        return catChannelData;
-    }
-
-    public LiveData<Integer> checkChannelsInDB() {
         chSizeMediatorData.addSource(channelTableSizeData, integer -> {
             if (integer != null) {
                 chSizeMediatorData.removeSource(channelTableSizeData);
                 chSizeMediatorData.setValue(integer);
             }
         });
-        return chSizeMediatorData;
-    }
-    public LiveData<List<ChannelItem>> getAllChannelsInDBToCompare() {
         channelListData.addSource(channelLiveData, channelItemList -> {
             if (channelItemList != null) {
                 channelListData.removeSource(channelLiveData);
@@ -83,6 +53,26 @@ public class LoginViewModel extends AndroidViewModel {
 
             }
         });
+
+
+
+    }
+    public LiveData<LoginResponseWrapper> performLogin(String userEmail, String userPassword, String macAddress) {
+       return loginRepository.signIn(userEmail,userPassword,macAddress);
+
+    }
+
+    public LiveData<Login> getLoginInfoFromDB() {
+        return  loginData;
+    }
+    public LiveData<CatChannelWrapper> fetchChannelDetails(String token, String utc, String userId, String hashValue) {
+       return loginRepository.getChannels(token, utc, userId, hashValue);
+    }
+
+    public LiveData<Integer> checkChannelsInDB() {
+        return chSizeMediatorData;
+    }
+    public LiveData<List<ChannelItem>> getAllChannelsInDBToCompare() {
         return channelListData;
     }
     public void insertCatChannelToDB(List<CategoryItem> categoryList, List<ChannelItem> channelList) {
