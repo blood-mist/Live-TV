@@ -22,6 +22,7 @@ import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CatChannelInfo;
+import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
@@ -123,8 +124,8 @@ public class LoginActivity extends AppCompatActivity {
                         loadUnauthorized(getString(R.string.mac_not_registered), "N/A");
                     } else {
                         Toast.makeText(this, loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage(), Toast.LENGTH_LONG).show();
-                       loginLoader.smoothToHide();
-                       txtPasssword.requestFocus();
+                        loginLoader.smoothToHide();
+                        txtPasssword.requestFocus();
                     }
 
                 } else {
@@ -152,28 +153,34 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void fetchChannelDetails(String token, long utc, int id, String hashCode) {
-        loginViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode).observe(this, catChannelWrapper -> {
-            if (catChannelWrapper != null) {
-                if (catChannelWrapper.getCatChannelInfo() != null) {
-                    Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
-                    loginLoader.smoothToHide();
-                    this.catChannelInfo=catChannelWrapper.getCatChannelInfo();
-                    checkForExistingChannelData();
-                }else{
-                  switch(catChannelWrapper.getCatChannelError().getStatus()){
-                      case INVALID_HASH:
-                          showErrorDialog(INVALID_HASH, getString(R.string.session_expired));
-                          break;
-                      case INVALID_USER:
-                          showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
-                          break;
-                  }
+        LiveData<CatChannelWrapper> categoryChannelData = loginViewModel.fetchChannelDetails(token, String.valueOf(utc), String.valueOf(id), hashCode);
+        categoryChannelData.observe(this, new Observer<CatChannelWrapper>() {
+            @Override
+            public void onChanged(@Nullable CatChannelWrapper catChannelWrapper) {
+                if (catChannelWrapper != null) {
+                    if (catChannelWrapper.getCatChannelInfo() != null) {
+                        Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
+                        loginLoader.smoothToHide();
+                        LoginActivity.this.catChannelInfo = catChannelWrapper.getCatChannelInfo();
+                        LoginActivity.this.checkForExistingChannelData();
+                    } else {
+                        switch (catChannelWrapper.getCatChannelError().getStatus()) {
+                            case INVALID_HASH:
+                                LoginActivity.this.showErrorDialog(INVALID_HASH, LoginActivity.this.getString(R.string.session_expired));
+                                break;
+                            case INVALID_USER:
+                                LoginActivity.this.showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
+                                break;
+                        }
+                    }
+                    categoryChannelData.removeObserver(this);
                 }
 
-            }
 
+            }
         });
     }
+
     private void checkForExistingChannelData() {
         LiveData<Integer> channelSize = loginViewModel.checkChannelsInDB();
         channelSize.observe(this, new Observer<Integer>() {
@@ -198,22 +205,27 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void fetchChannelsFromDBtoUpdate() {
-        loginViewModel.getAllChannelsInDBToCompare().observe(this, channelItemList -> {
-            if (channelItemList != null) {
-                updateListData(channelItemList, catChannelInfo.getChannel());
+        LiveData<List<ChannelItem>>channelDBdata=   loginViewModel.getAllChannelsInDBToCompare();
+        channelDBdata.observe(this, new Observer<List<ChannelItem>>() {
+            @Override
+            public void onChanged(@Nullable List<ChannelItem> channelItemList) {
+                if (channelItemList != null) {
+                    LoginActivity.this.updateListData(channelItemList, catChannelInfo.getChannel());
+                    channelDBdata.removeObserver(this);
+                }
             }
         });
     }
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
-            for(int i=0;i<channels.size();i++) {
-                for(ChannelItem dbCHannelItem:channelItemList) {
-                    if(channels.get(i).getId()==dbCHannelItem.getId()) {
-                        channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
-                    }
+        for (int i = 0; i < channels.size(); i++) {
+            for (ChannelItem dbCHannelItem : channelItemList) {
+                if (channels.get(i).getId() == dbCHannelItem.getId()) {
+                    channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
                 }
             }
-            saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
+        }
+        saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
 
     }
 

@@ -129,13 +129,13 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         EventBus.getDefault().register(this);
         appVersion.setText(BuildConfig.VERSION_NAME);
         splashViewModel = ViewModelProviders.of(this).get(SplashViewModel.class);
-        checkEpgTable();
-        checkIfLoginDetailsAvailable();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        checkEpgTable();
+        checkIfLoginDetailsAvailable();
     }
 
     @Override
@@ -212,8 +212,9 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 break;
                         }
                     }
-
+                    categoryChannelData.removeObserver(this);
                 }
+
             }
 
         });
@@ -268,9 +269,14 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void fetchChannelsFromDBtoUpdate() {
-        splashViewModel.getAllChannelsInDBToCompare().observe(this, channelItemList -> {
-            if (channelItemList != null) {
-                updateListData(channelItemList, catChannelInfo.getChannel());
+        LiveData<List<ChannelItem>>channelDBdata=splashViewModel.getAllChannelsInDBToCompare();
+        channelDBdata.observe(this, new Observer<List<ChannelItem>>() {
+            @Override
+            public void onChanged(@Nullable List<ChannelItem> channelItemList) {
+                if (channelItemList != null) {
+                    SplashActivity.this.updateListData(channelItemList, catChannelInfo.getChannel());
+                    channelDBdata.removeObserver(this);
+                }
             }
         });
 
