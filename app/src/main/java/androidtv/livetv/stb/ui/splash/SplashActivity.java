@@ -50,6 +50,8 @@ import androidtv.livetv.stb.utils.PermissionUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.internal.observers.SubscriberCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -138,10 +140,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         checkIfLoginDetailsAvailable();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ChannelInserted event) {
@@ -283,17 +281,23 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
-            for (int i = 0; i < channels.size(); i++) {
-                for (ChannelItem dbCHannelItem : channelItemList) {
-                    if (channels.get(i).getId() == dbCHannelItem.getId()) {
-                        channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
-                    }
+        for (int i = 0; i < channels.size(); i++) {
+            for (ChannelItem dbCHannelItem : channelItemList) {
+                if (channels.get(i).getId() == dbCHannelItem.getId()) {
+                    channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
                 }
             }
-            saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
-
+        }
+        saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
     }
 
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
 
     private void insertDataToDB() {
         saveChannelDetailstoDb(catChannelInfo.getCategory(), catChannelInfo.getChannel());

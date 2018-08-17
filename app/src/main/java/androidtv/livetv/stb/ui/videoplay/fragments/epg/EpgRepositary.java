@@ -77,64 +77,52 @@ public class EpgRepositary {
         MediatorLiveData<EpgEntity> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.postValue(null);
          List<Epgs> epgsList = new ArrayList<>();
+        io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
+        call.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.newThread()).
+                unsubscribeOn(Schedulers.io()).
+                subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Response<EpgResponse> epgResponseResponse) {
+                        if (epgResponseResponse.code() == 200) {
+                            EpgResponse response = epgResponseResponse.body();
+                            if (response != null) {
+                                EpgEntity epgEntity = new EpgEntity();
+                                if (response.getError_code() <= 0) {
+                                    List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
+                                    if (epgs != null && epgs.size() > 0) {
+                                        insertToDb(epgs);
+                                    }
+
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+
+
         responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
             @Override
             public void onChanged(@Nullable List<Epgs> epgs) {
                 EpgEntity epgEntity = new EpgEntity();
-                if (epgs.size() > 0) {
-                    epgEntity.setEpgsList(epgs);
-
-                } else {
-                    io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
-                    call.subscribeOn(Schedulers.io())
-                            .observeOn(Schedulers.newThread()).
-                            unsubscribeOn(Schedulers.io()).
-                            subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
-                                @Override
-                                public void onSubscribe(Disposable d) {
-
-                                }
-
-                                @Override
-                                public void onNext(Response<EpgResponse> epgResponseResponse) {
-                                    if (epgResponseResponse.code() == 200) {
-                                        EpgResponse response = epgResponseResponse.body();
-                                        if (response != null) {
-                                            EpgEntity epgEntity = new EpgEntity();
-                                            if (response.getError_code() <= 0) {
-                                                List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
-                                                if (epgs != null && epgs.size() > 0) {
-                                                    insertToDb(epgs);
-                                                }
-
-                                            }
-                                        }
-                                    }
-
-
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                }
-
-                                @Override
-                                public void onComplete() {
-                                }
-                            });
-
-                }
                 responseMediatorLiveData.postValue(epgEntity);
             }
         });
-
-
-
-
-
-
-
-
 
         return responseMediatorLiveData;
 
