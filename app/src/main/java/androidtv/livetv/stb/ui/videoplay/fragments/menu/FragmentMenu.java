@@ -452,8 +452,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (mListChannels.contains(currentPlayed)) {
             selectedChannelPosition = mListChannels.indexOf(currentPlayed);
             categoryEditor.putString(PLAYED_CATEGORY_NAME, categoryName);
-//            String channelJson = gson.toJson(mListChannels);
-//            categoryEditor.putString(categoryName, channelJson);
         } else
             selectedChannelPosition = 0;
         categoryEditor.commit();
@@ -463,8 +461,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onSelectCategory(int position) {
         View currentFocusedView = categoryList.findViewHolderForLayoutPosition(position).itemView.findViewById(R.id.channelCategory_layout);
-        if (currentFocusedView != null)
-            currentFocusedView.setNextFocusDownId(gvChannelsList.findViewHolderForLayoutPosition(0).itemView.getId());
+        if (currentFocusedView != null) {
+            View firstChannelView = gvChannelsList.findViewHolderForLayoutPosition(0).itemView;
+            if (firstChannelView != null)
+                currentFocusedView.setNextFocusDownId(getId());
+        }
         /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
 
 
@@ -503,7 +504,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedChannelPosition = position;
         setValues(adapter.getmList().get(position));
         currentSelected = adapter.getmList().get(position);
-        if (currentPlayed!=null && currentSelected !=null && !currentPlayed.equals(currentSelected))
+        if (currentPlayed != null && currentSelected != null && currentPlayed.getId()!=currentSelected.getId())
             startPreview(adapter.getmList().get(position));
 
 
@@ -577,9 +578,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        isFirstRun = hidden;
         if (hidden) {
             stopPreview();
+            isFirstRun = true;
         } else {
             if (errorFragment != null)
                 showErrorFrag(errorFragment);
@@ -700,10 +701,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
+
         void load(Fragment epgFragment, String tag);
 
     }
-
 
 
     @Override

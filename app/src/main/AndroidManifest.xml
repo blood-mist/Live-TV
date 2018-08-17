@@ -12,7 +12,6 @@
         android:name=".ApplicationMain"
         android:allowBackup="true"
         android:icon="@drawable/live_tv"
-        android:logo="@drawable/live_tv"
         android:label="@string/app_name"
         android:roundIcon="@drawable/live_tv"
         android:supportsRtl="true"
