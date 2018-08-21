@@ -59,7 +59,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     public void onViewAttachedToWindow(@NonNull MyChannelListViewHolder holder) {
         super.onViewAttachedToWindow(holder);
 
-        if(getPositionSelected()==holder.getAdapterPosition()){
+        if (getPositionSelected() == holder.getAdapterPosition()) {
             holder.relativeLayout.requestFocus();
 
         }
@@ -93,20 +93,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             holder.relativeLayout.setSelected(false);
         }*/
 
-        holder.relativeLayout.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                listener.onChannelFocused(position);
-                holder.channelLogo.setScaleX(1.2f);
-                holder.channelLogo.setScaleY(1.05f);
-                holder.channelLogo.setAlpha(1f);
-//                holder.view.setVisibility(View.INVISIBLE);
-            } else {
-                holder.channelLogo.setScaleX(1f);
-                holder.channelLogo.setScaleY(1f);
-                holder.channelLogo.setAlpha(0.37f);
-//                holder.view.setVisibility(View.VISIBLE);
-            }
-        });
+
     }
 
     @Override
@@ -164,6 +151,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
     public interface ChannelListClickListener {
         void onClickChannel(int position);
+
         void onChannelFocused(int position);
     }
 
@@ -184,6 +172,22 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             relativeLayout.setOnClickListener(v -> {
                 selectedPos = getAdapterPosition();
                 listener.onClickChannel(getAdapterPosition());
+            });
+
+            relativeLayout.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    listener.onChannelFocused(getAdapterPosition());
+                    channelLogo.setScaleX(1.2f);
+                    channelLogo.setScaleY(1.05f);
+                    channelLogo.setAlpha(1f);
+                    recyclerView.smoothScrollToPosition(getAdapterPosition());
+//                holder.view.setVisibility(View.INVISIBLE);
+                } else {
+                    channelLogo.setScaleX(1f);
+                    channelLogo.setScaleY(1f);
+                    channelLogo.setAlpha(0.37f);
+//                holder.view.setVisibility(View.VISIBLE);
+                }
             });
         }
     }

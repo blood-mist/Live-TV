@@ -71,28 +71,28 @@ public class SplashViewModel extends AndroidViewModel {
         channelLiveData = splashRepository.getChannelList();
         tableCountData.addSource(loginTableSizeData, integer -> {
             if (integer != null) {
-                tableCountData.setValue(integer);
+                tableCountData.postValue(integer);
             }
         });
         userCredentialData.addSource(loginLiveData, login -> {
             if (login != null)
-                userCredentialData.setValue(login);
+                userCredentialData.postValue(login);
         });
         chSizeMediatorData.addSource(channelTableSizeData, integer -> {
             if (integer != null) {
-                chSizeMediatorData.setValue(integer);
+                chSizeMediatorData.postValue(integer);
             }
         });
 
         channelListData.addSource(channelLiveData, channelItemList -> {
             if (channelItemList != null) {
-                channelListData.setValue(channelItemList);
+                channelListData.postValue(channelItemList);
             }
         });
         liveAllEpgs = new MediatorLiveData<>();
         liveAllEpgs.setValue(null);
         liveAllEpgs.addSource(splashRepository.getAllEpg(), epgs ->{
-            liveAllEpgs.setValue(epgs);
+            liveAllEpgs.postValue(epgs);
             liveAllEpgs.removeSource(splashRepository.getAllEpg());
         } );
 

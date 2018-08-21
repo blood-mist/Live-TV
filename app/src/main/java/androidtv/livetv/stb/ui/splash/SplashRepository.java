@@ -392,7 +392,7 @@ public class SplashRepository {
         CatChannelWrapper catChannelWrapper = new CatChannelWrapper();
         Gson gson = new Gson();
         Observable<Response<ResponseBody>> catChannel = apiInterface.getCatChannel(token, Long.parseLong(utc), userId, hashValue);
-        catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+        catChannel.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<ResponseBody>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -425,11 +425,11 @@ public class SplashRepository {
 
                     @Override
                     public void onError(Throwable e) {
-                        CatChannelInfo catChannelInfo = new CatChannelInfo();
                         CatChannelError catChannelError = new CatChannelError();
                         if (e instanceof HttpException || e instanceof ConnectException || e instanceof UnknownHostException || e instanceof SocketTimeoutException) {
                             catChannelData.addSource(catChannelDao.getCategories(), categoryItems -> {
                                 if (categoryItems != null) {
+                                    CatChannelInfo catChannelInfo = new CatChannelInfo();
                                     catChannelInfo.setCategory(categoryItems);
                                     catChannelData.addSource(catChannelDao.getChannels(), channelItemList -> {
                                         if (channelItemList != null) {

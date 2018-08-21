@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "420017995352",
+    "firebase_url": "https://androidtv-live-tv.firebaseio.com",
+    "project_id": "androidtv-live-tv",
+    "storage_bucket": "androidtv-live-tv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420017995352:android:5e6730966354735f",
+        "android_client_info": {
+          "package_name": "androidtv.internettv.stb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420017995352-v35lmbe92p88s1m0mq5h3rdmpjas4qnr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "androidtv.internettv.stb",
+            "certificate_hash": "e21e283e735dcd50bacf6ddc1e529be528928724"
+          }
+        },
+        {
+          "client_id": "420017995352-i2m6uhj809t3j50m3i13jlevnchb0d14.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAED4k0LK3jbbn6Mshzf9sE0A3L7ZVADtM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420017995352-i2m6uhj809t3j50m3i13jlevnchb0d14.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

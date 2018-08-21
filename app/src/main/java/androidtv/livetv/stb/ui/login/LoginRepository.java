@@ -235,7 +235,7 @@ public class LoginRepository {
         CatChannelWrapper catChannelWrapper = new CatChannelWrapper();
         Gson gson = new Gson();
         Observable<Response<ResponseBody>> catChannel = loginApiInterface.getCatChannel(token, Long.parseLong(utc), userId, hashValue);
-        catChannel.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+        catChannel.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new Observer<Response<ResponseBody>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -255,7 +255,6 @@ public class LoginRepository {
                             if (jsonObject.has(KEY_CATEGORY)) {
                                 CatChannelInfo catChannelInfo = gson.fromJson(json, CatChannelInfo.class);
                                 catChannelWrapper.setCatChannelInfo(catChannelInfo);
-                                insertCatChannelsToDatabase(catChannelInfo.getCategory(), catChannelInfo.getChannel());
                             } else {
                                 CatChannelError catChannelError = gson.fromJson(json, CatChannelError.class);
                                 catChannelWrapper.setCatChannelError(catChannelError);

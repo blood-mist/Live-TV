@@ -57,6 +57,7 @@ public class LinkConfig {
     public  static final int  NO_CONNECTION=400;
     public static final int INVALID_HASH = 101;
     public static final int INVALID_USER=102;
+    public static final int USER_NOT_REGISTERED=304;
     public static final String CHANNEL_ID ="channel_id" ;
     public static final String CATEGORY_FAVORITE = "Favorites";
      public static final String PLAYED_CATEGORY_NAME ="last_played_category_name";

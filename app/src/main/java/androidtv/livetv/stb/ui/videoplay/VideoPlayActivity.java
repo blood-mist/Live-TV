@@ -167,7 +167,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragment(Fragment fragment) {
         Log.d("frag", "called from activity");
         currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
     }
 
 
@@ -176,22 +176,39 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
-                    if (currentFragment instanceof EpgFragment) {
-                        getSupportFragmentManager().popBackStack();
-                        currentFragment = null;
-                    } else {
-                        if (currentFragment instanceof DvrFragment) {
-                            if (!isDvrPlaying) {
-                                getSupportFragmentManager().popBackStack();
-                                currentFragment = null;
-                            }
-                        }else if(player.isPlaying()){
-                            showMenu();
+                if (currentFragment instanceof EpgFragment) {
+                    getSupportFragmentManager().popBackStack();
+                    currentFragment = null;
+                } else {
+                    if (currentFragment instanceof DvrFragment) {
+                        if (!isDvrPlaying) {
+                            getSupportFragmentManager().popBackStack();
+                            currentFragment = null;
                         }
+                    } else if (player.isPlaying()) {
+                        showMenu();
+                    }
 
 
                 }
                 break;
+
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                if (mVideoController == null) {
+                    changeToPreviousChannel();
+                    return true;
+                } else {
+                    return false;
+                }
+
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+                if (mVideoController == null) {
+                    changeToNextChannel();
+                    return true;
+                } else {
+                    return false;
+                }
+
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
                 if (mVideoController == null) {
                     changeToPreviousChannel();
@@ -270,7 +287,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         });
 
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
 
     }
 
@@ -279,23 +296,36 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void startChChangeFrmPriority(Handler chFrmPriorityHandler, String priorityNumber) {
-        chFrmPriorityHandler.postDelayed(() -> videoPlayViewModel.getAllChannels().observe(this, channelItemList -> {
-            if (channelItemList != null) {
-                Optional<ChannelItem> result =
-                        channelItemList.stream().filter(channelItem -> String.valueOf(channelItem.getChannelPriority()).equals(priorityNumber)).findFirst();
-                try {
-                    if (result.isPresent())
-                        playChannel(result.get());
-                    else {
-                        Toast.makeText(this, "Sorry no associated channel", Toast.LENGTH_SHORT).show();
+
+        chFrmPriorityHandler.postDelayed(() -> {
+            LiveData<List<ChannelItem>> listLiveData = videoPlayViewModel.getAllChannels();
+            listLiveData.observe(this, new Observer<List<ChannelItem>>() {
+                @Override
+                public void onChanged(@Nullable List<ChannelItem> channelItemList) {
+                    if (channelItemList != null) {
+                        checkIfChannelExistsAndPlay(channelItemList, priorityNumber);
+                        listLiveData.removeObserver(this);
                     }
-                } catch (NoSuchElementException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
                 }
+            });
+        }, TimeUnit.SECONDS.toMillis(5));
+    }
+
+    private void checkIfChannelExistsAndPlay(List<ChannelItem> channelItemList, String priorityNumber) {
+        boolean channelExists = false;
+        ChannelItem foundChannel = null;
+        for (ChannelItem searchChannel : channelItemList) {
+            if (String.valueOf(searchChannel.getChannelPriority()).equals(priorityNumber)) {
+                foundChannel = searchChannel;
+                channelExists = true;
+                break;
             }
-            txtChangeChannelFromPriority.setVisibility(View.GONE);
-        }), TimeUnit.SECONDS.toMillis(5));
+        }
+        if (channelExists) {
+            playChannel(foundChannel);
+        } else
+            Toast.makeText(VideoPlayActivity.this, getString(R.string.no_channel_found), Toast.LENGTH_SHORT).show();
     }
 
     private void changeToNextChannel() {
@@ -312,7 +342,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragmentWithBackStack(Fragment fragment, String tag) {
         hideProgressBar();
         currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).replace(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
 
     }
 
@@ -327,12 +357,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     getSupportFragmentManager().popBackStack();
                     currentFragment = null;
                 }
-            } else if (player.isPlaying()) {
-                if(menuFragment.isVisible()){
-                    super.onBackPressed();
-                }else{
-                    showMenu();
-                }
+            } else if (menuFragment.isVisible()) {
+                super.onBackPressed();
+            } else {
+                showMenu();
             }
         }
 
@@ -344,9 +372,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             openFragment(menuFragment);
         else {
             if (menuFrag.isHidden()) {
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
             } else {
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).hide(menuFrag).commit();
             }
         }
     }
@@ -357,7 +385,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             openFragment(menuFragment);
         else {
 
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
         }
     }
 
@@ -414,7 +442,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             handlerToHideMac.postDelayed(runnableToHideMac, TimeUnit.SECONDS.toMillis(7));
         };
 
-        handlerToShowMac.postDelayed(runnableToShowMac, TimeUnit.SECONDS.toMillis(7));
+        handlerToShowMac.postDelayed(runnableToShowMac, TimeUnit.MINUTES.toMillis(4));
 
     }
 
@@ -653,7 +681,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         if (menuFrag == null)
             openFragment(menuFragment);
         else {
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).show(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
 
 
         }
@@ -686,7 +714,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void hideMenuUI() {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag != null)
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in,android.R.animator.fade_out).hide(menuFrag).commit();
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).hide(menuFrag).commit();
     }
 
     private void showMenuBg() {

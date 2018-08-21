@@ -28,6 +28,7 @@ import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.LoginError;
+import androidtv.livetv.stb.entity.LoginResponseWrapper;
 import androidtv.livetv.stb.ui.splash.SplashActivity;
 import androidtv.livetv.stb.ui.unauthorized.UnauthorizedAccess;
 import androidtv.livetv.stb.ui.utc.GetUtc;
@@ -47,6 +48,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.INVALID_USER;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_ERROR_CODE;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_ERROR_MESSAGE;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_IP;
+import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
 import static androidtv.livetv.stb.utils.LinkConfig.USER_EMAIL;
 
 public class LoginActivity extends AppCompatActivity {
@@ -96,7 +98,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onMessageEvent(ChannelInserted event) {
         if (!event.isInserted()) {
             loadChannelActivity();
-
         } else {
             Toast.makeText(LoginActivity.this, getString(R.string.err_unexpected), Toast.LENGTH_LONG).show();
 
@@ -111,27 +112,33 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initLogin() {
         loginLoader.smoothToShow();
-        loginViewModel.performLogin(username, txtPasssword.getText().toString(), macAddress).observe(this, loginResponseWrapper -> {
-            if (loginResponseWrapper != null) {
-                if (loginResponseWrapper.getLoginInfo() != null) {
-                    GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
-                    long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                    fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
-                            loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
-                                    String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
-                } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
-                    if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
-                        loadUnauthorized(getString(R.string.mac_not_registered), "N/A");
+       LiveData<LoginResponseWrapper> loginResponseData= loginViewModel.performLogin(username, txtPasssword.getText().toString(), macAddress);
+       loginResponseData.observe(this, new Observer<LoginResponseWrapper>() {
+            @Override
+            public void onChanged(@Nullable LoginResponseWrapper loginResponseWrapper) {
+                if (loginResponseWrapper != null) {
+                    if (loginResponseWrapper.getLoginInfo() != null) {
+                        GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
+                        long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                        LoginActivity.this.fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
+                                loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
+                                        String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
+                    } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
+                        if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
+                            LoginActivity.this.loadUnauthorized(LoginActivity.this.getString(R.string.mac_not_registered), "N/A");
+                        } else {
+                            Toast.makeText(LoginActivity.this, loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage(), Toast.LENGTH_LONG).show();
+                            loginLoader.smoothToHide();
+                            txtPasssword.requestFocus();
+                        }
+
                     } else {
-                        Toast.makeText(this, loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage(), Toast.LENGTH_LONG).show();
-                        loginLoader.smoothToHide();
-                        txtPasssword.requestFocus();
+                        LoginActivity.this.showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError());
                     }
+                    loginResponseData.removeObserver(this);
 
-                } else {
-                    showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError());
+
                 }
-
             }
         });
 
@@ -162,7 +169,14 @@ public class LoginActivity extends AppCompatActivity {
                         Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
                         loginLoader.smoothToHide();
                         LoginActivity.this.catChannelInfo = catChannelWrapper.getCatChannelInfo();
-                        LoginActivity.this.checkForExistingChannelData();
+                        Thread thread=new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                checkForExistingChannelData();
+                            }
+                        });
+                        thread.start();
+
                     } else {
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
@@ -171,6 +185,8 @@ public class LoginActivity extends AppCompatActivity {
                             case INVALID_USER:
                                 LoginActivity.this.showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
                                 break;
+                            case NO_CONNECTION:
+                                showErrorDialog(NO_CONNECTION,getString(R.string.no_internet_body));
                         }
                     }
                     categoryChannelData.removeObserver(this);
@@ -210,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItemList) {
                 if (channelItemList != null) {
-                    LoginActivity.this.updateListData(channelItemList, catChannelInfo.getChannel());
+                    updateListData(channelItemList, catChannelInfo.getChannel());
                     channelDBdata.removeObserver(this);
                 }
             }
@@ -251,6 +267,11 @@ public class LoginActivity extends AppCompatActivity {
                 case INVALID_USER:
                     showSplash();
                     break;
+                case NO_CONNECTION:
+                    Intent intent=new Intent(this,SplashActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
 
             }
 

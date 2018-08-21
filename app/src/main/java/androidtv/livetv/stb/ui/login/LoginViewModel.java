@@ -42,14 +42,12 @@ public class LoginViewModel extends AndroidViewModel {
         loginData.addSource(loginDBData, login -> loginData.setValue(login));
         chSizeMediatorData.addSource(channelTableSizeData, integer -> {
             if (integer != null) {
-                chSizeMediatorData.removeSource(channelTableSizeData);
-                chSizeMediatorData.setValue(integer);
+                chSizeMediatorData.postValue(integer);
             }
         });
         channelListData.addSource(channelLiveData, channelItemList -> {
             if (channelItemList != null) {
-                channelListData.removeSource(channelLiveData);
-                channelListData.setValue(channelItemList);
+                channelListData.postValue(channelItemList);
 
             }
         });

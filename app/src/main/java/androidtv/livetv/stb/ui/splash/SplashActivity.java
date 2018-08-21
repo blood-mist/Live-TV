@@ -1,6 +1,7 @@
 package androidtv.livetv.stb.ui.splash;
 
 import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -67,6 +68,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.LIVE_ERROR_MESSAGE;
 import static androidtv.livetv.stb.utils.LinkConfig.LIVE_IP;
 import static androidtv.livetv.stb.utils.LinkConfig.NO_CONNECTION;
 import static androidtv.livetv.stb.utils.LinkConfig.USER_EMAIL;
+import static androidtv.livetv.stb.utils.LinkConfig.USER_NOT_REGISTERED;
 
 public class SplashActivity extends AppCompatActivity implements PermissionUtils.PermissionResultCallback, DownloadFragment.OnDismissInteraction {
     private static final String MAC_REGISTERED = "yes";
@@ -100,8 +102,8 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void checkEpgTable() {
-        splashViewModel.getAllEpgs().observe(this, epgs ->{
-                if(epgs!=null)
+        splashViewModel.getAllEpgs().observe(this, epgs -> {
+            if (epgs != null)
                 checkAndRemoveEpgs(epgs);
         });
     }
@@ -199,15 +201,29 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                     if (catChannelWrapper.getCatChannelInfo() != null) {
                         Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
                         catChannelInfo = catChannelWrapper.getCatChannelInfo();
-                        checkForExistingChannelData();
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                checkForExistingChannelData();
+                            }
+                        });
+                        thread.start();
+
                     } else {
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
+                                splashViewModel.deleteloginData();
                                 proceedToLoginViaFile(GlobalVariables.login.getEmail());
                                 break;
                             case INVALID_USER:
-                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
+                                GlobalVariables.login=null;
+                                splashViewModel.deleteloginData();
+                                splashViewModel.deleteLoginFile();
+                                checkValidUser();
+//                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
                                 break;
+                            case NO_CONNECTION:
+                                showErrorDialog(NO_CONNECTION, getString(R.string.no_internet_body));
                         }
                     }
                     categoryChannelData.removeObserver(this);
@@ -239,7 +255,18 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                     splashViewModel.deleteLoginFile();
                     checkValidUser();
                     break;
-
+                case USER_NOT_REGISTERED:
+                    splashViewModel.deleteloginData();
+                    splashViewModel.deleteLoginFile();
+                    openAccountApk(ACCOUNT_PACKAGE, "");
+                    break;
+                case NO_CONNECTION:
+                    try {
+                        Intent i = getPackageManager().getLaunchIntentForPackage(this.getPackageName());
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    }catch (Exception ignored){}
             }
 
         });
@@ -267,7 +294,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void fetchChannelsFromDBtoUpdate() {
-        LiveData<List<ChannelItem>>channelDBdata=splashViewModel.getAllChannelsInDBToCompare();
+        LiveData<List<ChannelItem>> channelDBdata = splashViewModel.getAllChannelsInDBToCompare();
         channelDBdata.observe(this, new Observer<List<ChannelItem>>() {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItemList) {
@@ -280,17 +307,20 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     }
 
-    private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
+    private void updateListData(List<ChannelItem> dbChannelList, List<ChannelItem> channels) {
         for (int i = 0; i < channels.size(); i++) {
-            for (ChannelItem dbCHannelItem : channelItemList) {
-                if (channels.get(i).getId() == dbCHannelItem.getId()) {
-                    channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+            try {
+                for (ChannelItem dbCHannelItem : dbChannelList) {
+                    if (channels.get(i).getId() == dbCHannelItem.getId()) {
+                        channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
     }
-
 
 
     @Override
@@ -465,41 +495,44 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     private void proceedToLoginViaFile(String emailFrmApi) {
         if (LoginFileUtils.readFromFile(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this))) {
-            String encrypted_password = LoginFileUtils.getUserPassword() + "";
+            try {
+                String encrypted_password = LoginFileUtils.getUserPassword();
 
+                Timber.d("File:", LoginFileUtils.getUserEmail());
+                String userEmail = LoginFileUtils.getUserEmail();
+                Timber.d("File:", encrypted_password + "");
 
-            Timber.d("File:", LoginFileUtils.getUserEmail() + "");
-            String userEmail = LoginFileUtils.getUserEmail();
-            Timber.d("File:", encrypted_password + "");
+                MyEncryption sUtils = new MyEncryption();
+                Timber.d("Decrypting " + encrypted_password);
+                String decrypted_password = sUtils.getDecryptedToken(encrypted_password);
+                Timber.d("CheckingPassword", decrypted_password);
+                splashViewModel.loginFromFile(userEmail, decrypted_password, macAddress).observe(this, loginResponseWrapper -> {
+                    if (loginResponseWrapper != null) {
+                        if (loginResponseWrapper.getLoginInfo() != null) {
+                            GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
+                            long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                            fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
+                                    loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
+                                            String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
+                        } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
+                            if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
+                                loadUnauthorized("404", getString(R.string.mac_not_registered), "N/A");
+                            } else {
+                                showErrorDialog(Integer.parseInt(loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode()), loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage());
+                            }
 
-            MyEncryption sUtils = new MyEncryption();
-            Timber.d("Decrypting " + encrypted_password);
-            String decrypted_password = sUtils.getDecryptedToken(encrypted_password);
-            Timber.d("CheckingPassword", decrypted_password);
-            splashViewModel.loginFromFile(userEmail, decrypted_password, macAddress).observe(this, loginResponseWrapper -> {
-                if (loginResponseWrapper != null) {
-                    if (loginResponseWrapper.getLoginInfo() != null) {
-                        GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
-                        long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                        fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
-                                loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
-                                        String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
-                    } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
-                        if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
-                            loadUnauthorized("404", getString(R.string.mac_not_registered), "N/A");
                         } else {
-                            Toast.makeText(this, loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage(), Toast.LENGTH_LONG).show();
+                            showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), userEmail);
                             LoginFileUtils.deleteLoginFile();
-                            checkForValidMacAddress();
                         }
 
-                    } else {
-                        showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), userEmail);
-                        LoginFileUtils.deleteLoginFile();
                     }
-
-                }
-            });
+                });
+            } catch (Exception e) {
+                Toast.makeText(this, getString(R.string.err_autologin), Toast.LENGTH_LONG).show();
+                LoginFileUtils.deleteLoginFile();
+                showLogin(emailFrmApi);
+            }
         } else {
             LoginFileUtils.deleteLoginFile();
             showLogin(emailFrmApi);

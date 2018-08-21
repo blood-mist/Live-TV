@@ -72,4 +72,10 @@ public interface CatChannelDao {
 
     @Query("DELETE FROM EPG_TABLE WHERE epg_id = :id")
     void deleteEpg(String id);
+
+    @Query("DELETE FROM CATEGORY_TABLE")
+    void deleteCategory();
+
+    @Query("DELETE FROM CHANNEL_TABLE")
+    void deleteChannel();
 }

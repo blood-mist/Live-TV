@@ -55,6 +55,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 
 
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
+import androidtv.livetv.stb.utils.CustomLinearLayoutManager;
 import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 
@@ -153,6 +154,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private int currentChannelPosition = 0;
     private int selectedChannelPosition = 0;
     private int lastPlayedPosition = 0;
+    private int overallXScroll=0;
     private Login login;
     int lastPlayedId;
 
@@ -190,13 +192,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
         adapter = new ChannelListAdapter(getActivity(), this);
-        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        gvChannelsList.setLayoutManager(new CustomLinearLayoutManager(getActivity()));
         gvChannelsList.setAdapter(adapter);
         setUpRecylerViewCategory();
 
         layoutEpg.setNextFocusUpId(categoryList.getId());
         layoutDvr.setNextFocusUpId(categoryList.getId());
         layoutFav.setNextFocusUpId(categoryList.getId());
+        layoutFav.setNextFocusRightId(layoutFav.getId());
         gvChannelsList.setNextFocusRightId(layoutEpg.getId());
         layoutFav.setOnFocusChangeListener((view12, hasFocus) -> {
             if (hasFocus) {
@@ -446,12 +449,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @Override
     public void onSelectCategory(int position) {
-        View currentFocusedView = categoryList.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.channelCategory_layout);
-        if (currentFocusedView != null) {
-            View firstChannelView = gvChannelsList.findViewHolderForAdapterPosition(0).itemView;
-            if (firstChannelView != null)
-                currentFocusedView.setNextFocusDownId(firstChannelView.getId());
-        }
+        try {
+            View currentFocusedView = categoryList.findViewHolderForAdapterPosition(position).itemView.findViewById(R.id.channelCategory_layout);
+            if (currentFocusedView != null && adapter != null) {
+                View firstChannelView = gvChannelsList.findViewHolderForAdapterPosition(0).itemView;
+                if (firstChannelView != null)
+                    currentFocusedView.setNextFocusDownId(firstChannelView.getId());
+            }
+        }catch (Exception ignored){}
         /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
 
 
@@ -518,7 +523,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         menuViewModel.getPreviewLink(login.getToken(), utc, String.valueOf(login.getId()),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()), channelItem.getId()).observe(this, channelLinkResponse -> {
             if (channelLinkResponse != null) {
-                initVideoView(channelLinkResponse.getChannel().getLink());
+                try {
+                    initVideoView(channelLinkResponse.getChannel().getLink());
+                }catch (Exception ignored){
+                }
             }
         });
 
