@@ -135,6 +135,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private Handler handlerToHidePriority;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -480,7 +481,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         mVideoController = null;
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
-        if (currentPlayingChannel != null && currentPlayingChannel.getId() == (item.getId()) && player != null && player.getCurrentPosition() > 0) {
+        if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0) {
             hideMenuUI();
         } else {
             showProgressBar();
@@ -629,6 +630,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         VideoPlayActivity.this.hideMenuUI();
                     } else {
                         VideoPlayActivity.this.startCloseMenuHandler();
+                        if(!menuFragment.isVisible())
                         VideoPlayActivity.this.showPriorityNo();
 
                         if (menuFragment.isVisible()) {
@@ -681,6 +683,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
+
+
     private void loadNextDvr() {
         showProgressBar();
         long utc = GetUtc.getInstance().getTimestamp().getUtc();
@@ -717,7 +721,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void startCloseMenuHandler() {
-        hideMenuHandler.postDelayed(closeFragmentRunnable, TimeUnit.SECONDS.toMillis(10));
+        hideMenuHandler.postDelayed(closeFragmentRunnable, 15*1000);
 
     }
 

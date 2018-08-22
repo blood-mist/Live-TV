@@ -6,9 +6,13 @@ import android.arch.lifecycle.MediatorLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
+
 import org.greenrobot.eventbus.EventBus;
 
+import java.net.ConnectException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.db.AndroidTvDatabase;
