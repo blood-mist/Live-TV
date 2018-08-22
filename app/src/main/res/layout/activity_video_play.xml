@@ -121,6 +121,20 @@
         android:visibility="gone"
         app:indicatorColor="@color/color_white"
         app:indicatorName="BallSpinFadeLoaderIndicator" />
+    <androidtv.livetv.stb.ui.custom_views.CustomTextView
+        android:id="@+id/priority_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fontAssetName="@string/font_exo_semi_bold"
+        android:text="123"
+        android:visibility="invisible"
+        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="end"
+        android:padding="10dp"
+        android:textSize="32sp"
+        android:background="@color/transp"/>
 
 
 </FrameLayout>

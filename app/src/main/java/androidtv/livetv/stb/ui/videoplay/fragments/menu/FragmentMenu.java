@@ -183,7 +183,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
         adapter = new ChannelListAdapter(getActivity(), this);
-        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+
+        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvChannelsList.setAdapter(adapter);
         setUpRecylerViewCategory();
 

@@ -42,6 +42,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -61,6 +62,7 @@ import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginDataDelete;
 import androidtv.livetv.stb.entity.PlayBackErrorEntity;
+import androidtv.livetv.stb.ui.custom_views.CustomTextView;
 import androidtv.livetv.stb.ui.splash.SplashActivity;
 import androidtv.livetv.stb.ui.utc.GetUtc;
 import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
@@ -109,6 +111,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     SurfaceView videoSurfaceView;
     @BindView(R.id.menu_bg)
     ImageView menuBackground;
+    @BindView(R.id.priority_view)
+    CustomTextView priorityView;
 
 
     private VideoPlayViewModel videoPlayViewModel;
@@ -131,6 +135,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private String nextVideoNameDvr;
     private boolean isDvrPlaying;
     private ChannelItem currentPlayingChannel;
+    private Handler handlerToHidePriority;
+
 
 
     @Override
@@ -437,6 +443,21 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             startCloseMenuHandler();
     }
 
+    public void showPriorityNo(){
+        priorityView.setText(String.valueOf(currentPlayingChannel.getChannelPriority()));
+        priorityView.setVisibility(View.VISIBLE);
+        priorityView.bringToFront();
+        handlerToHidePriority = new Handler();
+        Runnable hidePriority = new Runnable() {
+            @Override
+            public void run() {
+                priorityView.setVisibility(View.INVISIBLE);
+            }
+        };
+        handlerToHidePriority.postDelayed(hidePriority,3*1000);
+
+    }
+
     private void randomDisplayMacAddress() {
         final Random random = new Random();
         handlerToShowMac = new Handler();
@@ -448,7 +469,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
         runnableToHideMac = () -> {
 
-
             params.setMargins(500, random.nextInt(500),
                     random.nextInt(200), random.nextInt(200));
 
@@ -456,27 +476,30 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             txtRandomDisplayBoxId.setVisibility(View.INVISIBLE);
             System.out.println("box is invisible");
 
-            handlerToShowMac.postDelayed(runnableToShowMac, TimeUnit.SECONDS.toMillis(5));
+            handlerToShowMac.postDelayed(runnableToShowMac, 180000);
         };
-        runnableToShowMac = () -> {
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
+        runnableToShowMac = new Runnable() {
+            @Override
+            public void run() {
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int height = displayMetrics.heightPixels;
+                int width = displayMetrics.widthPixels;
 //            params.setMargins(10,random.nextInt(height-20),random.nextInt(width-20),10);
 
-            params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
-                    random.nextInt(100), random.nextInt(100));
+                params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
+                        random.nextInt(100), random.nextInt(100));
 
-            txtRandomDisplayBoxId.bringToFront();
-            txtRandomDisplayBoxId.setLayoutParams(params);
-            txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
-            System.out.println("box is shown");
+                txtRandomDisplayBoxId.bringToFront();
+                txtRandomDisplayBoxId.setLayoutParams(params);
+                txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
+                System.out.println("box is shown");
 
-            handlerToHideMac.postDelayed(runnableToHideMac, TimeUnit.SECONDS.toMillis(7));
+                handlerToHideMac.postDelayed(runnableToHideMac, 5 * 1000);
+            }
         };
 
-        handlerToShowMac.postDelayed(runnableToShowMac, TimeUnit.MINUTES.toMillis(4));
+        handlerToShowMac.postDelayed(runnableToShowMac, 180000);
 
     }
 
@@ -492,7 +515,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         mVideoController = null;
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
-        if (currentPlayingChannel != null && currentPlayingChannel.getId() == (item.getId()) && player != null && player.getCurrentPosition() > 0) {
+        if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0) {
             hideMenuUI();
         } else {
             showProgressBar();
@@ -619,65 +642,85 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         try {
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setDataSource(this, Uri.parse(channelLink));
-            player.setOnPreparedListener(mp -> {
-                hideMenuBg();
-                mp.setScreenOnWhilePlaying(true);
-                if (isDvr) {
-                    MyVideoController controller = new MyVideoController(this, player, currentDvrChannelItem, this);
-                    mVideoController = new VideoControllerView(this, true);
-                    mVideoController.setAnchorView(videoSurfaceContainer);
-                    mVideoController.setMediaPlayer(controller, player);
-                    mVideoController.show();
-                    recordedStatus.setVisibility(View.VISIBLE);
-                    isDvrPlaying = true;
-                } else {
-                    recordedStatus.setVisibility(View.GONE);
-                }
-
-                if (isDvr) {
-                    hideMenuUI();
-                } else {
-                    startCloseMenuHandler();
-
-                    if (menuFragment.isVisible()) {
-                        menuFragment.hideErrorFrag();
+            player.prepareAsync();
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    VideoPlayActivity.this.hideMenuBg();
+                    player.setScreenOnWhilePlaying(true);
+                    player.start();
+                    VideoPlayActivity.this.hideProgressBar();
+                    if (isDvr) {
+                        MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
+                        mVideoController = new VideoControllerView(VideoPlayActivity.this, true);
+                        mVideoController.setAnchorView(videoSurfaceContainer);
+                        mVideoController.setMediaPlayer(controller, player);
+                        mVideoController.show();
+                        recordedStatus.setVisibility(View.VISIBLE);
+                        isDvrPlaying = true;
                     } else {
-                        menuFragment.setErrorFragMent(null);
+
+                        recordedStatus.setVisibility(View.GONE);
                     }
+
+                    if (isDvr) {
+                        VideoPlayActivity.this.hideMenuUI();
+                    } else {
+                        VideoPlayActivity.this.startCloseMenuHandler();
+                        if(!menuFragment.isVisible())
+                            VideoPlayActivity.this.showPriorityNo();
+
+                        if (menuFragment.isVisible()) {
+                            menuFragment.hideErrorFrag();
+                        } else {
+                            menuFragment.setErrorFragMent(null);
+                        }
+                    }
+                    VideoPlayActivity.this.randomDisplayMacAddress();
+
+
                 }
-                randomDisplayMacAddress();
-                player.setOnCompletionListener(mp1 -> {
+            });
+
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
                     if (isDvr) {
                         loadNextDvr();
                     }
-                });
-                mp.start();
-                hideProgressBar();
-            });
-            player.setOnErrorListener((mp, what, extra) -> {
-                Timber.d("on error ");
-                VideoPlayActivity.this.hideProgressBar();
-                VideoPlayActivity.this.hideMacDisplayHandler();
-                VideoPlayActivity.this.stopCloseMenuHandler();
-                VideoPlayActivity.this.showDvrMenu();
-                StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                if (isDvr) {
-                    isDvrPlaying = false;
-                    Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                    VideoPlayActivity.this.stopCloseMenuHandler();
-
-                } else {
-                    VideoPlayActivity.this.setErrorFragment(null, what, extra);
                 }
-                return true;
             });
-            player.prepareAsync();
+
+
+
+            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    Timber.d("on error ");
+                    VideoPlayActivity.this.hideProgressBar();
+                    VideoPlayActivity.this.hideMacDisplayHandler();
+                    VideoPlayActivity.this.stopCloseMenuHandler();
+                    VideoPlayActivity.this.showDvrMenu();
+                    StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
+                    //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                    if (isDvr) {
+                        isDvrPlaying = false;
+                        Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                        VideoPlayActivity.this.stopCloseMenuHandler();
+
+                    } else {
+                        VideoPlayActivity.this.setErrorFragment(null, what, extra);
+                    }
+                    return true;
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
+
 
     private void loadNextDvr() {
         showProgressBar();
@@ -717,7 +760,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void startCloseMenuHandler() {
-        hideMenuHandler.postDelayed(closeFragmentRunnable, TimeUnit.SECONDS.toMillis(10));
+        hideMenuHandler.postDelayed(closeFragmentRunnable, 15*1000);
 
     }
 

@@ -4,13 +4,17 @@ import android.content.Context;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
+import org.apache.http.conn.ConnectTimeoutException;
+
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.EpgItem;
@@ -93,7 +97,7 @@ public class DataUtils {
     public static PlayBackErrorEntity getErrorEntity(Context context, Exception exception) {
         String message = exception.getMessage();
         String code = "";
-        if(exception instanceof ConnectException){
+        if(exception instanceof ConnectException || exception instanceof SocketTimeoutException){
             message = context.getResources().getString(R.string.err_server_unreachable);
             code = context.getResources().getString(R.string.err_code_server_unreachable);
 
