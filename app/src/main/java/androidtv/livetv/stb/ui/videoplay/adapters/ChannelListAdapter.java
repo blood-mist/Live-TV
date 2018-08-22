@@ -18,7 +18,6 @@ import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.utils.GlideApp;
 import androidtv.livetv.stb.utils.LinkConfig;
-import timber.log.Timber;
 
 import static android.view.View.GONE;
 
@@ -34,6 +33,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     private ChannelListClickListener listener;
     private int selectedPos;
     private RecyclerView recyclerView;
+    private String categoryName;
 
     public int getPositionSelected() {
         return positionSelected;
@@ -47,10 +47,12 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     public ChannelListAdapter(Context context, ChannelListClickListener lis) {
         this.mContext = context;
         this.listener = lis;
+        setHasStableIds(true);
     }
 
 
-    public void setChannelItems(List<ChannelItem> list) {
+    public void setChannelItems(String categoryName,List<ChannelItem> list) {
+        this.categoryName =categoryName;
         this.mList = list;
         notifyDataSetChanged();
     }
@@ -59,10 +61,6 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     public void onViewAttachedToWindow(@NonNull MyChannelListViewHolder holder) {
         super.onViewAttachedToWindow(holder);
 
-        if (getPositionSelected() == holder.getAdapterPosition()) {
-            holder.relativeLayout.requestFocus();
-
-        }
     }
 
     @NonNull
@@ -101,6 +99,16 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         if (mList != null)
             return mList.size();
         else return 0;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override
@@ -150,7 +158,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     }
 
     public interface ChannelListClickListener {
-        void onClickChannel(int position);
+        void onClickChannel(String currentCategoryName,int position,List<ChannelItem>currentCategoryitems);
 
         void onChannelFocused(int position);
     }
@@ -171,7 +179,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
             relativeLayout.setOnClickListener(v -> {
                 selectedPos = getAdapterPosition();
-                listener.onClickChannel(getAdapterPosition());
+                listener.onClickChannel(categoryName,getAdapterPosition(),mList);
             });
 
             relativeLayout.setOnFocusChangeListener((v, hasFocus) -> {
@@ -191,6 +199,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
             });
         }
     }
+
 
     public int getSelectedChannelPositionViaId(int channelId) {
         if (mList != null) {

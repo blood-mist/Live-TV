@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
@@ -43,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
+import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
@@ -82,14 +84,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private static final int IS_FAV = 1;
     private MenuViewModel menuViewModel;
     private FragmentMenuInteraction mListener;
-    private int channelIds;
     private ChannelListAdapter adapter;
+    CategoryAdapter categoryAdapter;
     private SharedPreferences lastPlayedPrefs;
-    private int selectedCurrentChannelId;
+    private List<ChannelItem> currentPlayedCategoryItems;
 
     private Handler watchPreviewHandler = new Handler();
 
-    Gson gson = new Gson();
     private List<ChannelItem> allChannelItems, allFavItems;
     private boolean isFirstRun = true;
 
@@ -140,21 +141,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.fav)
     ImageView btnFav;
 
-    public int getCatId() {
-        return catId;
-    }
-
-    public void setCatId(int catId) {
-        this.catId = catId;
-    }
-
     private int catId = -1;
 
 
     private int currentChannelPosition = 0;
     private int selectedChannelPosition = 0;
-    private int lastPlayedPosition = 0;
-    private int overallXScroll=0;
     private Login login;
     int lastPlayedId;
 
@@ -192,7 +183,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
         adapter = new ChannelListAdapter(getActivity(), this);
-        gvChannelsList.setLayoutManager(new CustomLinearLayoutManager(getActivity()));
+        gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         gvChannelsList.setAdapter(adapter);
         setUpRecylerViewCategory();
 
@@ -265,7 +256,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public void playLastPlayedChannel() {
         lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
-        selectedCurrentChannelId = lastPlayedId;
         if (lastPlayedId != -1) {
             LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
             lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
@@ -312,7 +302,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     private void setUpRecylerViewCategory() {
         Log.d("frag", "recycle view created");
-        CategoryAdapter categoryAdapter = new CategoryAdapter(getActivity(), this);
+        categoryAdapter = new CategoryAdapter(getActivity(), this);
         categoryList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         categoryList.setAdapter(categoryAdapter);
 
@@ -402,13 +392,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      *
      * @param items
      */
-    private void setUpChannelsCategory(List<ChannelItem> items) {
+    private void setUpChannelsCategory(String categoryName, List<ChannelItem> items) {
         if (items != null) {
             if (items.size() > 0) {
 //                gvChannelsList.requestFocus();
-                adapter.setChannelItems(items);
+                adapter.setChannelItems(categoryName, items);
                 if (lastPlayedId != -1) {
                     selectedChannelPosition = adapter.getSelectedChannelPositionViaId(lastPlayedId);
+                    currentPlayedCategoryItems = items;
                     lastPlayedId = -1;
                 }
                 adapter.setPositionSelected(selectedChannelPosition);
@@ -418,6 +409,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentSelected = adapter.getmList().get(0);
 
                 }
+                gvChannelsList.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.requestFocus();
+                        gvChannelsList.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                    }
+                });
+
                 gvChannelsList.getLayoutManager().scrollToPosition(selectedChannelPosition);
                 adapter.notifyDataSetChanged();
             }
@@ -440,11 +440,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         categoryEditor.putString(SELECTED_CATEGORY_NAME, categoryName);
         if (mListChannels.contains(currentPlayed)) {
             selectedChannelPosition = mListChannels.indexOf(currentPlayed);
-            categoryEditor.putString(PLAYED_CATEGORY_NAME, categoryName);
         } else
             selectedChannelPosition = 0;
-        categoryEditor.commit();
-        setUpChannelsCategory(mListChannels);
+        categoryEditor.apply();
+        setUpChannelsCategory(categoryName, mListChannels);
     }
 
     @Override
@@ -456,7 +455,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 if (firstChannelView != null)
                     currentFocusedView.setNextFocusDownId(firstChannelView.getId());
             }
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         /*  categoryList.setNextFocusDownId(layoutEpg.getId());*/
 
 
@@ -468,14 +468,17 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      * @param position
      */
     @Override
-    public void onClickChannel(int position) {
+    public void onClickChannel(String currentPlayingCategory, int position, List<ChannelItem> currentPlayedChannel) {
         currentChannelPosition = position;
         selectedChannelPosition = position;
+        SharedPreferences.Editor categoryEditor = lastPlayedPrefs.edit();
+        categoryEditor.putString(PLAYED_CATEGORY_NAME, currentPlayingCategory);
+        categoryEditor.apply();
         Timber.d("position:" + currentChannelPosition);
-        selectedCurrentChannelId = adapter.getmList().get(position).getId();
         mListener.playChannel(adapter.getmList().get(currentChannelPosition));
         currentSelected = adapter.getmList().get(position);
         currentPlayed = adapter.getmList().get(position);
+        currentPlayedCategoryItems = currentPlayedChannel;
         mListener.playChannel(adapter.getmList().get(position));
 
     }
@@ -495,7 +498,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedChannelPosition = position;
         setValues(adapter.getmList().get(position));
         currentSelected = adapter.getmList().get(position);
-        if (currentPlayed != null && currentSelected != null && currentPlayed.getId()!=currentSelected.getId())
+        if (currentPlayed != null && currentSelected != null && currentPlayed.getId() != currentSelected.getId())
             startPreview(adapter.getmList().get(position));
 
 
@@ -525,7 +528,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             if (channelLinkResponse != null) {
                 try {
                     initVideoView(channelLinkResponse.getChannel().getLink());
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
             }
         });
@@ -626,22 +629,26 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             DisposableManager.disposeLive();
             if (((ChannelChangeObserver) observable).getChannelNext()) {
                 //put condition here so no IoB Exception occurs
-                if (currentChannelPosition < adapter.getItemCount() - 1)
+                if (currentChannelPosition < currentPlayedCategoryItems.size() - 1)
                     currentChannelPosition++;
                 else
                     currentChannelPosition = 0;
-                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+
             } else if (!((ChannelChangeObserver) observable).getChannelNext()) {
                 if (currentChannelPosition > 0)
                     currentChannelPosition--;
                 else
-                    currentChannelPosition = adapter.getItemCount() - 1;
-                mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+                    currentChannelPosition = currentPlayedCategoryItems.size() - 1;
 
             }
+            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mListener.playChannel(adapter.getmList().get(currentChannelPosition));
+                }
+            });
             selectedChannelPosition = currentChannelPosition;
             Timber.d("position:" + currentChannelPosition);
-            selectedCurrentChannelId = adapter.getmList().get(currentChannelPosition).getId();
             currentSelected = adapter.getmList().get(currentChannelPosition);
             currentPlayed = adapter.getmList().get(currentChannelPosition);
         }

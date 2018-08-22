@@ -103,6 +103,7 @@
         android:background="@drawable/transparent_rect_bordered_bg"
         android:gravity="center"
         android:inputType="number"
+        android:textIsSelectable="true"
         android:digits="0123456789"
         android:padding="20dp"
         android:textCursorDrawable="@android:color/transparent"

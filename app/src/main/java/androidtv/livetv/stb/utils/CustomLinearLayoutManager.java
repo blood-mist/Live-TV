@@ -5,6 +5,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
+
+import timber.log.Timber;
 
 public class CustomLinearLayoutManager extends LinearLayoutManager {
 
@@ -25,6 +29,36 @@ public class CustomLinearLayoutManager extends LinearLayoutManager {
         RecyclerView.SmoothScroller smoothScroller = new CenterSmoothScroller(recyclerView.getContext());
         smoothScroller.setTargetPosition(position);
         startSmoothScroll(smoothScroller);
+    }
+
+    @Override
+    public View onInterceptFocusSearch(View focused, int direction) {
+        if (direction == View.FOCUS_DOWN) {
+            int pos = getPosition(focused);
+            if (pos == getItemCount() - 1)
+                return focused;
+        }
+        if (direction == View.FOCUS_UP) {
+            int pos = getPosition(focused);
+            if (pos == 0)
+                return focused;
+        }
+        return super.onInterceptFocusSearch(focused, direction);
+    }
+
+    @Override
+    public View onFocusSearchFailed(View focused, int focusDirection, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        if (focusDirection == View.FOCUS_DOWN) {
+            int pos = getPosition(focused);
+            if (pos == getItemCount() - 1)
+                return focused;
+        }
+        if (focusDirection == View.FOCUS_UP) {
+            int pos = getPosition(focused);
+            if (pos == 0)
+                return focused;
+        }
+        return super.onFocusSearchFailed(focused, focusDirection, recycler, state);
     }
 
     private static class CenterSmoothScroller extends LinearSmoothScroller {
