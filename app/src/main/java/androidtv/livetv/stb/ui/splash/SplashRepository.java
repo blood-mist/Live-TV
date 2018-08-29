@@ -3,6 +3,7 @@ package androidtv.livetv.stb.ui.splash;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.os.Environment;
 
@@ -33,7 +34,6 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
-import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GeoAccessInfo;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginError;
@@ -59,9 +59,6 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.internal.observers.SubscriberCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
@@ -93,7 +90,7 @@ public class SplashRepository {
     private MediatorLiveData<CatChannelWrapper> catChannelData;
     private LoginDao mLoginDao;
     private CatChannelDao catChannelDao;
-    private MediatorLiveData<List<ChannelItem>> channelListData;
+    private LiveData<List<ChannelItem>> channelListData;
     private MediatorLiveData<LoginResponseWrapper> loginInfoLiveData;
 
     SplashRepository(Application application) {
@@ -118,15 +115,6 @@ public class SplashRepository {
         channelCountData = new MediatorLiveData<>();
         channelCountData.setValue(null);
         channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> channelCountData.postValue(integer));
-
-        channelListData = new MediatorLiveData<>();
-        channelListData.setValue(null);
-        channelListData.addSource(catChannelDao.getChannels(), channelItemList -> {
-            if (channelItemList != null) {
-                channelListData.postValue(channelItemList);
-            }
-        });
-
     }
 
     public static SplashRepository getInstance(final Application application) {
@@ -377,13 +365,7 @@ public class SplashRepository {
     }
 
     public LiveData<Login> getData() {
-        userCredentialData.addSource(mLoginDao.getLoginData(), login -> {
-            if (login != null) {
-                userCredentialData.postValue(login);
-            }
-
-        });
-        return userCredentialData;
+        return mLoginDao.getLoginData();
     }
 
     public LiveData<CatChannelWrapper> getChannels(String token, String utc, String userId, String hashValue) {
@@ -465,13 +447,12 @@ public class SplashRepository {
 
 
     private void insertCatChannelsToDatabase(List<CategoryItem> categoryList, List<ChannelItem> channels) {
-      new insertChannelDataTask(categoryList,channels,catChannelDao).execute();
+        new insertCategoryDataTask(categoryList, channels, catChannelDao).execute();
 
     }
 
 
-
-    public void callChannelLoad(){
+    public void callChannelLoad() {
 
     }
 
@@ -489,6 +470,8 @@ public class SplashRepository {
     }
 
     public LiveData<List<ChannelItem>> getChannelList() {
+        channelListData = null;
+        channelListData = catChannelDao.getChannels();
         return channelListData;
     }
 
@@ -516,11 +499,11 @@ public class SplashRepository {
                         try {
                             JSONObject jsonObject = new JSONObject(json);
                             if (jsonObject.has(KEY_LOGIN_SUCCESS)) {
-                                JSONObject loginobject=jsonObject.getJSONObject(KEY_LOGIN_SUCCESS);
-                                if(loginobject.has(KEY_MAC_INVALID)){
-                                    LoginInvalidResponse loginInvalid=gson.fromJson(json,LoginInvalidResponse.class);
+                                JSONObject loginobject = jsonObject.getJSONObject(KEY_LOGIN_SUCCESS);
+                                if (loginobject.has(KEY_MAC_INVALID)) {
+                                    LoginInvalidResponse loginInvalid = gson.fromJson(json, LoginInvalidResponse.class);
                                     loginResponseWrapper.setLoginInvalidResponse(loginInvalid);
-                                }else {
+                                } else {
                                     LoginInfo loginInfo = gson.fromJson(json, LoginInfo.class);
                                     loginResponseWrapper.setLoginInfo(loginInfo);
                                     insertLoginData(loginInfo.getLogin(), userPassword, macAddress);
@@ -596,36 +579,65 @@ public class SplashRepository {
                 login.getEmail(), new MyEncryption().getEncryptedToken(userPassword), login.getSession(), String.valueOf(login.getId()));
     }
 
-    public void deleteLoginFile(){
+    public void deleteLoginFile() {
         Completable.fromRunnable(LoginFileUtils::deleteLoginFile).subscribeOn(Schedulers.io()).subscribe();
     }
+
     public void deleteLoginFromDB() {
-        Completable.fromRunnable(()-> mLoginDao.deleteAll()).subscribeOn(Schedulers.io()).subscribe();
+        Completable.fromRunnable(() -> mLoginDao.deleteAll()).subscribeOn(Schedulers.io()).subscribe();
     }
 
     public LiveData<List<Epgs>> getAllEpg() {
         return liveDateEpgs;
     }
 
-    private static class insertChannelDataTask extends AsyncTask<Void, Void, Boolean> {
+    private static class insertCategoryDataTask extends AsyncTask<Void, Void, Boolean> {
 
-        private  List<CategoryItem> categoryItemList;
+        private List<CategoryItem> categoryItemList;
         private List<ChannelItem> channelItemList;
         private CatChannelDao dao;
-        boolean inserted=false;
 
-        insertChannelDataTask(List<CategoryItem> categoryItemList,List<ChannelItem> channelItemList,CatChannelDao dao) {
-            this.categoryItemList=categoryItemList;
-            this.channelItemList=channelItemList;
-            this.dao=dao;
+        insertCategoryDataTask(List<CategoryItem> categoryItemList, List<ChannelItem> channelItemList, CatChannelDao dao) {
+            this.categoryItemList = categoryItemList;
+            this.channelItemList = channelItemList;
+            this.dao = dao;
 
         }
 
         @Override
         protected Boolean doInBackground(Void... updateResult) {
-            long[] categoryResult=dao.insertCategory(categoryItemList);
-            long[] channelResult=dao.insertChannels(channelItemList);
-           return Arrays.asList(categoryResult).contains(DATA_INSERTION_FAILED) || Arrays.asList(channelResult).contains(DATA_INSERTION_FAILED);
+            dao.deleteCategory();
+            dao.deleteChannel();
+            long[] categoryResult = dao.insertCategory(categoryItemList);
+            long[] channelResult = dao.insertChannels(channelItemList);
+            return Arrays.asList(categoryResult).contains(DATA_INSERTION_FAILED) || Arrays.asList(channelResult).contains(DATA_INSERTION_FAILED);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isInserted) {
+            super.onPostExecute(isInserted);
+            EventBus.getDefault().post(new ChannelInserted(isInserted));
+//            new InsetChannelDataTask(channelItemList, dao).execute();
+        }
+
+    }
+
+    private static class InsetChannelDataTask extends AsyncTask<Void, Void, Boolean> {
+        private List<ChannelItem> channelItemList;
+        private CatChannelDao dao;
+
+        InsetChannelDataTask(List<ChannelItem> channelItemList, CatChannelDao dao) {
+            this.channelItemList = channelItemList;
+            this.dao = dao;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... updateResult) {
+            dao.deleteCategory();
+            dao.deleteChannel();
+            long[] channelResult = dao.insertChannels(channelItemList);
+            return Arrays.asList(channelResult).contains(DATA_INSERTION_FAILED);
         }
 
         @Override

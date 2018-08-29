@@ -173,6 +173,7 @@
     <string name="all_channels">All Channels</string>
     <string name="no_channel_found">Sorry , No associated channel found for given number.</string>
     <string name="err_autologin">Some Error Occurred During AutoLogin ,please re-login again.</string>
+    <string name="no_channels_found">No Channels Found For given category.</string>
 
 
 </resources>

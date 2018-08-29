@@ -50,14 +50,14 @@ public interface CatChannelDao {
     @Query("SELECT count(*)FROM CHANNEL_TABLE")
     LiveData<Integer> getChannelTableSize();
 
-    @Query("UPDATE CHANNEL_TABLE SET is_fav = :is_fav  WHERE channel_id = :channel_id")
-    long updateFav(int is_fav, int channel_id);
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    int updateFav(ChannelItem channelItem);
 
     @Query("SELECT * FROM CHANNEL_TABLE  WHERE channel_id=:channel_id")
     LiveData<ChannelItem> getLastPlayedChannel(int channel_id);
 
     @Transaction
-    @Query("SELECT * FROM CATEGORY_TABLE")
+    @Query("SELECT * FROM CATEGORY_TABLE ORDER BY displayOrder DESC")
     LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
 
     @Query("SELECT * FROM CHANNEL_TABLE WHERE is_fav = 1")
@@ -78,4 +78,7 @@ public interface CatChannelDao {
 
     @Query("DELETE FROM CHANNEL_TABLE")
     void deleteChannel();
+
+    @Query("SELECT * FROM CHANNEL_TABLE  LIMIT 1")
+    LiveData<ChannelItem> getFirstChannel();
 }

@@ -43,6 +43,17 @@
             android:nextFocusUp="@+id/categoryList"
             android:scrollingCache="false"
             android:smoothScrollbar="true" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/no_channels"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="gone"
+            android:text="@string/no_channels_found"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -215,19 +226,21 @@
                     android:importantForAccessibility="yes"
                     android:orientation="horizontal"
                     android:visibility="visible"
-                    android:weightSum="11">
+                    android:weightSum="8">
 
 
                     <LinearLayout
                         android:id="@+id/layout_epg"
                         android:layout_width="0dp"
                         android:layout_height="30dp"
-                        android:layout_weight="2"
                         android:focusable="true"
+                        android:layout_weight="2"
                         android:gravity="center"
+                        android:layout_marginRight="5dp"
                         android:clickable="true"
                         android:importantForAccessibility="yes"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginEnd="5dp">
 
                         <ImageView
                             android:id="@+id/epg"
@@ -262,12 +275,14 @@
                         android:id="@+id/layout_dvr"
                         android:layout_width="0dp"
                         android:layout_height="30dp"
-                        android:layout_weight="2"
                         android:focusable="true"
+                        android:layout_weight="2"
                         android:gravity="center"
+                        android:layout_marginRight="5dp"
                         android:clickable="true"
                         android:importantForAccessibility="yes"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginEnd="5dp">
 
                         <ImageView
                             android:id="@+id/dvr"
@@ -300,8 +315,8 @@
                     <LinearLayout
                         android:id="@+id/layout_fav"
                         android:layout_width="0dp"
+                        android:layout_weight="2"
                         android:layout_height="30dp"
-                        android:layout_weight="2.4"
                         android:focusable="true"
                         android:gravity="center_vertical"
                         android:importantForAccessibility="yes"

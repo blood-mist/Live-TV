@@ -16,7 +16,7 @@ import androidtv.livetv.stb.ui.login.LoginDao;
 import static androidtv.livetv.stb.utils.LinkConfig.DATABASE_NAME;
 
 
-@Database(entities = {Login.class, CategoryItem.class, ChannelItem.class, Epgs.class}, version = 102, exportSchema = false)
+@Database(entities = {Login.class, CategoryItem.class, ChannelItem.class, Epgs.class}, version = 105)
 public abstract class AndroidTvDatabase extends RoomDatabase {
     private static AndroidTvDatabase INSTANCE;
 

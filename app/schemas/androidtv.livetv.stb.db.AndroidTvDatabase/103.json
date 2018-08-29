@@ -1,0 +1,267 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 103,
+    "identityHash": "639599ae5f278402ef998b56885cb6ea",
+    "entities": [
+      {
+        "tableName": "login_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`session` TEXT, `community_id` INTEGER NOT NULL, `user_id` INTEGER NOT NULL, `email` TEXT, `is_active` INTEGER NOT NULL, `token` TEXT, PRIMARY KEY(`user_id`))",
+        "fields": [
+          {
+            "fieldPath": "session",
+            "columnName": "session",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "communityId",
+            "columnName": "community_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "is_active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "token",
+            "columnName": "token",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "user_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "category_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`displayOrder` INTEGER NOT NULL, `category_id` INTEGER NOT NULL, `category_name` TEXT, PRIMARY KEY(`category_id`))",
+        "fields": [
+          {
+            "fieldPath": "displayOrder",
+            "columnName": "displayOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "category_name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "category_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_category_table_category_id",
+            "unique": false,
+            "columnNames": [
+              "category_id"
+            ],
+            "createSql": "CREATE  INDEX `index_category_table_category_id` ON `${TABLE_NAME}` (`category_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "channel_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`channel_logo` TEXT, `is_fav` INTEGER NOT NULL, `category_id` INTEGER NOT NULL, `price` TEXT, `channel_id` INTEGER NOT NULL, `epg_name` TEXT, `channel_cdn_url` TEXT, `dvr_path` TEXT, `channl_url` TEXT, `channel_desc` TEXT, `channel_name` TEXT, `channel_priority` INTEGER NOT NULL, PRIMARY KEY(`channel_id`), FOREIGN KEY(`channel_id`) REFERENCES `category_table`(`category_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "channelLogo",
+            "columnName": "channel_logo",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "is_fav",
+            "columnName": "is_fav",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "channel_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelEpgName",
+            "columnName": "epg_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelCdnUrl",
+            "columnName": "channel_cdn_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dvrPath",
+            "columnName": "dvr_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelUrl",
+            "columnName": "channl_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelDesc",
+            "columnName": "channel_desc",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "channel_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "channelPriority",
+            "columnName": "channel_priority",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "channel_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "category_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "channel_id"
+            ],
+            "referencedColumns": [
+              "category_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "epg_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`epg_id` TEXT NOT NULL, `channel_id` INTEGER NOT NULL, `program_title` TEXT, `start_time` INTEGER, `end_time` INTEGER, `date` INTEGER, `timezone` TEXT, PRIMARY KEY(`epg_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "epg_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "channelID",
+            "columnName": "channel_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "programTitle",
+            "columnName": "program_title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "startTime",
+            "columnName": "start_time",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "endTime",
+            "columnName": "end_time",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "timeZone",
+            "columnName": "timezone",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "epg_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_epg_table_channel_id",
+            "unique": false,
+            "columnNames": [
+              "channel_id"
+            ],
+            "createSql": "CREATE  INDEX `index_epg_table_channel_id` ON `${TABLE_NAME}` (`channel_id`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"639599ae5f278402ef998b56885cb6ea\")"
+    ]
+  }
+}

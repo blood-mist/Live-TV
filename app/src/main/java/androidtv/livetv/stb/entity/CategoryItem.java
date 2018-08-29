@@ -19,7 +19,6 @@ public class CategoryItem{
 	@SerializedName("updated_at")
 	private String updatedAt;
 
-	@Ignore
 	@SerializedName("display_order")
 	private int displayOrder;
 

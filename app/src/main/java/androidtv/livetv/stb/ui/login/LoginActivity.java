@@ -26,6 +26,7 @@ import androidtv.livetv.stb.entity.CatChannelWrapper;
 import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.FavUpdatedListEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.LoginError;
 import androidtv.livetv.stb.entity.LoginResponseWrapper;
@@ -169,14 +170,7 @@ public class LoginActivity extends AppCompatActivity {
                         Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
                         loginLoader.smoothToHide();
                         LoginActivity.this.catChannelInfo = catChannelWrapper.getCatChannelInfo();
-                        Thread thread=new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkForExistingChannelData();
-                            }
-                        });
-                        thread.start();
-
+                                checkForExistingChannelData(catChannelWrapper.getCatChannelInfo());
                     } else {
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
@@ -197,14 +191,14 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void checkForExistingChannelData() {
+    private void checkForExistingChannelData(CatChannelInfo catChannelInfo) {
         LiveData<Integer> channelSize = loginViewModel.checkChannelsInDB();
         channelSize.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer integer) {
                 if (integer != null) {
                     if (integer > 0) {
-                        fetchChannelsFromDBtoUpdate();
+                        fetchChannelsFromDBtoUpdate(catChannelInfo);
                     } else {
                         insertDataToDB();
                     }
@@ -220,29 +214,41 @@ public class LoginActivity extends AppCompatActivity {
         saveChannelDetailstoDb(catChannelInfo.getCategory(), catChannelInfo.getChannel());
     }
 
-    private void fetchChannelsFromDBtoUpdate() {
+    private void fetchChannelsFromDBtoUpdate(CatChannelInfo catChannelInfo) {
         LiveData<List<ChannelItem>>channelDBdata=   loginViewModel.getAllChannelsInDBToCompare();
         channelDBdata.observe(this, new Observer<List<ChannelItem>>() {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItemList) {
                 if (channelItemList != null) {
-                    updateListData(channelItemList, catChannelInfo.getChannel());
+                    updateListData(channelItemList,catChannelInfo.getChannel(),catChannelInfo.getCategory());
                     channelDBdata.removeObserver(this);
                 }
             }
         });
     }
-
-    private void updateListData(List<ChannelItem> channelItemList, List<ChannelItem> channels) {
-        for (int i = 0; i < channels.size(); i++) {
-            for (ChannelItem dbCHannelItem : channelItemList) {
-                if (channels.get(i).getId() == dbCHannelItem.getId()) {
-                    channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(FavUpdatedListEvent event) {
+        saveChannelDetailstoDb(event.getCategoryItemList(), event.getChannels());
+    }
+    private void updateListData(List<ChannelItem> dbChannelList, List<ChannelItem> channels, List<CategoryItem> categoryItemList) {
+        Thread updateFavThread = new Thread(() -> {
+            for (int i = 0; i < channels.size(); i++) {
+                try {
+                    for (ChannelItem dbCHannelItem : dbChannelList) {
+                        if (channels.get(i).getId() == dbCHannelItem.getId()) {
+                            if (dbCHannelItem.getIs_fav() == 1) {
+                                channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        }
-        saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
 
+            EventBus.getDefault().post(new FavUpdatedListEvent(categoryItemList, channels));
+        });
+        updateFavThread.start();
     }
 
     private void saveChannelDetailstoDb(List<CategoryItem> categoryList, List<ChannelItem> channelList) {

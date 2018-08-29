@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,53 +18,41 @@ import androidtv.livetv.stb.entity.FavoriteResponse;
 
 public class MenuViewModel extends AndroidViewModel {
     private MenuRepository menuRepository;
-    private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
-    private MediatorLiveData<ChannelLinkResponse> previewData;
-    private MediatorLiveData<ChannelItem> lastPlayedData;
-    private MediatorLiveData<FavoriteResponse> favoriteData;
-    private MediatorLiveData<List<ChannelItem>> liveFavItems;
+    private LiveData<List<CategoriesWithChannels>> catChannelData;
+    private LiveData<List<ChannelItem>> liveFavItems;
 
 
     public MenuViewModel(@NonNull Application application) {
         super(application);
         menuRepository = MenuRepository.getInstance(application);
-        catChannelData=new MediatorLiveData<>();
-        previewData=new MediatorLiveData<>();
-        previewData.setValue(null);
-        catChannelData.setValue(null);
-        LiveData<List<CategoriesWithChannels>> categoriesWithChannelsData=menuRepository.getCategoriesWithChannels();
-        catChannelData.addSource(categoriesWithChannelsData, categoriesWithChannels -> catChannelData.setValue(categoriesWithChannels));
-        lastPlayedData = new MediatorLiveData<>();
-        lastPlayedData.setValue(null);
-
-        favoriteData=new MediatorLiveData<>();
-        favoriteData.setValue(null);
-
-        liveFavItems = new MediatorLiveData<>();
-        liveFavItems.addSource(menuRepository.getFavChannels(), channelItems -> liveFavItems.postValue(channelItems));
-
     }
 
     public LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels() {
+        catChannelData= null;
+        catChannelData = menuRepository.getCategoriesWithChannels();
         return catChannelData;
     }
 
-    public LiveData<ChannelLinkResponse> getPreviewLink(String token,long utc,String userId,String hashCode,int channelId) {
-        previewData.addSource(menuRepository.getPreviewLink(token, utc, String.valueOf(userId), String.valueOf(hashCode), String.valueOf(channelId)),
-                channelLinkResponse -> previewData.setValue(channelLinkResponse));
-        return previewData;
+    public LiveData<ChannelLinkResponse> getPreviewLink(String token, long utc, String userId, String hashCode, int channelId) {
+        return menuRepository.getPreviewLink(token, utc, String.valueOf(userId), String.valueOf(hashCode), String.valueOf(channelId));
     }
+
     public LiveData<ChannelItem> getLastPlayedChannel(int channel_id) {
-        lastPlayedData.addSource(menuRepository.getLastPlayedChannel(channel_id), channelItem -> lastPlayedData.setValue(channelItem));
-        return lastPlayedData;
+        return menuRepository.getLastPlayedChannel(channel_id);
     }
 
-    public void addChannelToFavorite( int favStatus,ChannelItem channel) {
-        menuRepository.addChannelToFav(favStatus,channel);
+    public void addChannelToFavorite(int favStatus, ChannelItem channel) {
+        menuRepository.addChannelToFav(favStatus, channel);
     }
 
-    public LiveData<List<ChannelItem>> getFavChannels(){
-       return liveFavItems;
+    public LiveData<List<ChannelItem>> getFavChannels() {
+        liveFavItems =null;;
+        liveFavItems= menuRepository.getFavChannels();
+        return liveFavItems;
+    }
+
+    public LiveData<ChannelItem> getFirstChannel() {
+        return menuRepository.getFirstChannelFromDB();
     }
 }
 

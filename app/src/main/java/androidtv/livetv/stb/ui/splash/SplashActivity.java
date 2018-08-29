@@ -34,8 +34,11 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelInserted;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
+import androidtv.livetv.stb.entity.FavUpdatedListEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
+import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginError;
+import androidtv.livetv.stb.entity.LoginResponseWrapper;
 import androidtv.livetv.stb.ui.login.LoginActivity;
 import androidtv.livetv.stb.ui.unauthorized.UnauthorizedAccess;
 import androidtv.livetv.stb.ui.utc.GetUtc;
@@ -86,7 +89,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     private PermissionUtils permissionutils;
     private String accountDownloadLink = "";
     ArrayList<String> permissions;
-    private CatChannelInfo catChannelInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,11 +184,16 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void fetchLoginDataFromDB() {
-        splashViewModel.checkDatainDb().observe(this, login -> {
-            if (login != null) {
-                GlobalVariables.login = login;
-                long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
+        LiveData<Login> dbloginData = splashViewModel.checkDatainDb();
+        dbloginData.observe(this, new Observer<Login>() {
+            @Override
+            public void onChanged(@Nullable Login login) {
+                if (login != null) {
+                    GlobalVariables.login = login;
+                    long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                    fetchChannelDetails(login.getToken(), utc, login.getId(), LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()));
+                    dbloginData.removeObserver(this);
+                }
             }
         });
     }
@@ -200,15 +207,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                 if (catChannelWrapper != null) {
                     if (catChannelWrapper.getCatChannelInfo() != null) {
                         Timber.d(catChannelWrapper.getCatChannelInfo().getCategory().size() + "");
-                        catChannelInfo = catChannelWrapper.getCatChannelInfo();
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                checkForExistingChannelData();
-                            }
-                        });
-                        thread.start();
-
+                        checkForExistingChannelData(catChannelWrapper.getCatChannelInfo());
                     } else {
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
@@ -216,10 +215,9 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 proceedToLoginViaFile(GlobalVariables.login.getEmail());
                                 break;
                             case INVALID_USER:
-                                GlobalVariables.login=null;
+                                GlobalVariables.login = null;
                                 splashViewModel.deleteloginData();
-                                splashViewModel.deleteLoginFile();
-                                checkValidUser();
+                                proceedToLoginViaFile(GlobalVariables.login.getEmail());
 //                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
                                 break;
                             case NO_CONNECTION:
@@ -266,26 +264,28 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);
                         finish();
-                    }catch (Exception ignored){}
+                    } catch (Exception ignored) {
+                    }
             }
 
         });
         splashError.show();
     }
 
-    private void checkForExistingChannelData() {
+    private void checkForExistingChannelData(CatChannelInfo catChannelInfo) {
         LiveData<Integer> channelSize = splashViewModel.checkChannelsInDB();
         channelSize.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer integer) {
                 if (integer != null) {
-                    Timber.d("size:" + integer);
+                    Timber.d("DB size:" + integer);
                     if (integer > 0) {
-                        fetchChannelsFromDBtoUpdate();
+                        fetchChannelsFromDBtoUpdate(catChannelInfo);
                     } else {
-                        insertDataToDB();
+                        insertDataToDB(catChannelInfo);
                     }
                     channelSize.removeObserver(this);
+
                 }
 
             }
@@ -293,33 +293,47 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     }
 
-    private void fetchChannelsFromDBtoUpdate() {
+    private void fetchChannelsFromDBtoUpdate(CatChannelInfo catChannelFrmApi) {
         LiveData<List<ChannelItem>> channelDBdata = splashViewModel.getAllChannelsInDBToCompare();
         channelDBdata.observe(this, new Observer<List<ChannelItem>>() {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItemList) {
                 if (channelItemList != null) {
-                    SplashActivity.this.updateListData(channelItemList, catChannelInfo.getChannel());
-                    channelDBdata.removeObserver(this);
+                    updateListData(channelItemList, catChannelFrmApi.getChannel(), catChannelFrmApi.getCategory());
+                    runOnUiThread(() -> channelDBdata.removeObserver(this));
                 }
             }
         });
 
     }
 
-    private void updateListData(List<ChannelItem> dbChannelList, List<ChannelItem> channels) {
-        for (int i = 0; i < channels.size(); i++) {
-            try {
-                for (ChannelItem dbCHannelItem : dbChannelList) {
-                    if (channels.get(i).getId() == dbCHannelItem.getId()) {
-                        channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(FavUpdatedListEvent event) {
+
+        saveChannelDetailstoDb(event.getCategoryItemList(), event.getChannels());
+    }
+
+    private void updateListData(List<ChannelItem> dbChannelList, List<ChannelItem> channels, List<CategoryItem> categoryItemList) {
+        Thread updateFavThread = new Thread(() -> {
+            for (int i = 0; i < channels.size(); i++) {
+                try {
+                    for (ChannelItem dbCHannelItem : dbChannelList) {
+                        if (channels.get(i).getId() == dbCHannelItem.getId()) {
+                            if (dbCHannelItem.getIs_fav() == 1) {
+                                channels.get(i).setIs_fav(dbCHannelItem.getIs_fav());
+                            }
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
-        saveChannelDetailstoDb(catChannelInfo.getCategory(), channels);
+
+            EventBus.getDefault().post(new FavUpdatedListEvent(categoryItemList, channels));
+        });
+        updateFavThread.start();
+
+
     }
 
 
@@ -329,7 +343,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
 
     }
 
-    private void insertDataToDB() {
+    private void insertDataToDB(CatChannelInfo catChannelInfo) {
         saveChannelDetailstoDb(catChannelInfo.getCategory(), catChannelInfo.getChannel());
 
     }
@@ -506,26 +520,31 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                 Timber.d("Decrypting " + encrypted_password);
                 String decrypted_password = sUtils.getDecryptedToken(encrypted_password);
                 Timber.d("CheckingPassword", decrypted_password);
-                splashViewModel.loginFromFile(userEmail, decrypted_password, macAddress).observe(this, loginResponseWrapper -> {
-                    if (loginResponseWrapper != null) {
-                        if (loginResponseWrapper.getLoginInfo() != null) {
-                            GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
-                            long utc = GetUtc.getInstance().getTimestamp().getUtc();
-                            fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
-                                    loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
-                                            String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
-                        } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
-                            if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
-                                loadUnauthorized("404", getString(R.string.mac_not_registered), "N/A");
+                LiveData<LoginResponseWrapper> loginfildeData = splashViewModel.loginFromFile(userEmail, decrypted_password, macAddress);
+                loginfildeData.observe(this, new Observer<LoginResponseWrapper>() {
+                    @Override
+                    public void onChanged(@Nullable LoginResponseWrapper loginResponseWrapper) {
+                        if (loginResponseWrapper != null) {
+                            if (loginResponseWrapper.getLoginInfo() != null) {
+                                GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
+                                long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                                fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
+                                        loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
+                                                String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
+                            } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
+                                if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
+                                    SplashActivity.this.loadUnauthorized("404", SplashActivity.this.getString(R.string.mac_not_registered), "N/A");
+                                } else {
+                                    SplashActivity.this.showErrorDialog(Integer.parseInt(loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode()), loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage());
+                                }
+
                             } else {
-                                showErrorDialog(Integer.parseInt(loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode()), loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage());
+                                SplashActivity.this.showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), userEmail);
+                                LoginFileUtils.deleteLoginFile();
                             }
+                            loginfildeData.removeObserver(this);
 
-                        } else {
-                            showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), userEmail);
-                            LoginFileUtils.deleteLoginFile();
                         }
-
                     }
                 });
             } catch (Exception e) {

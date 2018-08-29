@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -37,10 +38,9 @@ public class SplashViewModel extends AndroidViewModel {
     private MediatorLiveData<UserCheckWrapper> userCheckLiveData;
     private MediatorLiveData<CatChannelWrapper> catChannelData;
     private MediatorLiveData<Integer> tableCountData;
-    private MediatorLiveData<List<ChannelItem>> channelListData;
 
 
-    private MediatorLiveData<Login> userCredentialData;
+    private LiveData<Login> userCredentialData;
     private MediatorLiveData<Integer> chSizeMediatorData;
     private MediatorLiveData<List<Epgs>> liveAllEpgs;
 
@@ -50,45 +50,32 @@ public class SplashViewModel extends AndroidViewModel {
         geoAccessInfoLiveData = new MediatorLiveData<>();
         appInfoLiveData = new MediatorLiveData<>();
         userCheckLiveData = new MediatorLiveData<>();
-        userCredentialData = new MediatorLiveData<>();
+        userCredentialData = null;
         catChannelData = new MediatorLiveData<>();
         tableCountData = new MediatorLiveData<>();
         fileLoginData = new MediatorLiveData<>();
         chSizeMediatorData = new MediatorLiveData<>();
-        channelListData = new MediatorLiveData<>();
         chSizeMediatorData.setValue(null);
         tableCountData.setValue(null);
         geoAccessInfoLiveData.setValue(null);
         appInfoLiveData.setValue(null);
         userCheckLiveData.setValue(null);
-        userCredentialData.setValue(null);
         fileLoginData.setValue(null);
         catChannelData.setValue(null);
-        channelListData.setValue(null);
-        loginLiveData = splashRepository.getData();
+        userCredentialData = splashRepository.getData();
         loginTableSizeData = splashRepository.getRowCount();
         channelTableSizeData = splashRepository.getChannelCount();
-        channelLiveData = splashRepository.getChannelList();
         tableCountData.addSource(loginTableSizeData, integer -> {
             if (integer != null) {
-                tableCountData.postValue(integer);
+                tableCountData.setValue(integer);
             }
-        });
-        userCredentialData.addSource(loginLiveData, login -> {
-            if (login != null)
-                userCredentialData.postValue(login);
         });
         chSizeMediatorData.addSource(channelTableSizeData, integer -> {
             if (integer != null) {
-                chSizeMediatorData.postValue(integer);
+                chSizeMediatorData.setValue(integer);
             }
         });
 
-        channelListData.addSource(channelLiveData, channelItemList -> {
-            if (channelItemList != null) {
-                channelListData.postValue(channelItemList);
-            }
-        });
         liveAllEpgs = new MediatorLiveData<>();
         liveAllEpgs.setValue(null);
         liveAllEpgs.addSource(splashRepository.getAllEpg(), epgs ->{
@@ -145,7 +132,9 @@ public class SplashViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<ChannelItem>> getAllChannelsInDBToCompare() {
-        return channelListData;
+        channelLiveData=null;
+        channelLiveData = splashRepository.getChannelList();
+        return channelLiveData;
     }
 
 

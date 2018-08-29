@@ -2,6 +2,7 @@ package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
@@ -29,32 +31,29 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
     private Context mContext;
     private List<ChannelItem> mList;
-    private int positionSelected;
     private ChannelListClickListener listener;
     private int selectedPos;
     private RecyclerView recyclerView;
     private String categoryName;
+    private int categoryPosition;
+    private int currentChannelPosition;
 
-    public int getPositionSelected() {
-        return positionSelected;
-    }
 
-    public void setPositionSelected(int positionSelected) {
-        this.positionSelected = positionSelected;
-//        notifyDataSetChanged();
-    }
 
     public ChannelListAdapter(Context context, ChannelListClickListener lis) {
         this.mContext = context;
         this.listener = lis;
-        setHasStableIds(true);
     }
 
 
-    public void setChannelItems(String categoryName,List<ChannelItem> list) {
+    public void setChannelItems(String categoryName, int position, int channelPosition, List<ChannelItem> list) {
         this.categoryName =categoryName;
+      if(mList==null)  mList=new ArrayList<>();
+        this.categoryPosition=position;
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ChannelDiffUtils(mList,list));
+        diffResult.dispatchUpdatesTo(this);
         this.mList = list;
-        notifyDataSetChanged();
+        this.currentChannelPosition=channelPosition;
     }
 
     @Override
@@ -76,13 +75,14 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         GlideApp.with(mContext).load(LinkConfig.BASE_URL + LinkConfig.CHANNEL_LOGO_URL + item.getChannelLogo())
                 .placeholder(R.drawable.placeholder_logo)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .centerCrop()
                 .into(holder.channelLogo);
 
         if (item.getIs_fav() == 1)
             holder.fav.setVisibility(View.VISIBLE);
         else
             holder.fav.setVisibility(GONE);
+
+        holder.itemView.setTag(position);
 
 
     /*    if (position == getPositionSelected()) {
@@ -158,7 +158,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     }
 
     public interface ChannelListClickListener {
-        void onClickChannel(String currentCategoryName,int position,List<ChannelItem>currentCategoryitems);
+        void onClickChannel(String currentCategoryName,int categoryPosition,int position,List<ChannelItem>currentCategoryitems);
 
         void onChannelFocused(int position);
     }
@@ -179,7 +179,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
             relativeLayout.setOnClickListener(v -> {
                 selectedPos = getAdapterPosition();
-                listener.onClickChannel(categoryName,getAdapterPosition(),mList);
+                listener.onClickChannel(categoryName,categoryPosition,getAdapterPosition(),mList);
             });
 
             relativeLayout.setOnFocusChangeListener((v, hasFocus) -> {
@@ -188,7 +188,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
                     channelLogo.setScaleX(1.2f);
                     channelLogo.setScaleY(1.05f);
                     channelLogo.setAlpha(1f);
-                    recyclerView.smoothScrollToPosition(getAdapterPosition());
+//                    recyclerView.smoothScrollToPosition(getAdapterPosition());
 //                holder.view.setVisibility(View.INVISIBLE);
                 } else {
                     channelLogo.setScaleX(1f);

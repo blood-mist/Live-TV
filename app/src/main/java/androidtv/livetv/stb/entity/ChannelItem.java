@@ -6,6 +6,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import javax.annotation.Generated;
 
@@ -18,7 +20,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_TABLE;
 
 @Generated("com.robohorse.robopojogenerator")
 @Entity(tableName = CHANNEL_TABLE)
-public class ChannelItem {
+public class ChannelItem implements Parcelable {
 
     @ColumnInfo(name = "channel_logo")
     @SerializedName("channel_logo")
@@ -38,7 +40,7 @@ public class ChannelItem {
 
 
     @ColumnInfo(name = "is_fav")
-    private int is_fav = 0;
+    private int is_fav;
 
 
     @Ignore
@@ -126,17 +128,10 @@ public class ChannelItem {
     @SerializedName("channel_language")
     private String channelLanguage;
 
-    @Ignore
-    @SerializedName("is_recommended")
-    private Object isRecommended;
 
     @ColumnInfo(name = "channel_name")
     @SerializedName("name")
     private String name;
-
-    @Ignore
-    @SerializedName("is_approved")
-    private Object isApproved;
 
     @ColumnInfo(name = "channel_priority")
     @SerializedName("channel_priority")
@@ -334,13 +329,7 @@ public class ChannelItem {
         return channelLanguage;
     }
 
-    public void setIsRecommended(Object isRecommended) {
-        this.isRecommended = isRecommended;
-    }
 
-    public Object getIsRecommended() {
-        return isRecommended;
-    }
 
     public void setName(String name) {
         this.name = name;
@@ -350,13 +339,6 @@ public class ChannelItem {
         return name;
     }
 
-    public void setIsApproved(Object isApproved) {
-        this.isApproved = isApproved;
-    }
-
-    public Object getIsApproved() {
-        return isApproved;
-    }
 
     public void setChannelPriority(int channelPriority) {
         this.channelPriority = channelPriority;
@@ -418,12 +400,93 @@ public class ChannelItem {
                         ",channel_desc = '" + channelDesc + '\'' +
                         ",channel_status = '" + channelStatus + '\'' +
                         ",channel_language = '" + channelLanguage + '\'' +
-                        ",is_recommended = '" + isRecommended + '\'' +
                         ",name = '" + name + '\'' +
-                        ",is_approved = '" + isApproved + '\'' +
                         ",channel_priority = '" + channelPriority + '\'' +
                         ",mobile_ad_server_type = '" + mobileAdServerType + '\'' +
                         ",country_id = '" + countryId + '\'' +
                         "}";
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.channelLogo);
+        dest.writeString(this.isContentAllow);
+        dest.writeInt(this.is_fav);
+        dest.writeString(this.mobileAdUrl);
+        dest.writeString(this.mobileUrl);
+        dest.writeString(this.createdAt);
+        dest.writeString(this.deviceType);
+        dest.writeInt(this.mobileServerType);
+        dest.writeInt(this.channelServerType);
+        dest.writeString(this.parentalLock);
+        dest.writeString(this.dvrPathMobile);
+        dest.writeInt(this.categoryId);
+        dest.writeString(this.updatedAt);
+        dest.writeString(this.price);
+        dest.writeInt(this.id);
+        dest.writeString(this.channelType);
+        dest.writeString(this.channelEpgName);
+        dest.writeString(this.channelCdnUrl);
+        dest.writeInt(this.channelCdnServerType);
+        dest.writeString(this.dvrPath);
+        dest.writeString(this.channelUrl);
+        dest.writeString(this.channelDesc);
+        dest.writeInt(this.channelStatus);
+        dest.writeString(this.channelLanguage);
+        dest.writeString(this.name);
+        dest.writeInt(this.channelPriority);
+        dest.writeInt(this.mobileAdServerType);
+        dest.writeInt(this.countryId);
+    }
+
+    public ChannelItem() {
+    }
+
+    protected ChannelItem(Parcel in) {
+        this.channelLogo = in.readString();
+        this.isContentAllow = in.readString();
+        this.is_fav = in.readInt();
+        this.mobileAdUrl = in.readString();
+        this.mobileUrl = in.readString();
+        this.createdAt = in.readString();
+        this.deviceType = in.readString();
+        this.mobileServerType = in.readInt();
+        this.channelServerType = in.readInt();
+        this.parentalLock = in.readString();
+        this.dvrPathMobile = in.readString();
+        this.categoryId = in.readInt();
+        this.updatedAt = in.readString();
+        this.price = in.readString();
+        this.id = in.readInt();
+        this.channelType = in.readString();
+        this.channelEpgName = in.readString();
+        this.channelCdnUrl = in.readString();
+        this.channelCdnServerType = in.readInt();
+        this.dvrPath = in.readString();
+        this.channelUrl = in.readString();
+        this.channelDesc = in.readString();
+        this.channelStatus = in.readInt();
+        this.channelLanguage = in.readString();
+        this.name = in.readString();
+        this.channelPriority = in.readInt();
+        this.mobileAdServerType = in.readInt();
+        this.countryId = in.readInt();
+    }
+
+    public static final Parcelable.Creator<ChannelItem> CREATOR = new Parcelable.Creator<ChannelItem>() {
+        @Override
+        public ChannelItem createFromParcel(Parcel source) {
+            return new ChannelItem(source);
+        }
+
+        @Override
+        public ChannelItem[] newArray(int size) {
+            return new ChannelItem[size];
+        }
+    };
 }

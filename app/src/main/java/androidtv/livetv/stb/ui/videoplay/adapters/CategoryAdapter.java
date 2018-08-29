@@ -13,11 +13,10 @@ import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
-import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
+import timber.log.Timber;
 
-import static android.view.View.GONE;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 
 
@@ -124,6 +123,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
         int pos = holder.getAdapterPosition();
+        int relative_position=0;
         CategoriesWithChannels categoryItem = null;
         /**
          * check the position of list
@@ -132,13 +132,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
          */
         if (pos == 0) {
             holder.mTitleView.setText(R.string.all_channels);
+            relative_position=0;
         } else {
             if (allFavList != null && allFavList.size() > 0) {
                 if (pos == 1) {
                     holder.mTitleView.setText(CATEGORY_FAVORITE);
+                    relative_position=1;
                 } else {
                     if (categoryItemList != null) {
                         categoryItem = categoryItemList.get(position - 2);
+                        relative_position=position-2;
                         holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                     } else {
                         holder.mTitleView.setText(R.string.no_category);
@@ -147,11 +150,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             } else {
                 if (categoryItemList != null) {
                     categoryItem = categoryItemList.get(position - 1);
+                    relative_position=-1;
                     holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                 } else {
                     holder.mTitleView.setText(R.string.no_category);
                 }
             }
+
         }
 
         /**
@@ -161,17 +166,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         holder.mCategoryLayout.setOnClickListener(v -> {
 
             selectedPos = pos;
-            if (pos == 0)
-                mListener.onClickCategory("All Channels", allChannelList);
+            if (pos == 0) {
+                mListener.onClickCategory("All Channels", pos, allChannelList);
+            }
             else {
                 if (allFavList != null && allFavList.size() > 0) {
                     if (pos == 1)
-                        mListener.onClickCategory(CATEGORY_FAVORITE, allFavList);
+                        mListener.onClickCategory(CATEGORY_FAVORITE, pos,allFavList);
                     else if (finalCategoryItem != null)
-                        mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+                        mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(),pos, finalCategoryItem.channelItemList);
 
                 } else if (finalCategoryItem != null)
-                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), finalCategoryItem.channelItemList);
+                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), pos,finalCategoryItem.channelItemList);
 
 
             }
@@ -184,12 +190,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             if (hasFocus) {
                 holder.mTitleView.setSelected(true);
                 holder.mCategoryLayout.setScaleY(1.02f);
-                mListener.onSelectCategory(pos);
+                mListener.onSelectCategory(pos,v);
             } else {
                 holder.mTitleView.setSelected(false);
                 holder.mCategoryLayout.setScaleX(1.0f);
             }
         });
+        holder.mCategoryLayout.setTag(position);
 
 
     }
@@ -217,8 +224,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     public interface OnListClickListener {
 
-        void onClickCategory(String categoryName, List<ChannelItem> channels);
-        void onSelectCategory(int position);
+        void onClickCategory(String categoryName,int categoryPosition, List<ChannelItem> channels);
+        void onSelectCategory(int position, View focusedCatView);
     }
 
 }

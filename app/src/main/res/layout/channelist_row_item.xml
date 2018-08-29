@@ -11,10 +11,12 @@
 
     <ImageView
         android:id="@+id/img"
-        android:layout_width="150dp"
-        android:layout_height="103dp"
+        android:layout_width="160dp"
+        android:layout_height="130dp"
         android:padding="5dp"
         android:alpha="0.37"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
         android:layout_gravity="center"
         android:layout_centerInParent="true"
         android:src="@drawable/placeholder_logo"/>
@@ -26,6 +28,8 @@
         android:layout_above="@+id/view"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
+        android:scaleType="centerInside"
+        android:adjustViewBounds="true"
         android:src="@drawable/rate"
         android:layout_alignParentEnd="true" />
 

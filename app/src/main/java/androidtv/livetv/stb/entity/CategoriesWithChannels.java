@@ -11,6 +11,4 @@ public class CategoriesWithChannels {
 
     @Relation(parentColumn = "category_id",entityColumn = "category_id",entity = ChannelItem.class)
     public List<ChannelItem> channelItemList;
-
-
 }

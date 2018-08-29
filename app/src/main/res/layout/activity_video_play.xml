@@ -94,7 +94,7 @@
 
 
     </FrameLayout>
-    <EditText
+    <TextView
         android:id="@+id/tv_setchannelfrompriority"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -102,25 +102,13 @@
         android:layout_marginTop="15dp"
         android:background="@drawable/transparent_rect_bordered_bg"
         android:gravity="center"
-        android:inputType="number"
-        android:textIsSelectable="true"
-        android:digits="0123456789"
         android:padding="20dp"
-        android:textCursorDrawable="@android:color/transparent"
         android:text="@string/txt_empty"
+        android:clickable="true"
+        android:focusable="true"
         android:textColor="#ffffff"
         android:textSize="50sp"
-        android:visibility="gone"
-        android:maxLength="4"/>
-    <com.wang.avi.AVLoadingIndicatorView
-        android:id="@+id/progressBar1"
-        style="@style/AVLoadingIndicatorView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        app:indicatorColor="@color/color_white"
-        app:indicatorName="BallSpinFadeLoaderIndicator" />
+        android:visibility="gone"/>
     <androidtv.livetv.stb.ui.custom_views.CustomTextView
         android:id="@+id/priority_view"
         android:layout_width="wrap_content"
@@ -134,7 +122,18 @@
         android:layout_gravity="end"
         android:padding="10dp"
         android:textSize="32sp"
-        android:background="@color/transp"/>
+        android:background="@color/transp"
+        android:layout_marginEnd="20dp" />
+
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progressBar1"
+        style="@style/AVLoadingIndicatorView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:indicatorColor="@color/color_white"
+        app:indicatorName="BallSpinFadeLoaderIndicator" />
 
 
 </FrameLayout>

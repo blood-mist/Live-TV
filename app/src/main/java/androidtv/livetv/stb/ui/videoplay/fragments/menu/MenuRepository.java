@@ -3,9 +3,11 @@ package androidtv.livetv.stb.ui.videoplay.fragments.menu;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -35,29 +37,26 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import timber.log.Timber;
 
 import static android.os.Build.VERSION_CODES.O;
+import static org.greenrobot.eventbus.EventBus.TAG;
 
 public class MenuRepository {
     private static MenuRepository mInstance;
     private ApiInterface videoPlayApiInterface;
     private MediatorLiveData<List<CategoryItem>> categoryData;
-    private MediatorLiveData<List<CategoriesWithChannels>> catChannelData;
+    private LiveData<List<CategoriesWithChannels>> catChannelData;
     private CatChannelDao catChannelDao;
     private MediatorLiveData<ChannelItem> lastChannelData;
-    private MediatorLiveData<List<ChannelItem>> favLiveData;
-
+    private LiveData<List<ChannelItem>> favLiveData;
     public MenuRepository(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
         catChannelDao = db.catChannelDao();
         videoPlayApiInterface = retrofitInstance.create(ApiInterface.class);
         categoryData = new MediatorLiveData<>();
-        catChannelData=new MediatorLiveData<>();
-        favLiveData = new MediatorLiveData<>();
-        catChannelData.addSource(catChannelDao.getCategoriesWithChannels(), categoriesWithChannels -> catChannelData.postValue(categoriesWithChannels));
         categoryData.addSource(catChannelDao.getCategories(), categoryItems -> categoryData.postValue(categoryItems));
-        favLiveData.addSource(catChannelDao.getFavChannels(), channelItems -> favLiveData.postValue(channelItems));
 
     }
 
@@ -80,6 +79,8 @@ public class MenuRepository {
 
 
     public LiveData<List<CategoriesWithChannels>>getCategoriesWithChannels() {
+        catChannelData=null;
+        catChannelData=catChannelDao.getCategoriesWithChannels();
         return catChannelData;
     }
 
@@ -130,6 +131,8 @@ public class MenuRepository {
     }
 
     public LiveData<List<ChannelItem>> getFavChannels(){
+        favLiveData=null;
+        favLiveData= catChannelDao.getFavChannels();
         return favLiveData;
     }
 
@@ -138,7 +141,11 @@ public class MenuRepository {
 
     }
 
-    private static class insertAsyncTask extends AsyncTask<Void, Void, Long> {
+    public LiveData<ChannelItem> getFirstChannelFromDB() {
+        return catChannelDao.getFirstChannel();
+    }
+
+    private static class insertAsyncTask extends AsyncTask<Void, Void, Integer> {
 
        private  int favStatus;
        private ChannelItem channelItem;
@@ -152,13 +159,14 @@ public class MenuRepository {
         }
 
         @Override
-        protected Long doInBackground(Void... updateResult) {
-        return dao.updateFav(favStatus,channelItem.getId());
+        protected Integer doInBackground(Void... updateResult) {
+        return dao.updateFav(channelItem);
         }
 
         @Override
-        protected void onPostExecute(Long aLong) {
+        protected void onPostExecute(Integer aLong) {
             super.onPostExecute(aLong);
+            Timber.d("updatedRows"+aLong+"");
             EventBus.getDefault().post(new FavEvent(aLong,favStatus,channelItem));
 
 

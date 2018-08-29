@@ -9,27 +9,19 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,22 +34,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.sql.Time;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import androidtv.livetv.stb.R;
-import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.Epgs;
-import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginDataDelete;
@@ -75,16 +61,16 @@ import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DeviceUtils;
-import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import butterknife.OnClick;
 import timber.log.Timber;
 
+import static android.view.View.GONE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
+import static java.lang.Thread.sleep;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
         SurfaceHolder.Callback, EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis {
@@ -96,7 +82,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @BindView(R.id.progressBar1)
     AVLoadingIndicatorView progressBar;
     @BindView(R.id.tv_setchannelfrompriority)
-    EditText txtChangeChannelFromPriority;
+    TextView txtChangeChannelFromPriority;
     @BindView(R.id.tvboxID)
     TextView txtRandomDisplayBoxId;
     @BindView(R.id.mainImage)
@@ -116,14 +102,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
     private VideoPlayViewModel videoPlayViewModel;
-    private Handler handlerToShowMac;
-    private Handler handlerToHideMac;
-    private Runnable runnableToHideMac;
-    private Runnable runnableToShowMac;
     private FragmentMenu menuFragment = new FragmentMenu();
     private Fragment currentFragment;
-    private List<CategoryItem> mCategoryList = new ArrayList<>();
-    private List<ChannelItem> mChannelList = new ArrayList<>();
     private MediaPlayer player;
     private ChannelChangeObserver channelChangeObservable;
     private VideoControllerView mVideoController;
@@ -135,14 +115,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private String nextVideoNameDvr;
     private boolean isDvrPlaying;
     private ChannelItem currentPlayingChannel;
-    private Handler handlerToHidePriority;
-
+    private Handler handlerToHidePriority, chFrmPriorityHandler;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_play);
+        chFrmPriorityHandler = new Handler();
         lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
         hideMenuHandler = new Handler();
@@ -158,6 +138,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         if (imm != null) {
             imm.hideSoftInputFromWindow(txtChangeChannelFromPriority.getWindowToken(), 0);
         }
+        stopHandlerChangeChannelFromNumbers();
         searchChannelWithgivenPriorityNumber(txtChangeChannelFromPriority.getText().toString());
     }
 
@@ -193,16 +174,24 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 if (currentFragment instanceof EpgFragment) {
-                    getSupportFragmentManager().popBackStack();
-                    currentFragment = null;
+                    getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+                    getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+                    currentFragment = menuFragment;;
                 } else {
-                    if (currentFragment instanceof DvrFragment) {
-                        if (!isDvrPlaying) {
-                            getSupportFragmentManager().popBackStack();
-                            currentFragment = null;
+                    try {
+                        if (currentFragment instanceof DvrFragment) {
+                            if (!isDvrPlaying) {
+                                getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+                                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+                                currentFragment = menuFragment;
+                            }
+                        } else if (player != null && player.isPlaying()) {
+                            if (menuFragment == null || menuFragment.isHidden())
+                                showMenu();
+                            else
+                                hideMenuUI();
                         }
-                    } else if (player.isPlaying()) {
-                        showMenu();
+                    } catch (Exception ignored) {
                     }
 
 
@@ -248,10 +237,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 if (mVideoController != null) {
                     mVideoController.show();
                     return true;
-                } else if (menuFrag == null || menuFrag.isHidden() && txtChangeChannelFromPriority.getVisibility() == View.GONE) {
+                } else if ((menuFrag == null || menuFrag.isHidden()) && txtChangeChannelFromPriority.getVisibility() == View.GONE) {
                     showMenu();
                     return true;
                 } else if (txtChangeChannelFromPriority.getVisibility() == View.VISIBLE) {
+                    stopHandlerChangeChannelFromNumbers();
                     searchChannelWithgivenPriorityNumber(txtChangeChannelFromPriority.getText().toString());
                     return true;
                 } else
@@ -278,54 +268,172 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             case 14:
             case 15:
             case 16:
-                if (txtChangeChannelFromPriority.getVisibility() == View.GONE) {
-                    changeChannelfromPriority((char) event.getUnicodeChar());
-                }
-                return true;
+                return numberKeyCodeEvent(keyCode);
         }
         return super.onKeyDown(keyCode, event);
     }
 
-    private void changeChannelfromPriority(char keyNumber) {
-        Handler chFrmPriorityHandler = new Handler();
-        txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
-        txtChangeChannelFromPriority.requestFocus();
-        txtChangeChannelFromPriority.setText(String.valueOf(keyNumber));
-        txtChangeChannelFromPriority.setSelection(txtChangeChannelFromPriority.getText().length());
-        startChChangeFrmPriority(chFrmPriorityHandler, txtChangeChannelFromPriority.getText().toString());
-        txtChangeChannelFromPriority.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                startChChangeFrmPriority(chFrmPriorityHandler, String.valueOf(charSequence));
-            }
+    private boolean numberKeyCodeEvent(int keyCode) {
+        stopHandlerChangeChannelFromNumbers();
+        if (menuFragment != null) {
+            menuFragment.hideErrorFrag();
+        }
+        hideMenuUI();
+        switch (keyCode) {
+            case 7:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "0");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                stopChPriorityHandler(chFrmPriorityHandler);
+                return true;
 
-            }
+            case 8:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "1");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 9:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "2");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 10:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "3");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 11:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "4");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 12:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "5");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 13:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "6");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 14:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "7");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 15:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "8");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case 16:
+                txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
+                txtChangeChannelFromPriority.bringToFront();
+                if (txtChangeChannelFromPriority.getText().length() < 4) {
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "9");
+                    startHandlerChangeChannelFromNumbers();
+                    // condnsetchannelfrompriority();
+                } else {
+                    txtChangeChannelFromPriority.setText("");
+                    txtChangeChannelFromPriority.setVisibility(View.GONE);
+                    Toast.makeText(this, "Sorry no associated channel ", Toast.LENGTH_SHORT).show();
+                }
+                return true;
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                stopChPriorityHandler(chFrmPriorityHandler);
-                startChChangeFrmPriority(chFrmPriorityHandler, editable.toString());
-            }
-        });
-
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
+            default:
+                return false;
+        }
 
     }
 
-    private void stopChPriorityHandler(Handler chFrmPriorityHandler) {
-        chFrmPriorityHandler.removeCallbacksAndMessages(null);
+    private Runnable runnableChangeChannelFromNumbers = new Runnable() {
+        @Override
+        public void run() {
+            searchChannelWithgivenPriorityNumber(txtChangeChannelFromPriority.getText().toString());
+        }
+    };
+
+    private void stopHandlerChangeChannelFromNumbers() {
+        chFrmPriorityHandler.removeCallbacks(runnableChangeChannelFromNumbers);
     }
 
-    private void startChChangeFrmPriority(Handler chFrmPriorityHandler, String priorityNumber) {
-
-        chFrmPriorityHandler.postDelayed(() -> {
-            searchChannelWithgivenPriorityNumber(priorityNumber);
-        }, TimeUnit.SECONDS.toMillis(3));
+    private void startHandlerChangeChannelFromNumbers() {
+        chFrmPriorityHandler.postDelayed(runnableChangeChannelFromNumbers, 2000);
     }
+
 
     private void searchChannelWithgivenPriorityNumber(String priorityNumber) {
         LiveData<List<ChannelItem>> listLiveData = videoPlayViewModel.getAllChannels();
@@ -336,6 +444,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     checkIfChannelExistsAndPlay(channelItemList, priorityNumber);
                     listLiveData.removeObserver(this);
                 }
+                txtChangeChannelFromPriority.setText("");
                 txtChangeChannelFromPriority.setVisibility(View.GONE);
             }
         });
@@ -352,13 +461,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         }
         if (channelExists) {
-            playChannel(foundChannel);
-        } else
+            if (menuFragment != null) {
+                menuFragment.onClickChannel(getString(R.string.all_channels), 0, channelItemList.indexOf(foundChannel), channelItemList);
+                showMenu();
+            }
+        } else {
             Toast.makeText(VideoPlayActivity.this, getString(R.string.no_channel_found), Toast.LENGTH_SHORT).show();
+            hideProgressBar();
+            showMenu();
+        }
     }
 
 
     private void changeChannel(boolean isNext) {
+        hideMenuUI();
         Thread channelChangeThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -377,27 +493,33 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void openFragmentWithBackStack(Fragment fragment, String tag) {
         hideProgressBar();
         currentFragment = fragment;
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
+        hideMenuUI();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).add(R.id.container_movie_player, fragment).commit();
 
     }
 
     @Override
     public void onBackPressed() {
         if (currentFragment instanceof EpgFragment) {
-            getSupportFragmentManager().popBackStack();
-            currentFragment = null;
+           getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+           getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+            currentFragment = menuFragment;
         } else {
             if (currentFragment instanceof DvrFragment) {
                 if (!isDvrPlaying) {
-                    getSupportFragmentManager().popBackStack();
-                    currentFragment = null;
+                    getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+                    getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+                    currentFragment = menuFragment;
                 }
             } else if (menuFragment.isVisible()) {
                 try {
+                    player.stop();
                     player.reset();
                     player.release();
                 } catch (Exception ignored) {
                 }
+                getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
+                finish();
                 super.onBackPressed();
             } else {
                 showMenu();
@@ -410,13 +532,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag == null)
             openFragment(menuFragment);
-        else {
-            if (menuFrag.isHidden()) {
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
-            } else {
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).hide(menuFrag).commit();
-            }
-        }
+        else
+            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
+
     }
 
     private void showMenuFrag(ErrorFragment errorFragment) {
@@ -439,11 +557,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     public void onUserInteraction() {
         super.onUserInteraction();
         stopCloseMenuHandler();
-        if (player.isPlaying())
-            startCloseMenuHandler();
+        try {
+            if (player.getCurrentPosition() > 0 && player.isPlaying())
+                startCloseMenuHandler();
+        } catch (Exception ignored) {
+        }
     }
 
-    public void showPriorityNo(){
+    public void showPriorityNo() {
         priorityView.setText(String.valueOf(currentPlayingChannel.getChannelPriority()));
         priorityView.setVisibility(View.VISIBLE);
         priorityView.bringToFront();
@@ -454,58 +575,54 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 priorityView.setVisibility(View.INVISIBLE);
             }
         };
-        handlerToHidePriority.postDelayed(hidePriority,3*1000);
+        handlerToHidePriority.postDelayed(hidePriority, 3 * 1000);
 
     }
 
-    private void randomDisplayMacAddress() {
-        final Random random = new Random();
-        handlerToShowMac = new Handler();
-        handlerToHideMac = new Handler();
-
-
-        final FrameLayout.LayoutParams params =
-                (FrameLayout.LayoutParams) txtRandomDisplayBoxId.getLayoutParams();
-
-        runnableToHideMac = () -> {
-
-            params.setMargins(500, random.nextInt(500),
-                    random.nextInt(200), random.nextInt(200));
-
-            txtRandomDisplayBoxId.setLayoutParams(params);
-            txtRandomDisplayBoxId.setVisibility(View.INVISIBLE);
-            System.out.println("box is invisible");
-
-            handlerToShowMac.postDelayed(runnableToShowMac, 180000);
-        };
-        runnableToShowMac = new Runnable() {
+        Thread threadToDisplayBoxId = new Thread(new Runnable() {
             @Override
             public void run() {
-                DisplayMetrics displayMetrics = new DisplayMetrics();
-                VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                int height = displayMetrics.heightPixels;
-                int width = displayMetrics.widthPixels;
-//            params.setMargins(10,random.nextInt(height-20),random.nextInt(width-20),10);
+                Random random=new Random();
+                final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtRandomDisplayBoxId.getLayoutParams();
+                while (true) {
+                    if (txtRandomDisplayBoxId.getVisibility() == View.VISIBLE) {
+                        runOnUiThread(() -> txtRandomDisplayBoxId.setVisibility(GONE));
+                        try {
+                            sleep(2000 + (new Random().nextInt(2 * 60 * 1000)));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
-                params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
-                        random.nextInt(100), random.nextInt(100));
+                    } else {
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = new SimpleDateFormat("aaaddMMyyyyHHmmss");
+                        final String formattedDate = df.format(c.getTime());
+                        DisplayMetrics displayMetrics = new DisplayMetrics();
+                        VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                        int height = displayMetrics.heightPixels;
+                        int width = displayMetrics.widthPixels;
+                        params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
+                                random.nextInt(100), random.nextInt(100));
 
-                txtRandomDisplayBoxId.bringToFront();
-                txtRandomDisplayBoxId.setLayoutParams(params);
-                txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
-                System.out.println("box is shown");
-
-                handlerToHideMac.postDelayed(runnableToHideMac, 5 * 1000);
+                        runOnUiThread(() -> {
+                            txtRandomDisplayBoxId.setText((AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(VideoPlayActivity.this)) + " " + formattedDate);
+                            txtRandomDisplayBoxId.bringToFront();
+                            txtRandomDisplayBoxId.setLayoutParams(params);
+                            txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
+                        });
+                        try {
+                            sleep(5 * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
-        };
+        });
 
-        handlerToShowMac.postDelayed(runnableToShowMac, 180000);
-
-    }
 
     void hideMacDisplayHandler() {
-        if (handlerToShowMac != null)
-            handlerToShowMac.removeCallbacks(null);
+        threadToDisplayBoxId.interrupt();
     }
 
 
@@ -515,29 +632,32 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         mVideoController = null;
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
-        if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0) {
-            hideMenuUI();
-        } else {
-            showProgressBar();
-            long utc = GetUtc.getInstance().getTimestamp().getUtc();
-            Login login = GlobalVariables.login;
-            currentPlayingChannel = item;
-            LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
-                    LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
-                            login.getSession()), macAddress, item.getId());
-            videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
-                @Override
-                public void onChanged(@Nullable ChannelLinkResponseWrapper channelLinkResponse) {
-                    if (channelLinkResponse != null) {
-                        if (channelLinkResponse.getChannelLinkResponse() != null) {
-                            VideoPlayActivity.this.playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
-                        } else if (channelLinkResponse.getException() != null) {
-                            setErrorFragment(channelLinkResponse.getException(), 0, 0);
+        try {
+            if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0) {
+                hideMenuUI();
+            } else {
+                showProgressBar();
+                long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                Login login = GlobalVariables.login;
+                currentPlayingChannel = item;
+                LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
+                        LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
+                                login.getSession()), macAddress, item.getId());
+                videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
+                    @Override
+                    public void onChanged(@Nullable ChannelLinkResponseWrapper channelLinkResponse) {
+                        if (channelLinkResponse != null) {
+                            if (channelLinkResponse.getChannelLinkResponse() != null) {
+                                playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
+                            } else if (channelLinkResponse.getException() != null) {
+                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
+                            }
+                            videoLinkData.removeObserver(this);
                         }
-                        videoLinkData.removeObserver(this);
                     }
-                }
-            });
+                });
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -591,12 +711,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     protected void onPause() {
+        EventBus.getDefault().unregister(this);
         Log.d("activity_state", "onPause");
         try {
             player.stop();
+            player.reset();
+            player.release();
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        hideMacDisplayHandler();
+        try {
+            getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
+        } catch (Exception ignored) {
         }
         finish();
         super.onPause();
@@ -610,13 +738,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     protected void onStop() {
         Log.d("activity_state", "onStop");
-        EventBus.getDefault().unregister(this);
         try {
             player.stop();
+            player.reset();
+            player.release();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
+            menuFragment = null;
+        } catch (Exception ignored) {
+        }
+        hideMacDisplayHandler();
         finish();
         super.onStop();
     }
@@ -624,6 +759,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     protected void onDestroy() {
         try {
+            player.stop();
             player.reset();
             player.release();
         } catch (Exception e) {
@@ -637,9 +773,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("media", channelLink);
         if (player == null) {
             player = new MediaPlayer();
-        } else player.reset();
+        }
 //        String link = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
         try {
+            player.reset();
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setDataSource(this, Uri.parse(channelLink));
             player.prepareAsync();
@@ -649,7 +786,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     VideoPlayActivity.this.hideMenuBg();
                     player.setScreenOnWhilePlaying(true);
                     player.start();
-                    VideoPlayActivity.this.hideProgressBar();
+                    threadToDisplayBoxId.start();
+                    hideProgressBar();
+                    startCloseMenuHandler();
                     if (isDvr) {
                         MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
                         mVideoController = new VideoControllerView(VideoPlayActivity.this, true);
@@ -667,16 +806,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         VideoPlayActivity.this.hideMenuUI();
                     } else {
                         VideoPlayActivity.this.startCloseMenuHandler();
-                        if(!menuFragment.isVisible())
+                        if (!menuFragment.isVisible())
                             VideoPlayActivity.this.showPriorityNo();
 
-                        if (menuFragment.isVisible()) {
+                        if (menuFragment != null || menuFragment.isVisible()) {
                             menuFragment.hideErrorFrag();
                         } else {
                             menuFragment.setErrorFragMent(null);
                         }
                     }
-                    VideoPlayActivity.this.randomDisplayMacAddress();
 
 
                 }
@@ -692,15 +830,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             });
 
 
-
             player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     Timber.d("on error ");
-                    VideoPlayActivity.this.hideProgressBar();
-                    VideoPlayActivity.this.hideMacDisplayHandler();
-                    VideoPlayActivity.this.stopCloseMenuHandler();
-                    VideoPlayActivity.this.showDvrMenu();
+                    hideProgressBar();
+                    hideMacDisplayHandler();
+                    stopCloseMenuHandler();
+                    showDvrMenu();
                     StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
                     //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
                     if (isDvr) {
@@ -711,6 +848,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     } else {
                         VideoPlayActivity.this.setErrorFragment(null, what, extra);
                     }
+                    if (what == -1003)
+                        player.setOnErrorListener(null);
                     return true;
                 }
             });
@@ -719,7 +858,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         }
 
     }
-
 
 
     private void loadNextDvr() {
@@ -753,14 +891,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         else {
             try {
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
-            }catch(Exception ignored){}
+            } catch (Exception ignored) {
+            }
 
 
         }
     }
 
     private void startCloseMenuHandler() {
-        hideMenuHandler.postDelayed(closeFragmentRunnable, 15*1000);
+        hideMenuHandler.postDelayed(closeFragmentRunnable, 15 * 1000);
 
     }
 
