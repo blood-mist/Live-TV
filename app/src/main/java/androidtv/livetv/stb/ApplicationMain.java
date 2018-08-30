@@ -29,7 +29,7 @@ public class ApplicationMain extends Application {
             Timber.plant(new CrashReportingTree());
         }
 
-//        Thread.setDefaultUncaughtExceptionHandler((thread, e) -> handleUncaughtException(thread, e));
+        Thread.setDefaultUncaughtExceptionHandler(this::handleUncaughtException);
     }
 
 

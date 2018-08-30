@@ -215,9 +215,9 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 proceedToLoginViaFile(GlobalVariables.login.getEmail());
                                 break;
                             case INVALID_USER:
-                                GlobalVariables.login = null;
                                 splashViewModel.deleteloginData();
                                 proceedToLoginViaFile(GlobalVariables.login.getEmail());
+                                GlobalVariables.login = null;
 //                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
                                 break;
                             case NO_CONNECTION:

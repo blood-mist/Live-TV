@@ -95,16 +95,8 @@ public class ErrorFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-
-    }
-
     public void setUpError(PlayBackErrorEntity upError) {
        txtErrorCode.setText(upError.getErrorCode());
        txtErrorMessage.setText(upError.getErrorMessage());
     }
-
-
 }

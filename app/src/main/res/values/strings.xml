@@ -35,7 +35,7 @@
     <string name="download_complete">File Download Completed</string>
     <string name="myaccount">AndroidTV MyAccount</string>
     <string name="download_account_header">Download AndroidTV MyAccount</string>
-    <string name="download_myaccount">Download ANdroidTV MyAccount</string>
+    <string name="download_myaccount">Download AndroidTV MyAccount</string>
     <string name="sign_in">Sign In</string>
     <string name="label_password">Password: </string>
     <string name="username">Username:</string>
@@ -78,7 +78,7 @@
 
 
     <!-- Live TV Screen -->
-    <string name="all_category">My Purchase</string>
+    <string name="all_category">All Channels</string>
     <string name="category">Category</string>
     <string name="label_language">Language :</string>
     <string name="label_country">Country :</string>

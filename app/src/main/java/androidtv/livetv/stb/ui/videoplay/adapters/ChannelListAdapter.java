@@ -2,7 +2,6 @@ package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidtv.livetv.stb.R;
@@ -36,24 +34,21 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     private RecyclerView recyclerView;
     private String categoryName;
     private int categoryPosition;
-    private int currentChannelPosition;
 
 
 
     public ChannelListAdapter(Context context, ChannelListClickListener lis) {
         this.mContext = context;
         this.listener = lis;
+        setHasStableIds(true);
     }
 
 
-    public void setChannelItems(String categoryName, int position, int channelPosition, List<ChannelItem> list) {
+    public void setChannelItems(String categoryName,int position,List<ChannelItem> list) {
         this.categoryName =categoryName;
-      if(mList==null)  mList=new ArrayList<>();
-        this.categoryPosition=position;
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ChannelDiffUtils(mList,list));
-        diffResult.dispatchUpdatesTo(this);
         this.mList = list;
-        this.currentChannelPosition=channelPosition;
+        this.categoryPosition=position;
+        notifyDataSetChanged();
     }
 
     @Override

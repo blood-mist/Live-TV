@@ -15,7 +15,6 @@ import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
-import timber.log.Timber;
 
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 
@@ -166,9 +165,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         holder.mCategoryLayout.setOnClickListener(v -> {
 
             selectedPos = pos;
-            if (pos == 0) {
-                mListener.onClickCategory("All Channels", pos, allChannelList);
-            }
+            if (pos == 0)
+                mListener.onClickCategory("All Channels", pos,allChannelList);
             else {
                 if (allFavList != null && allFavList.size() > 0) {
                     if (pos == 1)

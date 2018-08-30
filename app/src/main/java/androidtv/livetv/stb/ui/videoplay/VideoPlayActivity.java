@@ -9,19 +9,27 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,16 +42,24 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import androidtv.livetv.stb.R;
+import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.Epgs;
+import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginDataDelete;
@@ -61,10 +77,12 @@ import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DeviceUtils;
+import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import butterknife.OnClick;
 import timber.log.Timber;
 
@@ -102,6 +120,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
     private VideoPlayViewModel videoPlayViewModel;
+    private Handler handlerToShowMac;
+    private Handler handlerToHideMac;
+    private Runnable runnableToHideMac;
+    private Runnable runnableToShowMac;
     private FragmentMenu menuFragment = new FragmentMenu();
     private Fragment currentFragment;
     private MediaPlayer player;
@@ -174,16 +196,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 if (currentFragment instanceof EpgFragment) {
-                    getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-                    getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
-                    currentFragment = menuFragment;;
+                    removeOptionalFragments();
                 } else {
                     try {
                         if (currentFragment instanceof DvrFragment) {
                             if (!isDvrPlaying) {
-                                getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-                                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
-                                currentFragment = menuFragment;
+                                removeOptionalFragments();
                             }
                         } else if (player != null && player.isPlaying()) {
                             if (menuFragment == null || menuFragment.isHidden())
@@ -201,6 +219,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 if (mVideoController == null) {
+                    hideMenuUI();
                     changeChannel(false);
                     return true;
                 } else {
@@ -209,6 +228,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_MEDIA_NEXT:
                 if (mVideoController == null) {
+                    hideMenuUI();
                     changeChannel(true);
                     return true;
                 } else {
@@ -217,6 +237,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
                 if (mVideoController == null) {
+                    hideMenuUI();
                     changeChannel(false);
                     return true;
 
@@ -248,8 +269,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     return false;
 
             case KeyEvent.KEYCODE_CHANNEL_UP:
-                changeChannel(true);
-                return true;
+                if (mVideoController == null) {
+                    hideMenuUI();
+                    changeChannel(true);
+                    return true;
+                }else
+                    return false;
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (menuFrag == null || menuFrag.isHidden()) {
                     if (mVideoController == null)
@@ -312,7 +337,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "2");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "2");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -338,7 +364,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "4");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "4");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -351,7 +378,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "5");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "5");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -364,7 +392,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "6");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "6");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -377,7 +406,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "7");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "7");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -390,7 +420,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "8");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "8");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -403,7 +434,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 txtChangeChannelFromPriority.setVisibility(View.VISIBLE);
                 txtChangeChannelFromPriority.bringToFront();
                 if (txtChangeChannelFromPriority.getText().length() < 4) {
-                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority.getText() + "9");
+                    txtChangeChannelFromPriority.setText(txtChangeChannelFromPriority
+                            .getText() + "9");
                     startHandlerChangeChannelFromNumbers();
                     // condnsetchannelfrompriority();
                 } else {
@@ -474,7 +506,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
     private void changeChannel(boolean isNext) {
-        hideMenuUI();
         Thread channelChangeThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -492,24 +523,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void openFragmentWithBackStack(Fragment fragment, String tag) {
         hideProgressBar();
-        currentFragment = fragment;
         hideMenuUI();
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).add(R.id.container_movie_player, fragment).commit();
+        currentFragment = fragment;
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).add(R.id.container_movie_player, fragment).addToBackStack(tag).commit();
 
     }
 
     @Override
     public void onBackPressed() {
         if (currentFragment instanceof EpgFragment) {
-           getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-           getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
-            currentFragment = menuFragment;
+            removeOptionalFragments();
         } else {
             if (currentFragment instanceof DvrFragment) {
                 if (!isDvrPlaying) {
-                    getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-                    getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
-                    currentFragment = menuFragment;
+                    removeOptionalFragments();
                 }
             } else if (menuFragment.isVisible()) {
                 try {
@@ -528,13 +555,19 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
+    private void removeOptionalFragments() {
+        getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+        currentFragment = menuFragment;
+    }
+
     private void showMenu() {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag == null)
             openFragment(menuFragment);
-        else
+        else {
             getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
-
+        }
     }
 
     private void showMenuFrag(ErrorFragment errorFragment) {
@@ -579,46 +612,44 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-        Thread threadToDisplayBoxId = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Random random=new Random();
-                final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtRandomDisplayBoxId.getLayoutParams();
-                while (true) {
-                    if (txtRandomDisplayBoxId.getVisibility() == View.VISIBLE) {
-                        runOnUiThread(() -> txtRandomDisplayBoxId.setVisibility(GONE));
-                        try {
-                            sleep(2000 + (new Random().nextInt(2 * 60 * 1000)));
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+    Thread threadToDisplayBoxId = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            Random random = new Random();
+            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtRandomDisplayBoxId.getLayoutParams();
+            while (true) {
+                if (txtRandomDisplayBoxId.getVisibility() == View.VISIBLE) {
+                    runOnUiThread(() -> txtRandomDisplayBoxId.setVisibility(GONE));
+                    try {
+                        sleep(2000 + (new Random().nextInt(2 * 60 * 1000)));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                    } else {
-                        Calendar c = Calendar.getInstance();
-                        SimpleDateFormat df = new SimpleDateFormat("aaaddMMyyyyHHmmss");
-                        final String formattedDate = df.format(c.getTime());
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                        int height = displayMetrics.heightPixels;
-                        int width = displayMetrics.widthPixels;
-                        params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
-                                random.nextInt(100), random.nextInt(100));
+                } else {
+                    Calendar c = Calendar.getInstance();
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    int height = displayMetrics.heightPixels;
+                    int width = displayMetrics.widthPixels;
+                    params.setMargins(random.nextInt(width - txtRandomDisplayBoxId.getWidth() - 200), random.nextInt(height - txtRandomDisplayBoxId.getHeight() - 200),
+                            random.nextInt(100), random.nextInt(100));
 
-                        runOnUiThread(() -> {
-                            txtRandomDisplayBoxId.setText((AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(VideoPlayActivity.this)) + " " + formattedDate);
-                            txtRandomDisplayBoxId.bringToFront();
-                            txtRandomDisplayBoxId.setLayoutParams(params);
-                            txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
-                        });
-                        try {
-                            sleep(5 * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    runOnUiThread(() -> {
+                        txtRandomDisplayBoxId.setText((AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(VideoPlayActivity.this)));
+                        txtRandomDisplayBoxId.bringToFront();
+                        txtRandomDisplayBoxId.setLayoutParams(params);
+                        txtRandomDisplayBoxId.setVisibility(View.VISIBLE);
+                    });
+                    try {
+                        sleep(5 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-        });
+        }
+    });
 
 
     void hideMacDisplayHandler() {
@@ -721,7 +752,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         } catch (Exception e) {
             e.printStackTrace();
         }
-        hideMacDisplayHandler();
         try {
             getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
         } catch (Exception ignored) {
@@ -751,7 +781,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             menuFragment = null;
         } catch (Exception ignored) {
         }
-        hideMacDisplayHandler();
+        ;
         finish();
         super.onStop();
     }
@@ -786,8 +816,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     VideoPlayActivity.this.hideMenuBg();
                     player.setScreenOnWhilePlaying(true);
                     player.start();
-                    threadToDisplayBoxId.start();
                     hideProgressBar();
+
+                    if (threadToDisplayBoxId.getState() == Thread.State.NEW)
+                    {
+                        threadToDisplayBoxId.start();
+                    }
+
                     startCloseMenuHandler();
                     if (isDvr) {
                         MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
