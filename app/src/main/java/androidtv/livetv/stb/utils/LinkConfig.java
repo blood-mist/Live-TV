@@ -21,6 +21,8 @@ public class LinkConfig {
     public static final String NEW_CHANNEL_LINK="api/v1/livetv/package_validation";
     public static final String EXTRA_LINK_URL = "api/v1/livetv/internet";
 
+    public static final String TEST_CHANNEL_CAT_URL="/api/v1/test/livetv";
+
 
     public static final String LOGIN_BUTTON_CLICK ="api/v1/user/login";
     public static final String ALLOW_COUNTRY ="api/v1/other/geoblock";

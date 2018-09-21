@@ -111,7 +111,7 @@ public class SplashRepository {
 
 
         });
-        liveDateEpgs.addSource(catChannelDao.getAllEpgs(), epgs -> liveDateEpgs.postValue(epgs));
+        liveDateEpgs.addSource(catChannelDao.getAllEpgs(), liveDateEpgs::postValue);
         channelCountData = new MediatorLiveData<>();
         channelCountData.setValue(null);
         channelCountData.addSource(catChannelDao.getChannelTableSize(), integer -> channelCountData.postValue(integer));

@@ -48,11 +48,11 @@ public interface ApiInterface {
     @FormUrlEncoded
     Observable<Response<ResponseBody>> signIn(@Field("uname") String userEmail, @Field("pswd") String userPassword, @Field("boxId") String boxId);
 
-    /*@GET(LinkConfig.CATEGORY_URL)
-    Observable<Response<ResponseBody>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);*/
-
-    @GET(LinkConfig.EXTRA_LINK_URL)
+    @GET(LinkConfig.CATEGORY_URL)
     Observable<Response<ResponseBody>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);
+
+   /* @GET(LinkConfig.EXTRA_LINK_URL)
+    Observable<Response<ResponseBody>> getCatChannel(@Header("Authorization") String token, @Query("utc") long utc,@Query("userId") String userId,@Query("hash")String hash);*/
 
     @GET(LinkConfig.GET_UTC)
     Observable<Response<TimeStampEntity>> getTimestamp();

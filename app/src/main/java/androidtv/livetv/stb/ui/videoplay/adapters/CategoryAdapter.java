@@ -3,18 +3,20 @@ package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.ui.videoplay.adapters.viewholder.MyCategoryViewHolder;
 
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 
@@ -22,7 +24,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
 /**
  * Category Adapter
  */
-public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> {
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCategoryViewHolder> {
 
     private final LayoutInflater mInflater;
 
@@ -30,6 +32,17 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     private OnListClickListener mListener;
     private int selectedPos;
     private List<ChannelItem> allChannelList, allFavList;
+    private RecyclerView recyclerView;
+
+    public View getSelectedCategoryView() {
+            return selectedCategoryView;
+    }
+
+    public void setSelectedCategoryView(View selectedCategoryView) {
+        this.selectedCategoryView = selectedCategoryView;
+    }
+
+    private View selectedCategoryView;
 
     public void setAllChannelList(List<ChannelItem> allChannelList) {
         this.allChannelList = allChannelList;
@@ -66,6 +79,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView=recyclerView;
         recyclerView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -121,26 +135,21 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
      */
     @Override
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
-        int pos = holder.getAdapterPosition();
-        int relative_position=0;
-        CategoriesWithChannels categoryItem = null;
+        CategoriesWithChannels categoryItem;
         /**
          * check the position of list
          * if position is 0 the created a category called ALl with
          * id = -1;
          */
-        if (pos == 0) {
+        if (position == 0) {
             holder.mTitleView.setText(R.string.all_channels);
-            relative_position=0;
         } else {
             if (allFavList != null && allFavList.size() > 0) {
-                if (pos == 1) {
+                if (position == 1) {
                     holder.mTitleView.setText(CATEGORY_FAVORITE);
-                    relative_position=1;
                 } else {
                     if (categoryItemList != null) {
                         categoryItem = categoryItemList.get(position - 2);
-                        relative_position=position-2;
                         holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                     } else {
                         holder.mTitleView.setText(R.string.no_category);
@@ -149,7 +158,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             } else {
                 if (categoryItemList != null) {
                     categoryItem = categoryItemList.get(position - 1);
-                    relative_position=-1;
                     holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                 } else {
                     holder.mTitleView.setText(R.string.no_category);
@@ -157,46 +165,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
             }
 
         }
+        holder.mCategoryLayout.setTag(position);
+
 
         /**
          * final object created.
          */
-        final CategoriesWithChannels finalCategoryItem = categoryItem;
-        holder.mCategoryLayout.setOnClickListener(v -> {
-
-            selectedPos = pos;
-            if (pos == 0)
-                mListener.onClickCategory("All Channels", pos,allChannelList);
-            else {
-                if (allFavList != null && allFavList.size() > 0) {
-                    if (pos == 1)
-                        mListener.onClickCategory(CATEGORY_FAVORITE, pos,allFavList);
-                    else if (finalCategoryItem != null)
-                        mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(),pos, finalCategoryItem.channelItemList);
-
-                } else if (finalCategoryItem != null)
-                    mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), pos,finalCategoryItem.channelItemList);
-
-
-            }
-        });
-
-        /**
-         * when focus changes
-         */
-        holder.mCategoryLayout.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                holder.mTitleView.setSelected(true);
-                holder.mCategoryLayout.setScaleY(1.02f);
-                mListener.onSelectCategory(pos,v);
-            } else {
-                holder.mTitleView.setSelected(false);
-                holder.mCategoryLayout.setScaleX(1.0f);
-            }
-        });
-        holder.mCategoryLayout.setTag(position);
-
-
     }
 
     public void addFavoriteItem(List<ChannelItem> favoriteList) {
@@ -225,5 +199,56 @@ public class CategoryAdapter extends RecyclerView.Adapter<MyCategoryViewHolder> 
         void onClickCategory(String categoryName,int categoryPosition, List<ChannelItem> channels);
         void onSelectCategory(int position, View focusedCatView);
     }
+
+     class MyCategoryViewHolder extends RecyclerView.ViewHolder {
+        private TextView mTitleView;
+        private LinearLayout mCategoryLayout;
+         CategoriesWithChannels finalCategoryItem ;
+        private MyCategoryViewHolder(View itemView) {
+            super(itemView);
+            mTitleView = itemView.findViewById(R.id.category_title);
+            mCategoryLayout = itemView.findViewById(R.id.channelCategory_layout);
+
+            mCategoryLayout.setOnClickListener(v -> {
+
+                selectedPos = getAdapterPosition();
+                if (getAdapterPosition() == 0)
+                    mListener.onClickCategory("All Channels", getAdapterPosition(),allChannelList);
+                else {
+                    if (allFavList != null && allFavList.size() > 0) {
+                        if (getAdapterPosition() == 1)
+                            mListener.onClickCategory(CATEGORY_FAVORITE, getAdapterPosition(),allFavList);
+                        else if(categoryItemList!=null) {
+                            finalCategoryItem = categoryItemList.get(getAdapterPosition() - 2);
+                            mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), getAdapterPosition(), finalCategoryItem.channelItemList);
+                        }
+
+                    } else if (categoryItemList != null) {
+                        finalCategoryItem = categoryItemList.get(getAdapterPosition() - 1);
+                        mListener.onClickCategory(finalCategoryItem.categoryItem.getTitle(), getAdapterPosition(), finalCategoryItem.channelItemList);
+                    }
+
+
+                }
+            });
+
+            /**
+             * when focus changes
+             */
+           mCategoryLayout.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+//                    recyclerView.smoothScrollToPosition(getAdapterPosition());
+                    mTitleView.setSelected(true);
+                    mCategoryLayout.setScaleY(1.02f);
+                    mListener.onSelectCategory(getAdapterPosition(),v);
+                    setSelectedCategoryView(mCategoryLayout);
+                } else {
+                    mTitleView.setSelected(false);
+                    mCategoryLayout.setScaleX(1.0f);
+                }
+            });
+        }
+    }
+
 
 }

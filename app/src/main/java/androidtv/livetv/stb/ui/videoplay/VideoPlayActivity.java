@@ -15,21 +15,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,24 +34,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import androidtv.livetv.stb.R;
-import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.Epgs;
-import androidtv.livetv.stb.entity.FavEvent;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
 import androidtv.livetv.stb.entity.LoginDataDelete;
@@ -77,7 +60,6 @@ import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DeviceUtils;
-import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
@@ -138,6 +120,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private boolean isDvrPlaying;
     private ChannelItem currentPlayingChannel;
     private Handler handlerToHidePriority, chFrmPriorityHandler;
+    private List<ChannelItem> allChannelList;
 
 
     @Override
@@ -170,6 +153,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("activity_state", "onStart");
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
+        getAllChannelListfromDB();
         if (menuFragment == null) {
             menuFragment = new FragmentMenu();
         }
@@ -466,20 +450,22 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         chFrmPriorityHandler.postDelayed(runnableChangeChannelFromNumbers, 2000);
     }
 
-
-    private void searchChannelWithgivenPriorityNumber(String priorityNumber) {
+    private void getAllChannelListfromDB(){
         LiveData<List<ChannelItem>> listLiveData = videoPlayViewModel.getAllChannels();
         listLiveData.observe(this, new Observer<List<ChannelItem>>() {
             @Override
             public void onChanged(@Nullable List<ChannelItem> channelItemList) {
                 if (channelItemList != null) {
-                    checkIfChannelExistsAndPlay(channelItemList, priorityNumber);
+                    allChannelList = channelItemList;
                     listLiveData.removeObserver(this);
                 }
-                txtChangeChannelFromPriority.setText("");
-                txtChangeChannelFromPriority.setVisibility(View.GONE);
             }
         });
+    }
+    private void searchChannelWithgivenPriorityNumber(String priorityNumber) {
+                checkIfChannelExistsAndPlay(allChannelList, priorityNumber);
+                txtChangeChannelFromPriority.setText("");
+                txtChangeChannelFromPriority.setVisibility(View.GONE);
     }
 
     private void checkIfChannelExistsAndPlay(List<ChannelItem> channelItemList, String priorityNumber) {
@@ -506,15 +492,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
     private void changeChannel(boolean isNext) {
-        Thread channelChangeThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                channelChangeObservable = new ChannelChangeObserver();
-                channelChangeObservable.addObserver(menuFragment);
-                channelChangeObservable.setChannelNext(isNext);
-                channelChangeObservable.notifyObservers();
-                channelChangeObservable.deleteObserver(menuFragment);
-            }
+        Thread channelChangeThread = new Thread(() -> {
+            channelChangeObservable = new ChannelChangeObserver();
+            channelChangeObservable.addObserver(menuFragment);
+            channelChangeObservable.setChannelNext(isNext);
+            channelChangeObservable.notifyObservers();
+            channelChangeObservable.deleteObserver(menuFragment);
         });
         channelChangeThread.start();
 
@@ -621,13 +604,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 if (txtRandomDisplayBoxId.getVisibility() == View.VISIBLE) {
                     runOnUiThread(() -> txtRandomDisplayBoxId.setVisibility(GONE));
                     try {
-                        sleep(2000 + (new Random().nextInt(2 * 60 * 1000)));
+                        sleep(2000 + (new Random().nextInt(30 * 60 * 1000)));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
                 } else {
-                    Calendar c = Calendar.getInstance();
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     VideoPlayActivity.this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                     int height = displayMetrics.heightPixels;
@@ -689,6 +671,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 });
             }
         } catch (Exception ignored) {
+            showMenu();
         }
     }
 
@@ -868,6 +851,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
+                    if (what == -1003)
+                        player.setOnErrorListener(null);
                     Timber.d("on error ");
                     hideProgressBar();
                     hideMacDisplayHandler();
@@ -883,8 +868,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     } else {
                         VideoPlayActivity.this.setErrorFragment(null, what, extra);
                     }
-                    if (what == -1003)
-                        player.setOnErrorListener(null);
+
                     return true;
                 }
             });
@@ -996,9 +980,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     @Override
-    public void playChannelFromOnAir(ChannelItem channel, boolean onAir) {
+    public void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir) {
         getSupportFragmentManager().popBackStack();
-        playChannel(channel);
+        menuFragment.onClickChannel(getString(R.string.all_channels),0,channelPositionById,allChannelList);
+//        playChannel(channel);
     }
 
     @Override

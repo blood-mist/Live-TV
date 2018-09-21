@@ -146,7 +146,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
             setSelectedChannel(position);
             holder.itemLayout.requestFocus();
             holder.itemLayout.setSelected(true);
-            onChannelClicked(channel,position);
+//            onChannelClicked(channel,position);
         }
 
     }

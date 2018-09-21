@@ -145,6 +145,10 @@ public class MenuRepository {
         return catChannelDao.getFirstChannel();
     }
 
+    public LiveData<List<ChannelItem>> getAlLChannels() {
+        return catChannelDao.getChannels();
+    }
+
     private static class insertAsyncTask extends AsyncTask<Void, Void, Integer> {
 
        private  int favStatus;

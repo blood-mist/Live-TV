@@ -9,6 +9,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 import android.arch.persistence.room.Update;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,10 +36,7 @@ public interface CatChannelDao {
     LiveData<List<CategoryItem>> getCategories();
 
 
-    @Query("SELECT * FROM CHANNEL_TABLE WHERE category_id=:category_id")
-    LiveData<List<ChannelItem>> getChannels(int category_id);
-
-    @Query("SELECT * FROM CHANNEL_TABLE ")
+    @Query("SELECT * FROM CHANNEL_TABLE ORDER BY channel_priority ASC")
     LiveData<List<ChannelItem>> getChannels();
 
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
@@ -57,7 +55,7 @@ public interface CatChannelDao {
     LiveData<ChannelItem> getLastPlayedChannel(int channel_id);
 
     @Transaction
-    @Query("SELECT * FROM CATEGORY_TABLE ORDER BY displayOrder DESC")
+    @Query("SELECT * FROM CATEGORY_TABLE ORDER BY displayOrder ASC")
     LiveData<List<CategoriesWithChannels>> getCategoriesWithChannels();
 
     @Query("SELECT * FROM CHANNEL_TABLE WHERE is_fav = 1")

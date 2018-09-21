@@ -9,6 +9,6 @@ public class CategoriesWithChannels {
     @Embedded
     public CategoryItem categoryItem;
 
-    @Relation(parentColumn = "category_id",entityColumn = "category_id",entity = ChannelItem.class)
+    @Relation(parentColumn = "category_id",entityColumn = "category_id",entity = ChannelItem.class )
     public List<ChannelItem> channelItemList;
 }

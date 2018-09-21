@@ -314,7 +314,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void onAirClick(Epgs epgs) {
-        mListener.playChannelFromOnAir(adapter.getChannel(epgs.getChannelID()),true);
+        mListener.playChannelFromOnAir(adapter.getChannel(epgs.getChannelID()),allChannelItems.indexOf(currentChannel),true);
     }
 
     public void setCurrentChannel(ChannelItem currentChannel) {
@@ -328,7 +328,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     }
 
     public interface FragmentDvrInteraction {
-        void playChannelFromOnAir(ChannelItem channel ,boolean onAir);
+        void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir);
         void playDvr(Epgs epgs,ChannelItem item);
     }
 

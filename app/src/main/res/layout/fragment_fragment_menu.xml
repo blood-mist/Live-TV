@@ -5,14 +5,11 @@
     android:layout_height="match_parent"
     android:background="#40000000"
     android:orientation="horizontal">
-
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginLeft="100dp"
-        android:layout_marginStart="100dp"
-        android:layout_weight="2"
+        android:layout_weight="1.5"
+        android:padding="5dp"
         android:background="@color/transp"
         android:focusable="false"
         android:importantForAccessibility="auto"
@@ -63,7 +60,7 @@
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="10"
+        android:layout_weight="10.5"
         android:focusable="false"
         android:importantForAccessibility="auto">
 
@@ -145,7 +142,6 @@
                     android:id="@+id/txt_descTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:focusable="false"
@@ -162,26 +158,11 @@
                         android:focusable="false"
                         android:importantForAccessibility="noHideDescendants"
                         android:maxLines="1"
-                        android:maxWidth="200dp"
+                        android:minWidth="200dp"
                         android:text="@string/txt_empty"
                         android:textColor="@color/color_white"
                         android:textSize="25sp"
                         app:fontAssetName="@string/font_exo_Light" />
-
-                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
-                        android:id="@+id/amount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@drawable/rectangle_grey"
-                        android:focusable="false"
-                        android:importantForAccessibility="noHideDescendants"
-                        android:padding="5dp"
-                        android:text="@string/txt_empty"
-                        android:textColor="@color/text_color"
-                        android:textSize="12sp"
-                        app:fontAssetName="@string/font_exo_semi_bold" />
-
                     <androidtv.livetv.stb.ui.custom_views.CustomTextView
                         android:id="@+id/channelNo"
                         android:layout_width="wrap_content"

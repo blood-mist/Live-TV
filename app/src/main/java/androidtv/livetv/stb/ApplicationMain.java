@@ -57,6 +57,7 @@ public class ApplicationMain extends Application {
 
             Toast.makeText(this, "failed to save datas", Toast.LENGTH_LONG).show();
         }
+        System.exit(1);
 
     }
 

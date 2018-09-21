@@ -2,6 +2,7 @@ package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
+import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.GlideApp;
 import androidtv.livetv.stb.utils.LinkConfig;
 
@@ -42,7 +44,6 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         this.listener = lis;
         setHasStableIds(true);
     }
-
 
     public void setChannelItems(String categoryName,int position,List<ChannelItem> list) {
         this.categoryName =categoryName;

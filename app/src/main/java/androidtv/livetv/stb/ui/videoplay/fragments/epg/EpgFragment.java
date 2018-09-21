@@ -27,7 +27,6 @@ import java.util.List;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
-import androidtv.livetv.stb.entity.EpgEntity;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.GlobalVariables;
 import androidtv.livetv.stb.entity.Login;
@@ -39,6 +38,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.ChannelRecyclerAdapter;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
+import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +50,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
 
     private FragmentEpgInteraction mListener;
-    private LiveData<EpgEntity> epgEntityLive = null;
+    private LiveData<List<Epgs>> epgEntityLive = null;
     private ChannelItem currentSelectedChannel;
     private List<ChannelItem> allChannelItems;
 
@@ -164,9 +164,9 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         epgListAdapter = new EpgListAdapter(getActivity(), this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
-        onChannelClickInteraction(adapter.getChannelById(getCurrentSelectedChannel().getId()),adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
+        onChannelClickInteraction(adapter.getChannelById(getCurrentSelectedChannel().getId()), adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
 
-   }
+    }
 
 
     private List<Date> getDateList() {
@@ -185,7 +185,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onChannelClickInteraction(ChannelItem channel, int adapterPosition) {
 
-        if(epgEntityLive != null && epgEntityLive.hasActiveObservers()){
+        if (epgEntityLive != null && epgEntityLive.hasActiveObservers()) {
             epgEntityLive.removeObservers(this);
             epgEntityLive = null;
         }
@@ -194,41 +194,46 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         txtChannelName.setText(channel.getName());
         resetOnAir(channel);
         currentSelectedChannel = channel;
-        Log.d("channel",channel.getName());
+        Log.d("channel", channel.getName());
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         epgListAdapter.clear();
         gvDate.setVisibility(View.GONE);
         showNoEpg("Loading");
-        epgEntityLive =   viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
+        DisposableManager.disposeEpg();
+        LiveData<Boolean> epgFetchData = viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
                 , String.valueOf(utc.getUtc()), login.getSession()), String.valueOf(channel.getId()));
 
-       epgEntityLive.observe(this, new Observer<EpgEntity>() {
-            @Override
-            public void onChanged(@Nullable EpgEntity epgs) {
-
-                if (epgs != null) {
-                    if (epgs.getEpgsList() != null && epgs.getEpgsList().size() > 0) {
-                        setUpAdapter(epgs.getEpgsList(),false);
-                        cuurentEpgList = epgs.getEpgsList();
-                    } else {
-
-                        nOEpg.setVisibility(View.VISIBLE);
-                        if (epgs.getError_message() != null && epgs.getError_message().length()>0) {
-                            gvDate.setVisibility(View.GONE);
-                           showNoEpg(epgs.getError_message());
-                        } else {
-                            gvDate.setVisibility(View.GONE);
-                            showNoEpg("No epg found");
-                        }
-                    }
-                }
+        epgFetchData.observe(this, aBoolean -> {
+            if (aBoolean != null) {
+                getEpgFromDB(currentSelectedChannel);
             }
         });
 
     }
 
-    private void setUpAdapter(List<Epgs> epgs,boolean showDate) {
+    private void getEpgFromDB(ChannelItem currentSelectedChannel) {
+        epgEntityLive = viewModel.getEpgFromDB(currentSelectedChannel.getId());
+        epgEntityLive.observe(this, new Observer<List<Epgs>>() {
+            @Override
+            public void onChanged(@Nullable List<Epgs> epgs) {
+                if (epgs != null) {
+                    if (epgs.size() > 0) {
+                        setUpAdapter(epgs, false);
+                        cuurentEpgList = epgs;
+                    } else {
+                        nOEpg.setVisibility(View.VISIBLE);
+                        gvDate.setVisibility(View.GONE);
+                        showNoEpg("No epg found");
+                    }
+                    epgEntityLive.removeObserver(this);
+                    epgEntityLive = null;
+                }
+            }
+        });
+    }
+
+    private void setUpAdapter(List<Epgs> epgs, boolean showDate) {
         if (epgs != null) {
             List<Epgs> newList = getFilteredEpgs(epgs);
             if (newList.size() > 0) {
@@ -238,17 +243,16 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                 gvEpgDvr.setVisibility(View.VISIBLE);
 
             } else {
-                if(!showDate) gvDate.setVisibility(View.GONE);
+                if (!showDate) gvDate.setVisibility(View.GONE);
 
                 showNoEpg("No epg found");
             }
         } else {
-            if(!showDate) gvDate.setVisibility(View.GONE);
+            if (!showDate) gvDate.setVisibility(View.GONE);
             showNoEpg("No epg found");
 
 
         }
-
 
 
     }
@@ -284,22 +288,22 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onClick(int postion, Date date) {
         currentEpgDate = date;
-        setUpAdapter(cuurentEpgList,true);
+        setUpAdapter(cuurentEpgList, true);
         gvDate.smoothScrollToPosition(postion);
     }
 
 
     @Override
     public void onEpgClicked(Epgs epg) {
-        mListener.playChannelFromOnAir(adapter.getChannel(epg.getChannelID()),true);
+        mListener.playChannelFromOnAir(adapter.getChannel(epg.getChannelID()),allChannelItems.indexOf(currentSelectedChannel), true);
     }
 
     @Override
     public void onOnAirSetup(Epgs epgs) {
-        if(currentSelectedChannel.getId() == epgs.getChannelID()) {
+        if (currentSelectedChannel.getId() == epgs.getChannelID()) {
             txtPrgmName.setText(epgs.getProgramTitle());
             txtPrgmTime.setText(DataUtils.getPrgmTime(epgs.getStartTime(), epgs.getEndTime()));
-        }else{
+        } else {
             txtPrgmName.setText("");
             txtPrgmTime.setText("");
         }
@@ -311,8 +315,8 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 //        getActivity().runOnUiThread(new Runnable() {
 //            @Override
 //            public void run() {
-                txtPrgmName.setText("");
-                txtPrgmTime.setText("");
+        txtPrgmName.setText("");
+        txtPrgmTime.setText("");
 //            }
 //        });
 
@@ -323,7 +327,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         ChannelItem item = adapter.getChannel(channelID);
         return item.getName();
     }
-
 
 
     @Override
@@ -342,11 +345,10 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         this.allChannelItems = allChannelItems;
     }
 
+
     public interface FragmentEpgInteraction {
-        void playChannelFromOnAir(ChannelItem channel ,boolean onAir);
+        void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir);
     }
-
-
 
 
 }

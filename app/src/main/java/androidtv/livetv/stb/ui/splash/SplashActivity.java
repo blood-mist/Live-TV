@@ -212,11 +212,11 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                         switch (catChannelWrapper.getCatChannelError().getStatus()) {
                             case INVALID_HASH:
                                 splashViewModel.deleteloginData();
-                                proceedToLoginViaFile(GlobalVariables.login.getEmail());
+                                proceedToLoginViaFile();
                                 break;
                             case INVALID_USER:
                                 splashViewModel.deleteloginData();
-                                proceedToLoginViaFile(GlobalVariables.login.getEmail());
+                                proceedToLoginViaFile();
                                 GlobalVariables.login = null;
 //                                showErrorDialog(INVALID_USER, catChannelWrapper.getCatChannelError().getErrorMessage());
                                 break;
@@ -246,7 +246,10 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             switch (errorCode) {
                 case INVALID_HASH:
                     splashViewModel.deleteloginData();
-                    showLogin(GlobalVariables.login.getEmail());
+                    if (GlobalVariables.login != null)
+                        showLogin(GlobalVariables.login.getEmail());
+                    else
+                        checkForValidMacAddress();
                     break;
                 case INVALID_USER:
                     splashViewModel.deleteloginData();
@@ -489,13 +492,14 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                         if (userCheckWrapper.getUserCheckInfo() != null) {
                             if ((userCheckWrapper.getUserCheckInfo().getData().getActivationStatus() == 1 && userCheckWrapper.getUserCheckInfo().getData().getIsActive() == 1)) {
                                 if (LoginFileUtils.checkIfFileExists(LinkConfig.LOGIN_FILE_NAME)) {
-                                    proceedToLoginViaFile(userCheckWrapper.getUserCheckInfo().getData().getUserName());
+                                    proceedToLoginViaFile();
                                 } else {
                                     showLogin(userCheckWrapper.getUserCheckInfo().getData().getUserName());
                                 }
                             }
                         } else {
-                            if (userCheckWrapper.getUserErrorInfo().getStatus() == 401 || userCheckWrapper.getUserErrorInfo().getStatus() == 402) {
+                            if (userCheckWrapper.getUserErrorInfo().getStatus() == 401 || userCheckWrapper.getUserErrorInfo().getStatus() == 402)
+                            {
                                 openAccountApk(ACCOUNT_PACKAGE, accountDownloadLink);
                             } else
                                 loadUnauthorized(String.valueOf(userCheckWrapper.getUserErrorInfo().getStatus()), userCheckWrapper.getUserErrorInfo().getMessage(), "N/A");
@@ -507,7 +511,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         );
     }
 
-    private void proceedToLoginViaFile(String emailFrmApi) {
+    private void proceedToLoginViaFile() {
         if (LoginFileUtils.readFromFile(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this))) {
             try {
                 String encrypted_password = LoginFileUtils.getUserPassword();
@@ -550,11 +554,11 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             } catch (Exception e) {
                 Toast.makeText(this, getString(R.string.err_autologin), Toast.LENGTH_LONG).show();
                 LoginFileUtils.deleteLoginFile();
-                showLogin(emailFrmApi);
+                checkForValidMacAddress();
             }
         } else {
             LoginFileUtils.deleteLoginFile();
-            showLogin(emailFrmApi);
+            checkForValidMacAddress();
         }
     }
 

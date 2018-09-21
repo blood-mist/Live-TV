@@ -7,6 +7,7 @@ public class DisposableManager {
 
     private static CompositeDisposable compositeDisposable;
     private static CompositeDisposable  liveCompositeDisposable;
+    private static CompositeDisposable epgCompositeDisposable;
 
     public static void add(Disposable disposable) {
         getCompositeDisposable().add(disposable);
@@ -17,12 +18,20 @@ public class DisposableManager {
 
     }
 
+    public static void addEpgDisposable(Disposable epgDisposable){
+        getEpgCompositeDisposable().add(epgDisposable);
+    }
+
     public static void dispose() {
         getCompositeDisposable().dispose();
     }
 
     public static  void disposeLive(){
         getLiveStreamDisposable().dispose();
+    }
+
+    public static void disposeEpg(){
+        getEpgCompositeDisposable().dispose();
     }
 
     private static CompositeDisposable getCompositeDisposable() {
@@ -37,6 +46,12 @@ public class DisposableManager {
             liveCompositeDisposable = new CompositeDisposable();
         }
         return liveCompositeDisposable;
+    }
+
+    private static  CompositeDisposable getEpgCompositeDisposable(){
+        if(epgCompositeDisposable==null ||  epgCompositeDisposable.isDisposed())
+            epgCompositeDisposable=new CompositeDisposable();
+        return epgCompositeDisposable;
     }
     private DisposableManager() {}
 }

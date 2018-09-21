@@ -29,8 +29,6 @@ public class VideoPlayViewModel extends AndroidViewModel {
         channelListData.setValue(null);
         LiveData<List<ChannelItem>> allChannelsData = videoPlayRepository.getAllChannels();
         channelListData.addSource(allChannelsData, channelItemList -> channelListData.setValue(channelItemList));
-
-
     }
 
 

@@ -4,6 +4,9 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:gravity="center"
+    android:focusable="false"
+    android:importantForAccessibility="auto"
+    android:focusableInTouchMode="false"
     >
     <!--android:background="@drawable/main_channel_list_selector"-->
 
@@ -26,6 +29,9 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:singleLine="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:importantForAccessibility="no"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:text="@string/category"

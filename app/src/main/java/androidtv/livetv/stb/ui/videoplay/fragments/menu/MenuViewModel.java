@@ -46,13 +46,17 @@ public class MenuViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<ChannelItem>> getFavChannels() {
-        liveFavItems =null;;
+        liveFavItems =null;
         liveFavItems= menuRepository.getFavChannels();
         return liveFavItems;
     }
 
     public LiveData<ChannelItem> getFirstChannel() {
         return menuRepository.getFirstChannelFromDB();
+    }
+
+    public LiveData<List<ChannelItem>> getAllChannel() {
+        return  menuRepository.getAlLChannels();
     }
 }
 

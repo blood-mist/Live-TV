@@ -24,7 +24,6 @@ public class EpgViewModel extends AndroidViewModel {
 
     private EpgRepositary epgRepositary;
     private MediatorLiveData<List<ChannelItem>> channelListMediator;
-    private MediatorLiveData<EpgEntity> epLiveData;
     private MediatorLiveData<List<Epgs>> liveAllEpgs;
 
 
@@ -32,8 +31,6 @@ public class EpgViewModel extends AndroidViewModel {
         super(application);
         epgRepositary = EpgRepositary.getInstance(application);
         channelListMediator = new MediatorLiveData<>();
-        epLiveData = new MediatorLiveData<>();
-        epLiveData.setValue(null);
         liveAllEpgs = new MediatorLiveData<>();
         liveAllEpgs.addSource(epgRepositary.getAllEpgs(), epgs -> liveAllEpgs.postValue(epgs));
         channelListMediator.addSource(epgRepositary.getAllChannels(), channelItems -> channelListMediator.postValue(channelItems));
@@ -44,12 +41,13 @@ public class EpgViewModel extends AndroidViewModel {
         return channelListMediator;
     }
 
-    public LiveData<EpgEntity> getEpgs(String token, long utc, String userId , String hashValue, String channelId){
-        epLiveData.postValue(null);
+    public LiveData<Boolean> getEpgs(String token, long utc, String userId , String hashValue, String channelId){
         return epgRepositary.getEpgs(token, utc, userId, hashValue, channelId);
 
     }
 
 
-
+    public LiveData<List<Epgs>> getEpgFromDB(int channel_id) {
+        return epgRepositary.getEpgOfChannel(channel_id);
+    }
 }

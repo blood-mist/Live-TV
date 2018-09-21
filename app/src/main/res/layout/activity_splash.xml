@@ -22,7 +22,7 @@
             android:scaleType="centerInside"
             android:adjustViewBounds="true"
             android:contentDescription="@string/app_icon"
-            android:src="@drawable/internet_tv" />
+            android:src="@drawable/live_tv" />
 
         <ProgressBar
             android:id="@+id/progressBar1"
