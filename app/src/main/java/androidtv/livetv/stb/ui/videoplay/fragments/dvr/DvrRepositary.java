@@ -86,19 +86,20 @@ public class DvrRepositary {
                             if (response != null) {
                                 List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
                                 if (epgs.size() > 0) {
-                                    insertToDb(epgs);
+                                    deleteEpg(Integer.parseInt(channelId));
                                 }
+
+                                responseMediatorLiveData.postValue(epgs);
+                                if(epgs.size()>0){
+                                    insertToDb(epgs);
+
+                                }
+
 
                             }
 
                         }
 
-                        responseMediatorLiveData.addSource(catChannelDao.getEpgs(Integer.parseInt(channelId)), new Observer<List<Epgs>>() {
-                            @Override
-                            public void onChanged(@Nullable List<Epgs> epgs) {
-                                responseMediatorLiveData.postValue(epgs);
-                            }
-                        });
 
 
 
@@ -161,6 +162,10 @@ public class DvrRepositary {
                     }
                 });
         return dvrStartDate;
+    }
+
+    public void deleteEpg(int id) {
+        Completable.fromRunnable(() -> catChannelDao.deleteEpgByChannel(id)).subscribeOn(Schedulers.io()).subscribe();
     }
 
 

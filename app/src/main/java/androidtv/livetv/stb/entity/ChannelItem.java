@@ -145,6 +145,30 @@ public class ChannelItem implements Parcelable {
     @SerializedName("country_id")
     private int countryId;
 
+    @ColumnInfo(name = "has_dvr")
+    @SerializedName("has_dvr")
+    private boolean hasDvr;
+
+    @ColumnInfo(name = "has_epg")
+    @SerializedName("has_epg")
+    private boolean hasEpg;
+
+    public boolean isHasDvr() {
+        return hasDvr;
+    }
+
+    public void setHasDvr(boolean hasDvr) {
+        this.hasDvr = hasDvr;
+    }
+
+    public boolean isHasEpg() {
+        return hasEpg;
+    }
+
+    public void setHasEpg(boolean hasEpg) {
+        this.hasEpg = hasEpg;
+    }
+
     public void setChannelLogo(String channelLogo) {
         this.channelLogo = channelLogo;
     }

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
         Date d = dateList.get(position);
         String txtToSet = DateUtils.smalldateFormat.format(d);
         holder.prgmDetails.setText(txtToSet);
+        Log.d("dates",txtToSet);
         holder.layoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -67,7 +69,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
                 }
                 // listener.onClick(position,dateList.get(position));
                 else {
-                    holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Light));
+                    holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_regular));
                     holder.prgmDetails.setScaleX(1f);
                     holder.prgmDetails.setScaleY(1f);
                     holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));

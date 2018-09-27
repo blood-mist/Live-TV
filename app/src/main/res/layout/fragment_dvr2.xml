@@ -7,13 +7,11 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#aa000000"
         android:gravity="bottom"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="800dp"
@@ -152,7 +150,7 @@
                             android:id="@+id/gv_date"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
+                            android:layout_weight="3.5"
                             android:nextFocusUp="@id/channel_list"
                             android:focusable="true"
                             android:focusableInTouchMode="true"

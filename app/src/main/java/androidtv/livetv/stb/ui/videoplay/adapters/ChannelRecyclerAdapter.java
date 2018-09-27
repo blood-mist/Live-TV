@@ -179,7 +179,7 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
                 }
             }
         }
-        return null;
+        return channelList.get(0);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

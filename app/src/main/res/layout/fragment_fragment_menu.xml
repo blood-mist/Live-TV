@@ -346,6 +346,7 @@
             android:id="@+id/preview_container"
             android:layout_width="250dp"
             android:minWidth="200dp"
+
             android:layout_height="150dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
@@ -354,7 +355,7 @@
             android:background="@color/color_black"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:layout_alignParentRight="true"
             android:layout_marginRight="21dp">
 
@@ -362,6 +363,7 @@
                 android:id="@+id/preview_view"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
+                android:visibility="invisible"
                 android:layout_height="wrap_content" />
 
         </FrameLayout>

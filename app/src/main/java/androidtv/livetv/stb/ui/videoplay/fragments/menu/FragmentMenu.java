@@ -624,6 +624,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         }
     }
 
+    public boolean isDvr() {
+        return isDvr;
+    }
+
+    public void setDvr(boolean dvr) {
+        isDvr = dvr;
+    }
+
+    private boolean isDvr;
+
 
     /**
      * update UI events and preview status on channel list navigation
@@ -728,6 +738,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 showErrorFrag(errorFragment);
             updateCategoryUI(this.allChannelItems, allFavItems, allCategoryChannels);
 
+
+
         }
         super.onHiddenChanged(hidden);
     }
@@ -814,18 +826,23 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @OnClick(R.id.layout_epg)
     public void OnEpgClick() {
-        EpgFragment fragment = new EpgFragment();
-        fragment.setCurrentSelectedChannel(currentSelected);
-        fragment.setAllChannelList(allChannelItems);
-        mListener.load(fragment, "epg");
+        if(currentSelected.isHasEpg()) {
+            EpgFragment fragment = new EpgFragment();
+            fragment.setCurrentSelectedChannel(currentSelected);
+            fragment.setAllChannelList(allChannelItems);
+            mListener.load(fragment, "epg");
+        }else{
+            Toast.makeText(getActivity(), "Epg not available for this channel", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @OnClick(R.id.layout_dvr)
     public void OnDvrClick() {
-        DvrFragment fragment = new DvrFragment();
-        fragment.setCurrentChannel(currentSelected);
-        fragment.setAllChannelList(allChannelItems);
-        mListener.load(fragment, "Dvr");
+        if(currentSelected.isHasDvr()) {
+            mListener.loadDvr(currentSelected, allChannelItems, "dvr");
+        }else{
+            Toast.makeText(getActivity(), "Dvr not available for this channel", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void showErrorFrag(ErrorFragment errorFragment) {
@@ -844,10 +861,31 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         this.errorFragment = errorFragment;
     }
 
+    public ChannelItem getDvrPlayedChannel() {
+        return dvrPlayedChannel;
+    }
+
+    public void setDvrPlayedChannel(ChannelItem dvrPlayedChannel) {
+        this.dvrPlayedChannel = dvrPlayedChannel;
+        if(dvrPlayedChannel != null) {
+            int position = allChannelItems.indexOf(dvrPlayedChannel);
+            currentChannelPosition = position;
+            selectedChannelPosition = position;
+            currentPlayingCategoryPosition = 0;
+            categoryEditor.putString(PLAYED_CATEGORY_NAME, getString(R.string.all_category));
+            categoryEditor.apply();
+            Timber.d("position:" + currentChannelPosition);
+            currentSelected = allChannelItems.get(position);
+            currentPlayed = allChannelItems.get(position);
+            currentPlayedCategoryItems = allChannelItems;
+            adapter.notifyDataSetChanged();
+        }
+    }
+
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
-
+        void loadDvr(ChannelItem current,List<ChannelItem> allChannelItems ,String dvr);
         void load(Fragment epgFragment, String tag);
 
     }
@@ -861,6 +899,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onResume() {
         super.onResume();
+        if(dvrPlayedChannel != null)
+        onClickChannel(getString(R.string.all_channels), 0, allChannelItems.indexOf(getDvrPlayedChannel()), allChannelItems);
 
     }
+
+
+
+    private ChannelItem dvrPlayedChannel;
 }

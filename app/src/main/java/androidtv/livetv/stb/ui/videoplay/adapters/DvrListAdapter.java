@@ -25,6 +25,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
     private OnClickDvrList listener;
     private Epgs playingEpg;
     private int selectedFocusedPosition;
+    private boolean isFirstrun = true;
 
     public int getSelectedFocusedPosition() {
         return selectedFocusedPosition;
@@ -63,6 +64,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
             listener.onOnAirSetup(epg);
 
+
         } else {
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
             holder.alarmPlay.setImageResource(R.drawable.play);
@@ -72,7 +74,16 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         }
 
         if(selectedFocusedPosition == position){
+            holder.LayoutTxtImgHor.setSelected(true);
             holder.LayoutTxtImgHor.requestFocus();
+        }else{
+            holder.LayoutTxtImgHor.setSelected(false);
+        }
+
+        if(holder.LayoutTxtImgHor.isSelected()){
+            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+        }else{
+            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
         }
 
         holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -88,6 +99,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                selectedFocusedPosition = position;
                 if (v.getTag() == "12") {
                     listener.onAirClick(epg);
                 } else {

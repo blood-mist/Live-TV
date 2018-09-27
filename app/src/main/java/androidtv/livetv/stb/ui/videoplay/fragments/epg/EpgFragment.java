@@ -153,7 +153,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         adapter.setSelectedChannelId(selectedChannelId);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gvChannelList.setAdapter(adapter);
-        adapter.setChannelList(allChannelItems);
+        adapter.setChannelList(getFilteredChannelList(allChannelItems));
         adapter.setSelectedChannel(adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
         gvChannelList.scrollToPosition((adapter.getChannelPositionById(getCurrentSelectedChannel().getId())));
 
@@ -164,8 +164,18 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         epgListAdapter = new EpgListAdapter(getActivity(), this);
         gvEpgDvr.setLayoutManager(new LinearLayoutManager(getActivity()));
         gvEpgDvr.setAdapter(epgListAdapter);
+
         onChannelClickInteraction(adapter.getChannelById(getCurrentSelectedChannel().getId()), adapter.getChannelPositionById(getCurrentSelectedChannel().getId()));
 
+    }
+    private List<ChannelItem> getFilteredChannelList(List<ChannelItem> allChannelItems) {
+        List<ChannelItem> filteredItems =  new ArrayList<>();
+        for(ChannelItem item:allChannelItems){
+            if(item.isHasEpg()){
+                filteredItems.add(item);
+            }
+        }
+        return filteredItems;
     }
 
 

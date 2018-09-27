@@ -210,6 +210,7 @@ public class VideoControllerView extends FrameLayout {
         mUseFastForward = true;
         mFromXml = true;
         Log.i(TAG, TAG);
+
     }
 
     public VideoControllerView(Context context) {
@@ -420,12 +421,52 @@ public class VideoControllerView extends FrameLayout {
         }
 
         int keyCode = event.getKeyCode();
+
         final boolean uniqueDown = event.getRepeatCount() == 0
                 && event.getAction() == KeyEvent.ACTION_DOWN;
+
+        if(keyCode == KeyEvent.KEYCODE_DPAD_UP){
+            mProgress.requestFocus();
+        }
 
         if(keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
             mPauseButton.requestFocus();
         }
+        if(keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD){
+            if (mPlayer != null) {
+                int pos = mPlayer.getCurrentPosition();
+                pos += 20000; // milliseconds
+                mPlayer.seekTo(pos);
+                setProgress();
+                show(sDefaultTimeout);
+            }
+
+
+        }
+
+        if(keyCode==KeyEvent.KEYCODE_MEDIA_REWIND) {
+            if (mPlayer == null) {
+                int pos = mPlayer.getCurrentPosition();
+                pos -= 20000; // milliseconds
+                mPlayer.seekTo(pos);
+                setProgress();
+                show(sDefaultTimeout);
+
+            }
+        }
+
+        if(keyCode == KeyEvent.KEYCODE_MEDIA_REWIND){
+            if (mPlayer != null) {
+                int pos = mPlayer.getCurrentPosition();
+                pos += 20000; // milliseconds
+                mPlayer.seekTo(pos);
+                setProgress();
+                show(sDefaultTimeout);
+            }
+
+
+        }
+
         if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK
                 || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
                 || keyCode == KeyEvent.KEYCODE_SPACE) {
@@ -602,6 +643,17 @@ public class VideoControllerView extends FrameLayout {
         }
 
         mProgress = (SeekBar) v.findViewById(R.id.mediacontroller_progress);
+        mProgress.setFocusable(true);
+        mProgress.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(b){
+                    mProgress.setBackgroundColor(mContext.getColor(R.color.darkgrey_trans));
+                }else{
+                   mProgress.setBackgroundColor(0);
+                }
+            }
+        });
         if (mProgress != null) {
             if (mProgress instanceof SeekBar) {
                 SeekBar seeker = (SeekBar) mProgress;

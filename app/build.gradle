@@ -3,7 +3,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "androidtv.livetv.stb"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 5
         versionName "1.0.5"

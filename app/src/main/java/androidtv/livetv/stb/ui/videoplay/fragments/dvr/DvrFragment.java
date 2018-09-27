@@ -56,6 +56,15 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     private Date selectedDate;
     private int selectedDatePosition = -1;
     private int selectedChannelId = 0;
+
+    public Epgs getCurrentPlayedEpg() {
+        return currentPlayedEpg;
+    }
+
+    public void setCurrentPlayedEpg(Epgs currentPlayedEpg) {
+        this.currentPlayedEpg = currentPlayedEpg;
+    }
+
     private Epgs currentPlayedEpg;
     private int currentEpgSelectedPosition = -1;
     private List<ChannelItem> allChannelItems;
@@ -92,6 +101,17 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
      private DvrViewModel viewModel;
      private ChannelItem currentChannel;
 
+
+    public void setSelectedDvrPosition(int selectedDvrPosition) {
+        this.currentEpgSelectedPosition = selectedDvrPosition;
+    }
+
+    public void setGetSelectedDatePosition(int getSelectedDatePosition) {
+        this.selectedDatePosition = getSelectedDatePosition;
+    }
+
+    private int getSelectedDatePosition;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,7 +141,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         gvEpgDvr.setAdapter(dvrListAdapter);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
         gvChannelList.setAdapter(adapter);
-        adapter.setChannelList(allChannelItems);
+        adapter.setChannelList(getFilteredChannelList(allChannelItems));
         adapter.setSelectedChannel(adapter.getChannelPositionById(currentChannel.getId()));
         gvChannelList.scrollToPosition((adapter.getChannelPositionById(currentChannel.getId())));
         gvChannelList.requestFocus();
@@ -137,9 +157,28 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     }
 
+    private List<ChannelItem> getFilteredChannelList(List<ChannelItem> allChannelItems) {
+        List<ChannelItem> filteredItems =  new ArrayList<>();
+        for(ChannelItem item:allChannelItems){
+            if(item.isHasDvr()){
+                filteredItems.add(item);
+            }
+        }
+        return filteredItems;
+    }
+
     private List<Date> getDateList(String startDate) {
         Date current = Calendar.getInstance().getTime();
         return DataUtils.getParsedDateList(startDate);
+//        List<Date> dates = new ArrayList<>();
+//        for (int i = 4; i > 0; i--) {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.add(Calendar.DATE, -1);
+//            dates.add(calendar.getTime());
+//        }
+//
+//        dates.add(Calendar.getInstance().getTime());
+//        return dates;
     }
 
     @Override
@@ -153,34 +192,47 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         nOEpg.setText("Loading...");
         nOEpg.setVisibility(View.VISIBLE);
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
-        LiveData<DvrStartDateTimeEntity> getDvrstartData=viewModel.getStartTime(login.getToken(),utc.getUtc(),String.valueOf(login.getId()),
-                LinkConfig.getHashCode(String.valueOf(login.getId())
-                        ,String.valueOf(utc.getUtc()),login.getSession()),1,
-                String.valueOf(channel.getId()));
-                getDvrstartData.observe(this, new Observer<DvrStartDateTimeEntity>() {
-            @Override
-            public void onChanged(@Nullable DvrStartDateTimeEntity dvrStartDateTimeEntity) {
-                if (dvrStartDateTimeEntity != null) {
-                    if (dvrStartDateTimeEntity.getStartDate() != null && dvrStartDateTimeEntity.getStartTime() != null) {
-                        dateListAdapter = new DateListAdapter(getContext(), getDateList(dvrStartDateTimeEntity.getStartDate()), DvrFragment.this::onClick);
-                        gvDate.setAdapter(dateListAdapter);
-                        gvDate.setVisibility(View.VISIBLE);
-                        setUpEpgs(channel, login, utc);
+        dateListAdapter = new DateListAdapter(getContext(), getDateList(""), DvrFragment.this::onClick);
+        gvDate.setAdapter(dateListAdapter);
+        gvDate.setVisibility(View.VISIBLE);
+        setUpEpgs(channel, login, utc);
 
-                    } else {
-                        //TODO Show Error
-
-                        gvEpgDvr.setVisibility(View.GONE);
-                        gvDate.setVisibility(View.GONE);
-                        nOEpg.setText("Dvr not available for this channel");
-                        nOEpg.setVisibility(View.VISIBLE);
-
-                    }
-
-                }
-
-            }
-        });
+//        } else {
+//            //TODO Show Error
+//            gvEpgDvr.setVisibility(View.GONE);
+//            gvDate.setVisibility(View.GONE);
+//            nOEpg.setText("Dvr not available for this channel");
+//            nOEpg.setVisibility(View.VISIBLE);
+//
+//        }
+//        LiveData<DvrStartDateTimeEntity> getDvrstartData=viewModel.getStartTime(login.getToken(),utc.getUtc(),String.valueOf(login.getId()),
+//                LinkConfig.getHashCode(String.valueOf(login.getId())
+//                        ,String.valueOf(utc.getUtc()),login.getSession()),1,
+//                String.valueOf(channel.getId()));
+//                getDvrstartData.observe(this, new Observer<DvrStartDateTimeEntity>() {
+//            @Override
+//            public void onChanged(@Nullable DvrStartDateTimeEntity dvrStartDateTimeEntity) {
+//                if (dvrStartDateTimeEntity != null) {
+//                    if (dvrStartDateTimeEntity.getStartDate() != null && dvrStartDateTimeEntity.getStartTime() != null) {
+//                        dateListAdapter = new DateListAdapter(getContext(), getDateList(dvrStartDateTimeEntity.getStartDate()), DvrFragment.this::onClick);
+//                        gvDate.setAdapter(dateListAdapter);
+//                        gvDate.setVisibility(View.VISIBLE);
+//                        setUpEpgs(channel, login, utc);
+//
+//                    } else {
+//                        //TODO Show Error
+//
+//                        gvEpgDvr.setVisibility(View.GONE);
+//                        gvDate.setVisibility(View.GONE);
+//                        nOEpg.setText("Dvr not available for this channel");
+//                        nOEpg.setVisibility(View.VISIBLE);
+//
+//                    }
+//
+//                }
+//
+//            }
+//        });
     }
 
     private void setUpEpgs(ChannelItem channel, Login login, TimeStampEntity utc) {
@@ -197,28 +249,26 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                     if(currentEpgSelectedPosition != -1 ){
                         dvrListAdapter.setSelectedFocusedPosition(currentEpgSelectedPosition);
                     }
-
-
-
                 }else{
                     dateListAdapter.setPositionClicked(dateListAdapter.getItemCount()-1);
-                    setUpAdapter(epgs);
+                    setUpAdapter(epgs,dateListAdapter.getDateList().get(dateListAdapter.getItemCount()-1));
                 }
             }
         });
     }
 
-    private void setUpAdapter(List<Epgs> epgs) {
+    private void setUpAdapter(List<Epgs> epgs,Date currentEpgDate) {
         if (epgs != null) {
-            List<Epgs> newList = getFilteredEpgs(epgs);
+            List<Epgs> newList = getFilteredEpgs(epgs ,currentEpgDate);
             if(newList.size()>0) {
                 dvrListAdapter.setmList(newList);
                 gvEpgDvr.setVisibility(View.VISIBLE);
+                if(currentPlayedEpg != null && currentChannel.getId() == currentPlayedEpg.getChannelID()){
 
-                    if(currentPlayedEpg != null){
 
                 }else {
-                    gvEpgDvr.scrollToPosition(newList.size()-1);
+                      dvrListAdapter.setSelectedFocusedPosition(dvrListAdapter.getItemCount()-1);
+                      gvEpgDvr.scrollToPosition(dvrListAdapter.getItemCount()-1);
                 }
                 nOEpg.setVisibility(View.GONE);
             }else{
@@ -234,10 +284,10 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         nOEpg.setVisibility(View.VISIBLE);
     }
 
-    private List<Epgs> getFilteredEpgs(List<Epgs> epgs) {
+    private List<Epgs> getFilteredEpgs(List<Epgs> epgs,Date currentEpgDate) {
         List<Epgs> newList = new ArrayList<>();
         for (Epgs epg : epgs) {
-            if (checkDate(epg.getDate())) {
+            if (checkDate(epg.getDate(),currentEpgDate)) {
                 Calendar currentTime = Calendar.getInstance();
                 Date currentDate = currentTime.getTime();
                 if (epg.getStartTime().before(currentDate)) {
@@ -249,7 +299,6 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
         if(newList.size()<=0){
             Epgs epgs1 = new Epgs();
-
             epgs1.setProgramTitle("MISC");
             epgs1.setChannelID(currentChannel.getId());
             Calendar calendar = Calendar.getInstance();
@@ -269,7 +318,7 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         return newList ;
     }
 
-    private boolean checkDate(Date date) {
+    private boolean checkDate(Date date ,Date currentEpgDate) {
         String epgDate = androidtv.livetv.stb.utils.DateUtils.dateAndTime.format(date);
         String current = androidtv.livetv.stb.utils.DateUtils.dateAndTime.format(currentEpgDate);
         return epgDate.equals(current);
@@ -278,22 +327,18 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     @Override
     public void onClick(int postion, Date date) {
         currentEpgDate = date;
-        setUpAdapter(cuurentEpgList);
-//        gvDate.getChildAt(postion).requestFocus();
+        setUpAdapter(cuurentEpgList,date);
         gvDate.smoothScrollToPosition(postion);
     }
-
-
 
     @Override
     public void clickDvr(Epgs epg, int position) {
         Log.d("dvr","clicked :"+epg.getProgramTitle());
-        mListener.playDvr(epg,currentChannel);
         selectedDatePosition = dateListAdapter.getPositionClicked();
         currentPlayedEpg = epg;
         currentEpgSelectedPosition = position;
         dvrListAdapter.setEpg(currentPlayedEpg);
-
+        mListener.playDvr(epg,currentChannel,position,selectedDatePosition);
     }
 
     @Override
@@ -319,8 +364,6 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     public void setCurrentChannel(ChannelItem currentChannel) {
         this.currentChannel = currentChannel;
-
-
     }
 
     public void setAllChannelList(List<ChannelItem> allChannelItems) {
@@ -329,16 +372,16 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     public interface FragmentDvrInteraction {
         void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir);
-        void playDvr(Epgs epgs,ChannelItem item);
+        void playDvr(Epgs epgs,ChannelItem item,int selectedDvr,int dateSelected);
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         if(!hidden){
             if(getView() != null )
-            getView().requestFocus();
+                getView().requestFocus();
             if(dvrListAdapter != null)
-            dvrListAdapter.notifyDataSetChanged();
+                dvrListAdapter.setSelectedFocusedPosition(currentEpgSelectedPosition);
         }
         super.onHiddenChanged(hidden);
     }

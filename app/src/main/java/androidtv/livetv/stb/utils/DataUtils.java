@@ -73,16 +73,7 @@ public class DataUtils {
 
     public static List<Date> getParsedDateList(String startDate) {
         List<Date> dates = new ArrayList<>();
-        Date start = null;
-        try {
-            start = DateUtils.convertStringToDateNew(startDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar startC = Calendar.getInstance();
-        startC.setTime(start);
-        int diffDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR) - startC.get(Calendar.DAY_OF_YEAR);
-        for (int i = diffDay; i > 0; i--) {
+        for (int i = 4; i > 0; i--) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_WEEK, -i);
             dates.add(calendar.getTime());

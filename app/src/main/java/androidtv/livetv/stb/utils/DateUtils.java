@@ -18,7 +18,7 @@ public class DateUtils {
     public static SimpleDateFormat _12HrsTimeFormat = new SimpleDateFormat("hh:mm");
     public static SimpleDateFormat _24HrsTimeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss Z");
-    public static SimpleDateFormat smalldateFormat = new SimpleDateFormat("E, MMM d");
+    public static SimpleDateFormat smalldateFormat = new SimpleDateFormat("E, MMM dd");
     public static SimpleDateFormat fullDayFormat =  new SimpleDateFormat("EEE", Locale.US);
 
     public static Date convertTimeTo24hrs(String time) throws ParseException {

@@ -25,6 +25,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
     private Context mContext;
     private EpgListAdapterListener listener;
 
+
     public EpgListAdapter(Context context,EpgListAdapterListener lis){
 
         this.mContext = context;
