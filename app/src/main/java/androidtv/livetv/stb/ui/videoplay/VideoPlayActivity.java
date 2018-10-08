@@ -223,6 +223,37 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
                 break;
 
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                try {
+                    if (mVideoController != null && !mVideoController.isShowing() && menuFrag.isHidden() && player.getCurrentPosition() > 0) {
+                        player.seekTo(player.getCurrentPosition() + 15000);
+                        return true;
+                    } else
+                        return false;
+                } catch (Exception ignored) {
+                    break;
+                }
+
+
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                try {
+                    if (mVideoController != null && !mVideoController.isShowing()&& menuFrag.isHidden() && player.getCurrentPosition() > 0) {
+                        player.seekTo(player.getCurrentPosition() - 15000);
+                        return true;
+                    } else
+                        return false;
+                } catch (Exception ignored) {
+                    break;
+                }
+
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
+                player.seekTo(player.getCurrentPosition() - 5 * 60 * 1000);
+                return true;
+
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                player.seekTo(player.getCurrentPosition() + 5 * 60 * 1000);
+                return true;
+
 
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 if (mVideoController == null) {
@@ -1060,7 +1091,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
                         long seconds = diff / 1000;
                         String buildUrl = part1+"-"+String.valueOf(milis)+"-"+String.valueOf(seconds)+".m3u8"+part2;
-                        Log.d("buildurl",buildUrl);
+                        Log.d("buiFldurl",buildUrl);
                         setUpVideoController(item, buildUrl,"");
                     } else if (channelLinkResponse.getException() != null) {
                         Toast.makeText(VideoPlayActivity.this, "Dvr cannot be played", Toast.LENGTH_SHORT).show();
