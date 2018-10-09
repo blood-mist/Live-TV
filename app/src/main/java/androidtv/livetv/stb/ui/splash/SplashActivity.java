@@ -449,11 +449,13 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void downloadApk(String apkDownloadLink, String appName, String message, int statusId) {
-        Intent intent = new Intent(this, DownloadService.class);
-        intent.putExtra(DOWNLOAD_LINK, apkDownloadLink);
-        intent.putExtra(DOWNLOAD_NAME, appName);
-        intent.putExtra(DOWNLOAD_ID, statusId);
-        startService(intent);
+        if(statusId==FORCE_ID) {
+            Intent intent = new Intent(this, DownloadService.class);
+            intent.putExtra(DOWNLOAD_LINK, apkDownloadLink);
+            intent.putExtra(DOWNLOAD_NAME, appName);
+            intent.putExtra(DOWNLOAD_ID, statusId);
+            startService(intent);
+        }
         getSupportFragmentManager().beginTransaction().replace(R.id.splash_container, DownloadFragment.newInstance(getString(R.string.update), message, statusId, apkDownloadLink), DOWNLOAD_FRAGMENT).commit();
 
 

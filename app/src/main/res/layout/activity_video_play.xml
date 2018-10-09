@@ -20,11 +20,6 @@
             android:orientation="vertical"
             android:visibility="gone"/>
 
-
-
-
-
-
         <TextView
             android:id="@+id/tvboxID"
             android:layout_width="wrap_content"
@@ -40,13 +35,13 @@
         <FrameLayout
             android:id="@+id/videoSurfaceContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center">
 
-            <SurfaceView
-                android:id="@+id/videoSurface"
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/video_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"/>
         </FrameLayout>
 
 
@@ -56,13 +51,11 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="40dp"
-            android:layout_marginRight="80dp"
             android:layout_marginTop="70dp"
             android:alpha="0.8"
             android:src="@drawable/status_recorded"
             android:visibility="invisible"
             android:layout_marginEnd="80dp" />
-
     </FrameLayout>
     <ImageView
         android:id="@+id/menu_bg"

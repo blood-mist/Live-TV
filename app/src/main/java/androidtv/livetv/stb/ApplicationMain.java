@@ -7,6 +7,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.util.Util;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,11 +22,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-
 import timber.log.Timber;
 
 
 public class ApplicationMain extends Application {
+
+
+    protected String userAgent;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,7 +38,7 @@ public class ApplicationMain extends Application {
         } else {
             Timber.plant(new CrashReportingTree());
         }
-
+        userAgent = Util.getUserAgent(this, getString(R.string.app_name));
         Thread.setDefaultUncaughtExceptionHandler(this::handleUncaughtException);
     }
 
@@ -64,6 +74,16 @@ public class ApplicationMain extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+    }
+
+    public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener) {
+        return new DefaultDataSourceFactory(this, listener, buildHttpDataSourceFactory(listener));
+    }
+
+    /** Returns a {@link HttpDataSource.Factory}. */
+    public HttpDataSource.Factory buildHttpDataSourceFactory(
+            TransferListener<? super DataSource> listener) {
+        return new DefaultHttpDataSourceFactory(userAgent, listener);
     }
 
 }

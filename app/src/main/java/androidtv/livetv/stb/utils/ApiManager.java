@@ -30,7 +30,7 @@ public class ApiManager {
                     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
                     // set your desired log level
                     logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-                    OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).addInterceptor(logging).build();
+                    OkHttpClient httpClient = new OkHttpClient.Builder().addInterceptor(logging).build();
 
                      retrofit = new Retrofit.Builder()
                             .baseUrl(dynamicEndPoint.getUrl())
