@@ -6,20 +6,16 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -30,20 +26,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
@@ -55,10 +46,10 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -69,7 +60,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -90,8 +80,6 @@ import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
-import androidtv.livetv.stb.ui.videoplay.videocontroller.MyVideoController;
-import androidtv.livetv.stb.ui.videoplay.videocontroller.VideoControllerView;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
@@ -100,7 +88,6 @@ import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import butterknife.OnClick;
 import timber.log.Timber;
 
@@ -108,7 +95,7 @@ import static android.view.View.GONE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 import static java.lang.Thread.sleep;
 
-public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction, EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis {
+public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction, EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction {
 
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private static final CookieManager DEFAULT_COOKIE_MANAGER;
@@ -150,7 +137,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private Fragment currentFragment;
     private SimpleExoPlayer player;
     private ChannelChangeObserver channelChangeObservable;
-    private VideoControllerView mVideoController;
     private Handler hideMenuHandler;
     private SharedPreferences lastPlayedPrefs;
     private SharedPreferences.Editor editor;
@@ -252,7 +238,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 } else {
                     try {
                         if (currentFragment instanceof DvrFragment) {
-                            if (mVideoController == null) {
+                            if (!videoSurfaceView.getUseController()) {
                                 removeOptionalFragments();
                             } else {
                                 if (currentFragment.isHidden())
@@ -261,7 +247,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             }
                         } else if (currentFragment instanceof FragmentMenu) {
 
-                            if (mVideoController != null && currentFragment.isHidden()) {
+                            if (videoSurfaceView.getUseController() && currentFragment.isHidden()) {
                                 dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
                                 dvrFragment.setGetSelectedDatePosition(selectedDvrDate);
                                 dvrFragment.setSelectedDvrPosition(selectedDvrPosition);
@@ -282,7 +268,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
 
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                if (mVideoController == null) {
+                if (!videoSurfaceView.getUseController()) {
                     hideMenuUI();
                     changeChannel(false);
                     return true;
@@ -291,7 +277,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
 
             case KeyEvent.KEYCODE_MEDIA_NEXT:
-                if (mVideoController == null) {
+                if (!videoSurfaceView.getUseController() ) {
                     hideMenuUI();
                     changeChannel(true);
                     return true;
@@ -307,7 +293,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if (mVideoController == null)
+                    if (!videoSurfaceView.getUseController())
                         changeChannel(false);
                     return true;
                 } else {
@@ -316,8 +302,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
             case 63:
-                if (mVideoController != null) {
-                    mVideoController.show();
+                if (isDvrPlaying ) {
+                    videoSurfaceView.showController();
                     return true;
                 } else if ((menuFrag == null || menuFrag.isHidden()) && txtChangeChannelFromPriority.getVisibility() == View.GONE) {
                     showMenu();
@@ -336,7 +322,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if (mVideoController == null)
+                    if (!videoSurfaceView.getUseController())
                         changeChannel(true);
                     return true;
                 } else {
@@ -731,7 +717,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannel(ChannelItem item) {
         saveCurrentInPrefs(item);
-        mVideoController = null;
         selectedDvrDate = 0;
         selectedDvrPosition = 0;
         currentPlayedEpg = null;
@@ -891,6 +876,25 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         player.addListener(new PlayerEventListener());
         player.setPlayWhenReady(startAutoPlay);
         videoSurfaceView.setPlayer(player);
+        videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+        player.setVideoSurfaceView((SurfaceView) videoSurfaceView.getVideoSurfaceView());
+
+        if(isDvr) {
+            videoSurfaceView.setUseController(true);
+            recordedStatus.setVisibility(View.VISIBLE);
+            videoSurfaceView.showController();
+            isDvrPlaying = true;
+            menuFragment.setDvr(true);
+        }else {
+            videoSurfaceView.setUseController(false);
+            isDvrPlaying = false;
+            recordedStatus.setVisibility(View.GONE);
+            menuFragment.setDvr(false);
+            videoSurfaceView.hideController();
+            menuFragment.setDvrPlayedChannel(null);
+        }
+        String splitUrl="http://mnmott.nettvnepal.com.np:81/test/shadowskill01.mp4/playlist.m3u8";
         MediaSource mediaSource = buildMediaSource(Uri.parse(channelLink));
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1089,24 +1093,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         currentDvrChannelItem = item;
         nextVideoNameDvr = nextVideoName;
         VideoPlayActivity.this.playVideo(link, true);
-
-
     }
 
 
-    @Override
-    public void onDvrStart() {
-        playPauseStatus.setVisibility(View.GONE);
-        player.setPlayWhenReady(true);
-    }
-
-    @Override
-    public void onDvrPause() {
-        playPauseStatus.setVisibility(View.VISIBLE);
-        playPauseStatus.bringToFront();
-        player.stop();
-
-    }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1125,9 +1114,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             if (playbackState == Player.STATE_ENDED) {
 //                showControls();
-            }
-
-            if(playbackState==Player.STATE_READY){
+            }else if(playWhenReady && playbackState==Player.STATE_READY){
                 hideProgressBar();
                hideMenuBg();
                 if (threadToDisplayBoxId.getState() == Thread.State.NEW)
@@ -1136,6 +1123,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
 
                 startCloseMenuHandler();
+                if(isDvrPlaying){
+                    playPauseStatus.setVisibility(View.GONE);
+                    player.setPlayWhenReady(true);
+                }
+            }
+            else {
+                if(isDvrPlaying){
+                    playPauseStatus.setVisibility(View.VISIBLE);
+                    playPauseStatus.bringToFront();
+                    player.stop();
+                }
+
             }
         }
 
