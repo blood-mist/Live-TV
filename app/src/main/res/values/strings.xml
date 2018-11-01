@@ -125,7 +125,7 @@
     <string name="war_no_channels_in_db">Please choose any channel to Play! Press Home to exit</string>
 
     <string name="err_code_media_error">MEDIA_ERROR</string>
-    <string name="err_media_error">Couldnt play the requested channel. Your network issue or it was down from the source itself, Please try again later </string>
+    <string name="err_media_error">Couldnt play the requested channel. Either network issue or it was down from the source itself, Please try again later </string>
 
     <string name="update_message">An update of this version of App available. Please press OK button in your remote to update your app now.</string>
     <string name="extra_link_url">livetv/internet</string>
