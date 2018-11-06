@@ -152,7 +152,7 @@
                             android:id="@+id/gv_date"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
+                            android:layout_weight="3.5"
                             android:focusable="true"
                             android:nextFocusUp="@id/channel_list"
 

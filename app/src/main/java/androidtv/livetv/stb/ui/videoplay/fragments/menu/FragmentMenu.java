@@ -786,6 +786,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (observable instanceof ChannelChangeObserver) {
             DisposableManager.disposeLive();
             if (((ChannelChangeObserver) observable).getChannelNext()) {
+                 currentChannelPosition = adapter.getSelectedChannelPositionViaId(currentPlayed.getId());
                 //put condition here so no IoB Exception occurs
                 if (currentChannelPosition < currentPlayedCategoryItems.size() - 1)
                     currentChannelPosition++;
@@ -793,6 +794,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentChannelPosition = 0;
 
             } else if (!((ChannelChangeObserver) observable).getChannelNext()) {
+                currentChannelPosition = adapter.getSelectedChannelPositionViaId(currentPlayed.getId());
                 if (currentChannelPosition > 0)
                     currentChannelPosition--;
                 else

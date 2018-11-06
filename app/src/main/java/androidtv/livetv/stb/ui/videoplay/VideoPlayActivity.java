@@ -31,9 +31,12 @@ import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ControlDispatcher;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
@@ -57,6 +60,7 @@ import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.util.Util;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -927,21 +931,41 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("media", channelLink);
         startAutoPlay = true;
         inErrorState=false;
+
+        if(!isDvr){
+            menuFragment.hideErrorFrag();
+            releasePlayer();
+        }
         boolean needNewPlayer = player == null;
         if (needNewPlayer) {
             TrackSelection.Factory adaptiveTrackSelectionFactory =
                     new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             trackSelector.setParameters(trackSelectorParameters);
+            DefaultAllocator allocator = new DefaultAllocator(true, 64*1024);
+		/*
+			Valores definidos para melhor configuração de buffer
+			DEFAULT_MIN_BUFFER_MS = 360000
+			DEFAULT_MAX_BUFFER_MS = 600000
+			Valores default do ExoPlayer2
+			DEFAULT_BUFFER_FOR_PLAYBACK_MS = 2500
+			DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5000
+		*/
+            DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
+            DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000,60000,1000,1000);
+            defaultLoadControl = loadControl.createDefaultLoadControl();
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
             player = ExoPlayerFactory.newSimpleInstance(
-                    this,
-                    trackSelector);
+                    renderersFactory,
+                    trackSelector, defaultLoadControl);
+
+
         }
         if(playerEventListener!=null)
             player.removeListener(playerEventListener);
         playerEventListener=new PlayerEventListener();
         player.addListener(playerEventListener);
-        player.setPlayWhenReady(startAutoPlay);
+        player.setPlayWhenReady(true);
         videoSurfaceView.setPlayer(player);
         videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
@@ -962,7 +986,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             menuFragment.setDvrPlayedChannel(null);
         }
         String splitUrl = "http://mnmott.nettvnepal.com.np:81/test/shadowskill01.mp4/playlist.m3u8";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(channelLink));
+        MediaSource mediaSource = buildMediaSource(Uri.parse(channelLink),isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
         if (haveResumePosition) {
@@ -976,7 +1000,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private MediaSource buildMediaSource(
-            Uri uri) {
+            Uri uri,boolean isDvr) {
         @C.ContentType int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_DASH:
@@ -990,8 +1014,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         buildDataSourceFactory(false))
                         .createMediaSource(uri);
             case C.TYPE_HLS:
-                return new HlsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(uri);
+                if(isDvr) {
+                    return new HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(uri);
+                }else{
+                    return new HlsMediaSource.Factory(dataSourceFactory)
+                            .setAllowChunklessPreparation(true)
+                            .createMediaSource(uri);
+                }
             case C.TYPE_OTHER:
                 return new ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(uri);
@@ -1295,7 +1325,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
                 else {
                     player.setPlayWhenReady(false);
-                    player.removeListener(this);
+                    player.removeListener(playerEventListener);
                     VideoPlayActivity.this.setErrorFragment(null, e.type, e.rendererIndex);
                 }
 
