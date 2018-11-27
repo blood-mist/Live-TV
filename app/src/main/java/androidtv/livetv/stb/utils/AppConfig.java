@@ -14,8 +14,9 @@ public class AppConfig {
         return isFromDevelopment;
     }
      public static String getMac(){
-    return "aabbccddeeff";
+    //return "aabbccddeeff";
    // return "ccd3e222652e";
 //         return "78c2c09cf233";
+         return "78C2C096EF97";
      }
 }

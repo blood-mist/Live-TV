@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,6 +30,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ControlDispatcher;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -101,6 +104,7 @@ import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
@@ -197,6 +201,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
+        Fabric.with(this, new Answers());
         dataSourceFactory = buildDataSourceFactory(true);
         trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
@@ -263,7 +268,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         currentFragment = fragment;
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
     }
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -814,6 +818,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         if (channelLinkResponse != null) {
                             if (channelLinkResponse.getChannelLinkResponse() != null) {
                                 playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
+                                // TODO: Use your own attributes to track content views in your app
+                                Answers.getInstance().logContentView(new ContentViewEvent()
+                                        .putContentName("Channel Played")
+                                        .putContentType(item.getName())
+                                        .putContentId("proirity"+item.getChannelPriority())
+                                        .putCustomAttribute("user", macAddress));
+
                             } else if (channelLinkResponse.getException() != null) {
                                 setErrorFragment(channelLinkResponse.getException(), 0, 0);
                             }

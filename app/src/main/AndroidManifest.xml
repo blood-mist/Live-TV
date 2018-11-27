@@ -44,9 +44,13 @@
         <activity
             android:name=".ui.videoplay.VideoPlayActivity"
             android:windowSoftInputMode="stateHidden"
+
             android:theme="@style/AppTheme"
                        />
         <activity android:name=".ui.channelLoad.ChannelLoadActivity" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="d7a40a1111d93649292eb8c18e272e83ddddb960" />
     </application>
 
 </manifest>
