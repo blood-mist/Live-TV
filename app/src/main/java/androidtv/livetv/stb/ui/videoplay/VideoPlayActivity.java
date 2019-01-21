@@ -72,8 +72,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import androidtv.livetv.stb.ApplicationMain;
 import androidtv.livetv.stb.R;
@@ -197,6 +201,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
+        try {
+            InetAddress group = InetAddress.getByName("224.0.0.1");
+            MulticastSocket s = new MulticastSocket();
+            s.joinGroup(group);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         dataSourceFactory = buildDataSourceFactory(true);
         trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
@@ -1147,12 +1158,19 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         String url = channelLinkResponse.getChannelLinkResponse().getChannel().getLink();
                         String[] parts = url.split(".m3u8");
                         String part1 = parts[0];
-                        String part2 = parts[1];
-                        long milis = epgs.getStartTime().getTime();
-                        milis = milis / 1000;
-                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
+                        String part2="";
+                        try {
+                            part2 = parts[1];
+                        }catch (Exception ignored){}
+//                        long milis = epgs.getStartTime().getTime();
+                        long millis= Calendar.getInstance().getTimeInMillis()- TimeUnit.MINUTES.toMillis(10);
+                        long diff= Calendar.getInstance().getTimeInMillis()-millis;
+                        millis=millis/1000;
+
+//                        milis = milis / 1000;
+//                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
                         long seconds = diff / 1000;
-                        String buildUrl = part1 + "-" + String.valueOf(milis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
+                        String buildUrl = part1 +"_dvr_" + String.valueOf(millis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
                         Log.d("buildurl", buildUrl);
                         setUpVideoController(item, buildUrl, "");
                     } else if (channelLinkResponse.getException() != null) {

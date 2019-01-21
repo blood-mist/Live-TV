@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
@@ -22,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import androidtv.livetv.stb.utils.DefaultDataSourceFactory;
 import timber.log.Timber;
 
 

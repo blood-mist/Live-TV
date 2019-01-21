@@ -91,7 +91,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         EventBus.getDefault().register(this);
         txtUsername.setText(username);
-        login.setOnClickListener(view -> initLogin());
+        txtPasssword.setText("123456");
+        initLogin();
+//        login.setOnClickListener(view -> initLogin());
 
     }
 

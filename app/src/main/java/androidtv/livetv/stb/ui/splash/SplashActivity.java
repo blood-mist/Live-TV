@@ -493,11 +493,12 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                     if (userCheckWrapper != null) {
                         if (userCheckWrapper.getUserCheckInfo() != null) {
                             if ((userCheckWrapper.getUserCheckInfo().getData().getActivationStatus() == 1 && userCheckWrapper.getUserCheckInfo().getData().getIsActive() == 1)) {
-                                if (LoginFileUtils.checkIfFileExists(LinkConfig.LOGIN_FILE_NAME)) {
+                                proceedToLoginViaFile();
+                                /*if (LoginFileUtils.checkIfFileExists(LinkConfig.LOGIN_FILE_NAME)) {
                                     proceedToLoginViaFile();
                                 } else {
                                     showLogin(userCheckWrapper.getUserCheckInfo().getData().getUserName());
-                                }
+                                }*/
                             }
                         } else {
                             if (userCheckWrapper.getUserErrorInfo().getStatus() == 401 || userCheckWrapper.getUserErrorInfo().getStatus() == 402)
@@ -514,7 +515,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void proceedToLoginViaFile() {
-        if (LoginFileUtils.readFromFile(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this))) {
+        /*if (LoginFileUtils.readFromFile(AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this))) {
             try {
                 String encrypted_password = LoginFileUtils.getUserPassword();
 
@@ -561,7 +562,34 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         } else {
             LoginFileUtils.deleteLoginFile();
             checkForValidMacAddress();
-        }
+        }*/
+        LiveData<LoginResponseWrapper> loginfildeData = splashViewModel.loginFromFile("demoiptv12@nitv.com", "123456", macAddress);
+        loginfildeData.observe(this, new Observer<LoginResponseWrapper>() {
+            @Override
+            public void onChanged(@Nullable LoginResponseWrapper loginResponseWrapper) {
+                if (loginResponseWrapper != null) {
+                    if (loginResponseWrapper.getLoginInfo() != null) {
+                        GlobalVariables.login = loginResponseWrapper.getLoginInfo().getLogin();
+                        long utc = GetUtc.getInstance().getTimestamp().getUtc();
+                        fetchChannelDetails(loginResponseWrapper.getLoginInfo().getLogin().getToken(), utc,
+                                loginResponseWrapper.getLoginInfo().getLogin().getId(), LinkConfig.getHashCode(String.valueOf(loginResponseWrapper.getLoginInfo().getLogin().getId()),
+                                        String.valueOf(utc), loginResponseWrapper.getLoginInfo().getLogin().getSession()));
+                    } else if (loginResponseWrapper.getLoginInvalidResponse() != null) {
+                        if (loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode().equals("404")) {
+                            SplashActivity.this.loadUnauthorized("404", SplashActivity.this.getString(R.string.mac_not_registered), "N/A");
+                        } else {
+                            SplashActivity.this.showErrorDialog(Integer.parseInt(loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getErrorCode()), loginResponseWrapper.getLoginInvalidResponse().getLoginInvalidData().getMessage());
+                        }
+
+                    } else {
+                        SplashActivity.this.showLoginErrorDialog(loginResponseWrapper.getLoginErrorResponse().getError(), "demoiptv12@nitv.com");
+                        LoginFileUtils.deleteLoginFile();
+                    }
+                    loginfildeData.removeObserver(this);
+
+                }
+            }
+        });
     }
 
     private void showLoginErrorDialog(LoginError error, String userEmail) {
