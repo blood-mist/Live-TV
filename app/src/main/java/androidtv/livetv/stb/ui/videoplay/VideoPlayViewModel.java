@@ -57,4 +57,13 @@ public class VideoPlayViewModel extends AndroidViewModel {
     }
 
 
+    public LiveData<List<ChannelItem>> getChannelsOfCategory(String categoryName) {
+        return videoPlayRepository.getChannelsOfCategory(categoryName);
+    }
+    public LiveData<ChannelItem> getLastPlayedChannel(int channel_id) {
+        return videoPlayRepository.getLastPlayedChannel(channel_id);
+    }
+    public LiveData<ChannelItem> getFirstChannel() {
+        return videoPlayRepository.getFirstChannelFromDB();
+    }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,19 +56,21 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
     @Override
     public void onViewAttachedToWindow(@NonNull MyChannelListViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-
     }
 
     @NonNull
     @Override
     public MyChannelListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.channelist_row_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.channelist_row_item, parent, false);
+        if(view==null){
+            Log.d("View Null","true");
+        }
         return new MyChannelListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyChannelListViewHolder holder, int position) {
-        ChannelItem item = mList.get(position);
+        ChannelItem item = mList.get(holder.getAdapterPosition());
         GlideApp.with(mContext).load(LinkConfig.BASE_URL + LinkConfig.CHANNEL_LOGO_URL + item.getChannelLogo())
                 .placeholder(R.drawable.placeholder_logo)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -78,7 +81,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
         else
             holder.fav.setVisibility(GONE);
 
-        holder.itemView.setTag(position);
+        holder.itemView.setTag(holder.getAdapterPosition());
 
 
     /*    if (position == getPositionSelected()) {
@@ -104,7 +107,7 @@ public class ChannelListAdapter extends RecyclerView.Adapter<ChannelListAdapter.
 
     @Override
     public int getItemViewType(int position) {
-        return position;
+        return super.getItemViewType(position);
     }
 
     @Override

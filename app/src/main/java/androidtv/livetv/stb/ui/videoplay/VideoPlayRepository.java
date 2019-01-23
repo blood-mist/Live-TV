@@ -3,8 +3,10 @@ package androidtv.livetv.stb.ui.videoplay;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
@@ -27,7 +29,10 @@ import androidtv.livetv.stb.utils.ApiInterface;
 import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -39,6 +44,7 @@ public class VideoPlayRepository {
     private MediatorLiveData<List<ChannelItem>> channelList;
     private CatChannelDao catChannelDao;
     private Context context;
+    private MediatorLiveData<ChannelItem> lastChannelData;
 
 
     public VideoPlayRepository(Application application) {
@@ -65,6 +71,22 @@ public class VideoPlayRepository {
             }
         }
         return mInstance;
+    }
+
+    public LiveData<ChannelItem> getFirstChannelFromDB() {
+        return catChannelDao.getFirstChannel();
+    }
+
+    public LiveData<ChannelItem> getLastPlayedChannel(int channel_id) {
+        lastChannelData = new MediatorLiveData<>();
+        lastChannelData.addSource(catChannelDao.getLastPlayedChannel(channel_id), channelItem -> {
+            if (channelItem != null) {
+                lastChannelData.removeSource(catChannelDao.getLastPlayedChannel(channel_id));
+                lastChannelData.postValue(channelItem);
+            }
+        });
+        return lastChannelData;
+
     }
 
     public LiveData<List<ChannelItem>> getAllChannels() {
@@ -198,18 +220,89 @@ public class VideoPlayRepository {
         return responseMediatorLiveData;
     }
 
-  public void deleteLoginLable(){
+    public void deleteLoginLable() {
         new DeleteLoginTableAsynTask(catChannelDao).execute();
-  }
+    }
+
+    public LiveData<List<ChannelItem>> getChannelsOfCategory(String categoryName) {
+        MediatorLiveData<List<ChannelItem>> channelsInCatListData = new MediatorLiveData<>();
+        channelsInCatListData.setValue(null);
+
+        if (categoryName.equals(context.getString(R.string.all_channels)))
+            return getAllChannels();
+        else {
+            Flowable<Integer> categoryId = catChannelDao.getCategoryIdFromName(categoryName);
+            categoryId.toObservable().subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                    .subscribe(new io.reactivex.Observer<Integer>() {
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                        }
+
+                        @Override
+                        public void onNext(Integer categoryId) {
+                            channelsInCatListData.addSource(getChannelsWithCategoryId(categoryId), channelItemList -> {
+                                if (channelItemList != null) {
+                                    channelsInCatListData.removeSource(getChannelsWithCategoryId(categoryId));
+                                    channelsInCatListData.postValue(channelItemList);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+        }
+        return channelsInCatListData;
+
+
+    }
+
+    private LiveData<List<ChannelItem>> getChannelsWithCategoryId(Integer categoryId) {
+        MediatorLiveData<List<ChannelItem>> channelsInCatList = new MediatorLiveData<>();
+        channelsInCatList.postValue(null);
+        Flowable<List<ChannelItem>> channelsInCat = catChannelDao.getChannelsOfCategory(categoryId);
+        channelsInCat.toObservable().subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
+                .subscribe(new io.reactivex.Observer<List<ChannelItem>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<ChannelItem> listLiveData) {
+                            if (listLiveData != null)
+                                channelsInCatList.postValue(listLiveData);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+        return channelsInCatList;
+    }
 
     private static class DeleteLoginTableAsynTask extends AsyncTask<Void, Void, Integer> {
 
         private CatChannelDao catChannelDao;
 
-        public DeleteLoginTableAsynTask(CatChannelDao catChannelDao){
+        public DeleteLoginTableAsynTask(CatChannelDao catChannelDao) {
             this.catChannelDao = catChannelDao;
         }
-
 
 
         @Override

@@ -18,6 +18,7 @@ import androidtv.livetv.stb.entity.CategoryItem;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.LoginDataDelete;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 
@@ -63,6 +64,13 @@ public interface CatChannelDao {
 
     @Query("DELETE FROM LOGIN_TABLE")
     int  nukeLoginTable();
+
+    @Query("SELECT category_id FROM CATEGORY_TABLE WHERE category_name=:categoryName")
+    Flowable<Integer> getCategoryIdFromName(String categoryName);
+
+    @Query("SELECT * FROM CHANNEL_TABLE WHERE category_id=:categoryId ORDER BY channel_priority ASC")
+    Flowable<List<ChannelItem>>getChannelsOfCategory(int categoryId);
+
 
     @Query("SELECT * FROM EPG_TABLE")
     LiveData<List<Epgs>> getAllEpgs();
