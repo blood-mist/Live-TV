@@ -99,7 +99,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     SharedPreferences.Editor categoryEditor;
 
     private List<ChannelItem> allChannelItems, allFavItems;
-    private boolean isFirstRun = true;
+    private boolean isFirstRun = false;
     private int ALL_CAT_CHANNELS = 10;
 
     public FragmentMenu() {
@@ -170,7 +170,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         menuViewModel = ViewModelProviders.of(this).get(MenuViewModel.class);
-        playLastPlayedChannel();
+//        playLastPlayedChannel();
         errorFragment = null;
     }
 
@@ -187,7 +187,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         View v = inflater.inflate(R.layout.fragment_fragment_menu, container, false);
         ButterKnife.bind(this, v);
         this.login = GlobalVariables.login;
-        categoryEditor = lastPlayedPrefs.edit();
+
         return v;
     }
 
@@ -224,16 +224,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 btnFav.setScaleY(1.0f);
                 txtFavUnfav.setScaleX(1.0f);
                 txtFavUnfav.setScaleY(1.0f);
-                        try {
-                            int index=categoryLayoutManager.findFirstVisibleItemPosition();
-                            View v=categoryLayoutManager.getChildAt(0);
-                            int top=(v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
-                            categoryLayoutManager.scrollToPositionWithOffset(index, top);
-                            layoutFav.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
+                try {
+                    int index = categoryLayoutManager.findFirstVisibleItemPosition();
+                    View v = categoryLayoutManager.getChildAt(0);
+                    int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
+                    categoryLayoutManager.scrollToPositionWithOffset(index, top);
+                    layoutFav.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
           /*  try {
@@ -261,9 +261,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 txtDvr.setScaleY(1.0f);
 
                 try {
-                    int index=categoryLayoutManager.findFirstVisibleItemPosition();
-                    View v=categoryLayoutManager.getChildAt(0);
-                    int top=(v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
+                    int index = categoryLayoutManager.findFirstVisibleItemPosition();
+                    View v = categoryLayoutManager.getChildAt(0);
+                    int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
                     categoryLayoutManager.scrollToPositionWithOffset(index, top);
                     layoutDvr.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
                 } catch (Exception e) {
@@ -296,9 +296,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 txtEpg.setScaleX(1.0f);
                 txtEpg.setScaleY(1.0f);
                 try {
-                    int index=categoryLayoutManager.findFirstVisibleItemPosition();
-                    View v=categoryLayoutManager.getChildAt(0);
-                    int top=(v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
+                    int index = categoryLayoutManager.findFirstVisibleItemPosition();
+                    View v = categoryLayoutManager.getChildAt(0);
+                    int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
                     categoryLayoutManager.scrollToPositionWithOffset(index, top);
                     layoutEpg.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
                 } catch (Exception e) {
@@ -396,7 +396,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     liveData.removeObserver(this);
                     categoryAdapter.setCategory(categoriesWithChannels);
 //                    categoryAdapter.notifyDataSetChanged();
-                    FragmentMenu.this.setUpCategoriesToView(allChannelItems, categoryAdapter, categoriesWithChannels);
+                    setUpCategoriesToView(allChannelItems, categoryAdapter, categoriesWithChannels);
                 }
             }
         });
@@ -425,8 +425,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (isFirstRun) {
             lastPlayedCategory = lastPlayedPrefs.getString(PLAYED_CATEGORY_NAME, "All Channels");
             isFirstRun = false;
-        } else
+        } else {
             lastPlayedCategory = lastPlayedPrefs.getString(SELECTED_CATEGORY_NAME, "All Channels");
+        }
 
         if (lastPlayedCategory.equalsIgnoreCase("All Channels")) {
             onClickCategory("All Channels", 0, allChannelItems);
@@ -482,6 +483,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                             currentPlayedCategoryItems = channelItemList;
                         } else {
                             currentPlayedCategoryItems = allChannelItems;
+                            categoryEditor = lastPlayedPrefs.edit();
                             categoryEditor.putString(PLAYED_CATEGORY_NAME, getString(R.string.all_category));
                             categoryEditor.apply();
                             currentChannelPosition = currentPlayedCategoryItems.indexOf(currentPlayed);
@@ -526,32 +528,55 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 gvChannelsList.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        try {
-                            currentSelected = adapter.getmList().get(selectedChannelPosition);
-                        } catch (Exception e) {
-                            currentSelected = adapter.getmList().get(0);
+                        if (!gvChannelsList.isComputingLayout()) {
+                            gvChannelsList.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        currentSelected = adapter.getmList().get(selectedChannelPosition);
+                                    } catch (Exception e) {
+                                        currentSelected = adapter.getmList().get(0);
 
-                        }
-                        try {
-                            selectedCategoryView = categoryList.findViewHolderForAdapterPosition(pos).itemView.findViewById(R.id.channelCategory_layout);
-                            selectedCategoryView.setNextFocusDownId(gvChannelsList.getChildAt(0).getId());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            layoutEpg.setNextFocusLeftId(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.getId());
-                        } catch (Exception ignored) {
-                            layoutEpg.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
-                        }
+                                    }
+                                    try {
+                                        selectedCategoryView = categoryList.findViewHolderForAdapterPosition(pos).itemView.findViewById(R.id.channelCategory_layout);
+                                        selectedCategoryView.setNextFocusDownId(gvChannelsList.getChildAt(0).getId());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        layoutEpg.setNextFocusLeftId(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.getId());
+                                    } catch (Exception ignored) {
+                                        try {
+                                            layoutEpg.setNextFocusLeftId(gvChannelsList.getLayoutManager().findViewByPosition(selectedChannelPosition).getId());
+                                        } catch (Exception ignored2) {
+                                            layoutEpg.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
+                                        }
+                                    }
 
-                        try {
-                            gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.requestFocus();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        gvChannelsList.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                    try {
+                                        gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.findViewById(R.id.relative_layout).requestFocus();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        try {
+                                            gvChannelsList.getLayoutManager().findViewByPosition(selectedChannelPosition).findViewById(R.id.relative_layout).requestFocus();
+                                        } catch (Exception e2) {
+                                            e2.printStackTrace();
+                                            try {
+                                                gvChannelsList.getChildAt(0).requestFocus();
+                                            } catch (Exception e1) {
+                                                e1.printStackTrace();
+                                                gvChannelsList.requestFocus();
+                                            }
+                                        }
+                                    }
 
+                                }
+                            }, 1000);
+                        }
                     }
+
                 });
 
             } else {
@@ -575,12 +600,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         selectedCategoryPosition = pos;
         currentCategoryTitleView.setText(categoryName);
         currentCategoryTitleView.setSelected(true);
+        categoryEditor = lastPlayedPrefs.edit();
         categoryEditor.putString(SELECTED_CATEGORY_NAME, categoryName);
+        categoryEditor.apply();
         if (mListChannels.contains(currentPlayed)) {
             selectedChannelPosition = mListChannels.indexOf(currentPlayed);
         } else
             selectedChannelPosition = 0;
-        categoryEditor.apply();
+
         setUpChannelsCategory(categoryName, pos, mListChannels);
     }
 
@@ -588,7 +615,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onSelectCategory(int position, View focusedCatView) {
 //        stopPreview();
         this.selectedCategoryView = focusedCatView;
-        this.selectedCategoryPosition=position;
+        this.selectedCategoryPosition = position;
         try {
             selectedCategoryView.setNextFocusDownId(gvChannelsList.getChildAt(0).getId());
         } catch (Exception e) {
@@ -613,6 +640,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             currentChannelPosition = position;
             selectedChannelPosition = position;
             currentPlayingCategoryPosition = categoryPosition;
+            categoryEditor = lastPlayedPrefs.edit();
             categoryEditor.putString(PLAYED_CATEGORY_NAME, currentPlayingCategory);
             categoryEditor.apply();
             Timber.d("position:" + currentChannelPosition);
@@ -732,12 +760,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
 //            stopPreview();
-            isFirstRun = true;
+            isFirstRun = false;
         } else {
             if (errorFragment != null)
                 showErrorFrag(errorFragment);
             updateCategoryUI(this.allChannelItems, allFavItems, allCategoryChannels);
-
 
 
         }
@@ -786,7 +813,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (observable instanceof ChannelChangeObserver) {
             DisposableManager.disposeLive();
             if (((ChannelChangeObserver) observable).getChannelNext()) {
-                 currentChannelPosition = adapter.getSelectedChannelPositionViaId(currentPlayed.getId());
+                currentChannelPosition = adapter.getSelectedChannelPositionViaId(currentPlayed.getId());
                 //put condition here so no IoB Exception occurs
                 if (currentChannelPosition < currentPlayedCategoryItems.size() - 1)
                     currentChannelPosition++;
@@ -828,21 +855,21 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     @OnClick(R.id.layout_epg)
     public void OnEpgClick() {
-        if(currentSelected.isHasEpg()) {
+        if (currentSelected.isHasEpg()) {
             EpgFragment fragment = new EpgFragment();
             fragment.setCurrentSelectedChannel(currentSelected);
             fragment.setAllChannelList(allChannelItems);
             mListener.load(fragment, "epg");
-        }else{
+        } else {
             Toast.makeText(getActivity(), "Epg not available for this channel", Toast.LENGTH_SHORT).show();
         }
     }
 
     @OnClick(R.id.layout_dvr)
     public void OnDvrClick() {
-        if(currentSelected.isHasDvr()) {
+        if (currentSelected.isHasDvr()) {
             mListener.loadDvr(currentSelected, allChannelItems, "dvr");
-        }else{
+        } else {
             Toast.makeText(getActivity(), "Dvr not available for this channel", Toast.LENGTH_SHORT).show();
         }
     }
@@ -869,11 +896,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public void setDvrPlayedChannel(ChannelItem dvrPlayedChannel) {
         this.dvrPlayedChannel = dvrPlayedChannel;
-        if(dvrPlayedChannel != null) {
+        if (dvrPlayedChannel != null) {
             int position = allChannelItems.indexOf(dvrPlayedChannel);
             currentChannelPosition = position;
             selectedChannelPosition = position;
             currentPlayingCategoryPosition = 0;
+            categoryEditor = lastPlayedPrefs.edit();
             categoryEditor.putString(PLAYED_CATEGORY_NAME, getString(R.string.all_category));
             categoryEditor.apply();
             Timber.d("position:" + currentChannelPosition);
@@ -887,7 +915,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     public interface FragmentMenuInteraction {
         void playChannel(ChannelItem item);
-        void loadDvr(ChannelItem current,List<ChannelItem> allChannelItems ,String dvr);
+
+        void loadDvr(ChannelItem current, List<ChannelItem> allChannelItems, String dvr);
+
         void load(Fragment epgFragment, String tag);
 
     }
@@ -901,11 +931,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onResume() {
         super.onResume();
-        if(dvrPlayedChannel != null)
-        onClickChannel(getString(R.string.all_channels), 0, allChannelItems.indexOf(getDvrPlayedChannel()), allChannelItems);
+        if (dvrPlayedChannel != null)
+            onClickChannel(getString(R.string.all_channels), 0, allChannelItems.indexOf(getDvrPlayedChannel()), allChannelItems);
 
     }
-
 
 
     private ChannelItem dvrPlayedChannel;

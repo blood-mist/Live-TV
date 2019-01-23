@@ -40,6 +40,9 @@
     <color name="dvr_text_color">#9b9b9b</color>
     <color name="darkgrey">#848484</color>
     <color name="darkgrey_trans">#88bfbfbf</color>
+    <color name="category_color_blue">#66303F9F</color>
+    <color name="category_color_blu_click">#661976D2</color>
+    <color name="color_blue_def">#662196F3</color>
 
 
 </resources>

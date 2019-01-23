@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.chromium.net:cronet-common-66.3359.158">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/cronet-common-66.3359.158.aar/d29091ff39211a67037e4e90b3e7c406/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/cronet-common-66.3359.158.aar/d29091ff39211a67037e4e90b3e7c406/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.chromium.net/cronet-common/66.3359.158/473c02d6f73828375a5746c537aa7cedf718c6c6/cronet-common-66.3359.158-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

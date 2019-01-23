@@ -3,7 +3,6 @@ package androidtv.livetv.stb.ui.splash;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.os.Environment;
 
@@ -49,8 +48,8 @@ import androidtv.livetv.stb.entity.VersionErrorResponse;
 import androidtv.livetv.stb.entity.VersionResponseWrapper;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.login.LoginDao;
-import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.ApiInterface;
+import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.LoginFileUtils;
 import androidtv.livetv.stb.utils.MyEncryption;
@@ -386,23 +385,26 @@ public class SplashRepository {
                         String json = null;
                         try {
                             json = catChannelInfoResponse.body().string();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
+                            onError(new Throwable("Unexpected Response from server"));
                         }
-                        try {
-                            JSONObject jsonObject = new JSONObject(json);
-                            if (jsonObject.has(KEY_CATEGORY)) {
-                                CatChannelInfo catChannelInfo = gson.fromJson(json, CatChannelInfo.class);
-                                catChannelWrapper.setCatChannelInfo(catChannelInfo);
-                            } else {
-                                CatChannelError catChannelError = gson.fromJson(json, CatChannelError.class);
-                                catChannelWrapper.setCatChannelError(catChannelError);
-                            }
+                        if(json!=null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(json);
+                                if (jsonObject.has(KEY_CATEGORY)) {
+                                    CatChannelInfo catChannelInfo = gson.fromJson(json, CatChannelInfo.class);
+                                    catChannelWrapper.setCatChannelInfo(catChannelInfo);
+                                } else {
+                                    CatChannelError catChannelError = gson.fromJson(json, CatChannelError.class);
+                                    catChannelWrapper.setCatChannelError(catChannelError);
+                                }
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            catChannelData.postValue(catChannelWrapper);
                         }
-                        catChannelData.postValue(catChannelWrapper);
                     }
 
                     @Override

@@ -222,6 +222,8 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 break;
                             case NO_CONNECTION:
                                 showErrorDialog(NO_CONNECTION, getString(R.string.no_internet_body));
+                            default:
+                                showErrorDialog(NO_CONNECTION, catChannelWrapper.getCatChannelError().getErrorMessage());
                         }
                     }
                     categoryChannelData.removeObserver(this);
@@ -449,7 +451,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
     }
 
     private void downloadApk(String apkDownloadLink, String appName, String message, int statusId) {
-        if(statusId==FORCE_ID) {
+        if (statusId == FORCE_ID) {
             Intent intent = new Intent(this, DownloadService.class);
             intent.putExtra(DOWNLOAD_LINK, apkDownloadLink);
             intent.putExtra(DOWNLOAD_NAME, appName);
@@ -501,8 +503,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
                                 }*/
                             }
                         } else {
-                            if (userCheckWrapper.getUserErrorInfo().getStatus() == 401 || userCheckWrapper.getUserErrorInfo().getStatus() == 402)
-                            {
+                            if (userCheckWrapper.getUserErrorInfo().getStatus() == 401 || userCheckWrapper.getUserErrorInfo().getStatus() == 402) {
                                 openAccountApk(ACCOUNT_PACKAGE, accountDownloadLink);
                             } else
                                 loadUnauthorized(String.valueOf(userCheckWrapper.getUserErrorInfo().getStatus()), userCheckWrapper.getUserErrorInfo().getMessage(), "N/A");

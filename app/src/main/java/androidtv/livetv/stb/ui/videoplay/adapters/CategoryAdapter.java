@@ -26,7 +26,6 @@ import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
  */
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCategoryViewHolder> {
 
-    private final LayoutInflater mInflater;
 
     private List<CategoriesWithChannels> categoryItemList;
     private OnListClickListener mListener;
@@ -55,7 +54,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
      * @param context
      */
     public CategoryAdapter(Context context, OnListClickListener lis) {
-        mInflater = LayoutInflater.from(context);
         this.mListener = lis;
     }
 
@@ -67,7 +65,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
     @NonNull
     @Override
     public MyCategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = mInflater.inflate(R.layout.category_list_row, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_row, parent, false);
         return new MyCategoryViewHolder(v);
     }
 
@@ -141,15 +139,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
          * if position is 0 the created a category called ALl with
          * id = -1;
          */
-        if (position == 0) {
+        if (holder.getAdapterPosition() == 0) {
             holder.mTitleView.setText(R.string.all_channels);
         } else {
             if (allFavList != null && allFavList.size() > 0) {
-                if (position == 1) {
+                if (holder.getAdapterPosition() == 1) {
                     holder.mTitleView.setText(CATEGORY_FAVORITE);
                 } else {
                     if (categoryItemList != null) {
-                        categoryItem = categoryItemList.get(position - 2);
+                        categoryItem = categoryItemList.get(holder.getAdapterPosition() - 2);
                         holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                     } else {
                         holder.mTitleView.setText(R.string.no_category);
@@ -157,7 +155,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
                 }
             } else {
                 if (categoryItemList != null) {
-                    categoryItem = categoryItemList.get(position - 1);
+                    categoryItem = categoryItemList.get(holder.getAdapterPosition() - 1);
                     holder.mTitleView.setText(categoryItem.categoryItem.getTitle());
                 } else {
                     holder.mTitleView.setText(R.string.no_category);
@@ -165,7 +163,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
             }
 
         }
-        holder.mCategoryLayout.setTag(position);
+        holder.mCategoryLayout.setTag(holder.getAdapterPosition());
 
 
         /**
@@ -200,7 +198,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
         void onSelectCategory(int position, View focusedCatView);
     }
 
-     class MyCategoryViewHolder extends RecyclerView.ViewHolder {
+
+    class MyCategoryViewHolder extends RecyclerView.ViewHolder {
         private TextView mTitleView;
         private LinearLayout mCategoryLayout;
          CategoriesWithChannels finalCategoryItem ;
@@ -231,6 +230,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.MyCate
 
                 }
             });
+
 
             /**
              * when focus changes

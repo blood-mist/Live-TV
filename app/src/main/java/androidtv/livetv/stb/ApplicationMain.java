@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
@@ -21,7 +22,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import androidtv.livetv.stb.utils.DefaultDataSourceFactory;
 import timber.log.Timber;
 
 
@@ -76,13 +76,13 @@ public class ApplicationMain extends Application {
         super.attachBaseContext(base);
     }
 
-    public DataSource.Factory buildDataSourceFactory(TransferListener<? super DataSource> listener) {
+    public DataSource.Factory buildDataSourceFactory(TransferListener listener) {
         return new DefaultDataSourceFactory(this, listener, buildHttpDataSourceFactory(listener));
     }
 
     /** Returns a {@link HttpDataSource.Factory}. */
     public HttpDataSource.Factory buildHttpDataSourceFactory(
-            TransferListener<? super DataSource> listener) {
+            TransferListener listener) {
         return new DefaultHttpDataSourceFactory(userAgent, listener);
     }
 
