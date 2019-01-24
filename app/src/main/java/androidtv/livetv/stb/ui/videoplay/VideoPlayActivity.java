@@ -210,13 +210,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
-        try {
-            InetAddress group = InetAddress.getByName("239.0.0.0");
-            MulticastSocket s = new MulticastSocket();
-            s.joinGroup(group);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         dataSourceFactory = buildDataSourceFactory(true);
         trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
@@ -1053,12 +1047,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             trackSelector.setParameters(trackSelectorParameters);
-            DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
+           /* DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
-            defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
-            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, defaultLoadControl);
+            defaultLoadControl = loadControl.createDefaultLoadControl();*/
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, new DefaultLoadControl());
         }
         if (playerEventListener != null)
             player.removeListener(playerEventListener);
@@ -1084,7 +1078,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "udp://239.10.20.30:8002";
+        String splitUrl = "udp://@239.1.20.1:8002";
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1125,13 +1119,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 try {
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
                     return new ExtractorMediaSource.Factory(udpDataSource)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
+                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
                             .createMediaSource(uri);
                 } catch (Exception e) {
                     return new ExtractorMediaSource.Factory(dataSourceFactory)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
+                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
                             .createMediaSource(uri);
                 }
             default: {
@@ -1333,7 +1327,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-    private class PlayerEventListener extends Player.DefaultEventListener {
+    private class PlayerEventListener implements Player.EventListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {

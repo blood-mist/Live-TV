@@ -6,9 +6,9 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -28,7 +29,32 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
+
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.UdpDataSource;
+import com.google.android.exoplayer2.util.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -43,8 +69,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 
+import androidtv.livetv.stb.ApplicationMain;
 import androidtv.livetv.stb.R;
-import androidtv.livetv.stb.entity.AllChannelsEvent;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.FavEvent;
@@ -57,12 +83,10 @@ import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 
 
-import androidtv.livetv.stb.ui.videoplay.adapters.MyCustomLayoutManager;
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
 
-import androidtv.livetv.stb.ui.videoplay.fragments.dvr.DvrFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 
 import butterknife.BindView;
@@ -82,17 +106,20 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
  * A simple {@link Fragment} subclass to show menu
  */
 public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener, Observer {
-
+    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private static final int IS_FAV = 1;
     private static final int ALL_CHANNELS_ADDED = 99;
     private static final int CHANNEL_ITEMS_SPECIFIER = 9;
     private MenuViewModel menuViewModel;
     private FragmentMenuInteraction mListener;
+    private DefaultTrackSelector trackSelector;
     private ChannelListAdapter adapter;
     CategoryAdapter categoryAdapter;
     private SharedPreferences lastPlayedPrefs;
     private List<ChannelItem> currentPlayedCategoryItems;
     private View selectedCategoryView;
+    private SimpleExoPlayer player;
+    DataSource.Factory dataSourceFactory;
 
     private Handler watchPreviewHandler = new Handler();
 
@@ -138,7 +165,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.gv_channels)
     RecyclerView gvChannelsList;
     @BindView(R.id.preview_view)
-    VideoView previewView;
+    PlayerView previewView;
     @BindView(R.id.preview_container)
     FrameLayout previewContainer;
     @BindView(R.id.epg)
@@ -195,11 +222,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("frag", "view created");
+        getLastPlayedChannel();
         categoryLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         categoryAdapter = new CategoryAdapter(getActivity(), FragmentMenu.this);
         categoryList.setLayoutManager(categoryLayoutManager);
         categoryList.setAdapter(categoryAdapter);
-
         adapter = new ChannelListAdapter(getActivity(), this);
         gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         gvChannelsList.setAdapter(adapter);
@@ -327,7 +354,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         });
     }
 
-    public void playLastPlayedChannel() {
+    public void getLastPlayedChannel() {
         lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
         if (lastPlayedId != -1) {
             LiveData<ChannelItem> lastPlayedChData = menuViewModel.getLastPlayedChannel(lastPlayedId);
@@ -336,7 +363,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 public void onChanged(@Nullable ChannelItem channelItem) {
                     if (channelItem != null) {
                         setValues(channelItem);
-                        mListener.playChannel(channelItem);
+//                        mListener.playChannel(channelItem);
                         currentPlayed = channelItem;
                         lastPlayedChData.removeObserver(this);
                     }
@@ -349,7 +376,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 public void onChanged(@Nullable ChannelItem channelItem) {
                     if (channelItem != null) {
                         setValues(channelItem);
-                        mListener.playChannel(channelItem);
+//                        mListener.playChannel(channelItem);
                         currentPlayed = channelItem;
                         firstPlayedData.removeObserver(this);
                     }
@@ -371,8 +398,10 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         }
     }
 
+
     @Override
     public void onStop() {
+        stopPreview();
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
@@ -636,7 +665,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onClickChannel(String currentPlayingCategory, int categoryPosition, int position, List<ChannelItem> currentPlayedChannel) {
         if (position != -1) {
-//            stopPreview();
+            stopPreview();
             currentChannelPosition = position;
             selectedChannelPosition = position;
             currentPlayingCategoryPosition = categoryPosition;
@@ -670,7 +699,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     @Override
     public void onChannelFocused(int position) {
-//        stopPreview();
+        stopPreview();
         try {
             View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
             if (currentFocusedView != null)
@@ -681,8 +710,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if (currentPlayed != null && currentSelected != null && currentPlayed.getId() != currentSelected.getId())
-//            startPreview(currentSelected);
+        if (currentPlayed != null && currentSelected != null && currentPlayed.getId() != currentSelected.getId())
+            startPreview(currentSelected);
 
 
     }
@@ -692,11 +721,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      * stop handler and video playback
      */
     private void stopPreview() {
-        //TODO stop preview here
-     /*   DisposableManager.dispose();
-        previewView.stopPlayback();
+        DisposableManager.dispose();
+        releasePlayer();
+        previewView.setVisibility(View.INVISIBLE);
         previewContainer.setVisibility(View.INVISIBLE);
-        watchPreviewHandler.removeCallbacksAndMessages(null);*/
+        watchPreviewHandler.removeCallbacksAndMessages(null);
     }
 
     /**
@@ -705,16 +734,19 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      * @param channelItem
      */
     private void fetchPreview(ChannelItem channelItem) {
-       /* long utc = GetUtc.getInstance().getTimestamp().getUtc();
+        long utc = GetUtc.getInstance().getTimestamp().getUtc();
         menuViewModel.getPreviewLink(login.getToken(), utc, String.valueOf(login.getId()),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()), channelItem.getId()).observe(this, channelLinkResponse -> {
             if (channelLinkResponse != null) {
                 try {
                     initVideoView(channelLinkResponse.getChannel().getLink());
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    initVideoView("");
+                    e.printStackTrace();
                 }
             }
-        });*/
+            initVideoView("");
+        });
 
     }
 
@@ -726,40 +758,109 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private void startPreview(ChannelItem channelItem) {
         //TODO enable preview here
-//        watchPreviewHandler.postDelayed(() -> fetchPreview(channelItem), TimeUnit.SECONDS.toMillis(5));
+        watchPreviewHandler.postDelayed(() -> fetchPreview(channelItem), TimeUnit.SECONDS.toMillis(3));
     }
 
+    private DataSource.Factory buildDataSourceFactory() {
+        return ((ApplicationMain) ((Objects.requireNonNull(getActivity())).getApplication())).buildDataSourceFactory(BANDWIDTH_METER);
+    }
     /**
      * initialise video view here
      *
      * @param link
      **/
     private void initVideoView(String link) {
-       /* try {
-            previewView.setVideoPath(link);
-        } catch (Exception e) {
-            e.printStackTrace();
+        boolean needNewPlayer = player == null;
+        if(needNewPlayer){
+             dataSourceFactory=buildDataSourceFactory();;
+            TrackSelection.Factory adaptiveTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory();
+            trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
+            DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
+            trackSelector.setParameters(trackSelectorParameters);
+            DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
+            DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
+            DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
+            defaultLoadControl = loadControl.createDefaultLoadControl();
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(), DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+            player = ExoPlayerFactory.newSimpleInstance(getActivity(), renderersFactory, trackSelector, defaultLoadControl);
         }
-        previewView.setVisibility(View.VISIBLE);
-        previewContainer.setVisibility(View.VISIBLE);
-        previewView.setOnPreparedListener(mediaPlayer -> {
-            mediaPlayer.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-            mediaPlayer.setVolume(0f, 0f);
-            mediaPlayer.start();
+        player.setVolume(0f);
+        player.setPlayWhenReady(true);
+        previewView.setPlayer(player);
+        previewView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+        player.setVideoSurfaceView((SurfaceView) previewView.getVideoSurfaceView());
+        String splitUrl = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl));
+        player.prepare(mediaSource);
+        player.addListener(new Player.EventListener() {
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                player.setPlayWhenReady(false);
+                player.removeListener(this);
+                Toast.makeText(getActivity(),"Preview not available",Toast.LENGTH_SHORT).show();
+                releasePlayer();
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                if(playWhenReady && playbackState==Player.STATE_READY){
+                    previewView.setVisibility(View.VISIBLE);
+                    previewContainer.setVisibility(View.VISIBLE);
+                }
+            }
         });
-        previewView.setOnErrorListener((mp, what, extra) -> {
-            previewView.setVisibility(GONE);
-            previewContainer.setVisibility(View.INVISIBLE);
-//                Toast.makeText(getActivity(), "LoginError Code: \t W"+what+"E"+extra, Toast.LENGTH_SHORT).show();
-            Timber.e("Media", "what = " + what + " extra = " + extra);
-            return true;
-        });*/
+
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            player.release();
+            player = null;
+            trackSelector=null;
+        }
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        @C.ContentType int type = Util.inferContentType(uri);
+        switch (type) {
+            case C.TYPE_DASH:
+                return new DashMediaSource.Factory(
+                        new DefaultDashChunkSource.Factory(dataSourceFactory),
+                        buildDataSourceFactory())
+                        .createMediaSource(uri);
+            case C.TYPE_SS:
+                return new SsMediaSource.Factory(
+                        new DefaultSsChunkSource.Factory(dataSourceFactory),
+                        buildDataSourceFactory())
+                        .createMediaSource(uri);
+            case C.TYPE_HLS:
+                    return new HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(uri);
+            case C.TYPE_OTHER:
+                try {
+                    UdpDataSource.Factory udpDataSource = dataSourceFactory;
+                    return new ExtractorMediaSource.Factory(udpDataSource)
+                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
+                            .createMediaSource(uri);
+                } catch (Exception e) {
+                    return new ExtractorMediaSource.Factory(dataSourceFactory)
+                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
+                            .createMediaSource(uri);
+                }
+            default: {
+                throw new IllegalStateException("Unsupported type: " + type);
+            }
+        }
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
-//            stopPreview();
+            stopPreview();
             isFirstRun = false;
         } else {
             if (errorFragment != null)

@@ -17,6 +17,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -95,6 +97,15 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
+        try {
+            InetAddress group1 = InetAddress.getByName("239.0.0.0");
+            InetAddress group2 = InetAddress.getByName("224.0.0.0");
+            MulticastSocket multicastSocket = new MulticastSocket();
+            multicastSocket.joinGroup(group1);
+            multicastSocket.joinGroup(group2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         permissionutils = new PermissionUtils(this);
         macAddress = AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this);
         permissions = new ArrayList<>(
