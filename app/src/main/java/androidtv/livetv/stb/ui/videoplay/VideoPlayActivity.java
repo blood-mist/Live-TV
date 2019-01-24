@@ -325,6 +325,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+        currentFragment=menuFrag;
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 if (currentFragment == null) {
@@ -1079,7 +1080,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             menuFragment.setDvrPlayedChannel(null);
         }
         String splitUrl = "udp://@239.1.20.1:8002";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
+        MediaSource mediaSource = buildMediaSource(Uri.parse(channelLink), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
         if (haveResumePosition) {
@@ -1357,6 +1358,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         gridMenuFragment.hideErrorFrag();
                 } else {
                     menuFragment.setErrorFragMent(null);
+                    gridMenuFragment.setErrorFragMent(null);
                 }
                 startCloseMenuHandler();
                 if (isDvrPlaying) {

@@ -16,6 +16,7 @@
         android:largeHeap="true"
         android:roundIcon="@drawable/live_tv"
         android:supportsRtl="true"
+        android:banner="@drawable/live_tv_demo"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.splash.SplashActivity">
             <intent-filter>

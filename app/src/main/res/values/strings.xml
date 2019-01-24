@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Live TV</string>
+    <string name="app_name">Live TV Demo</string>
     <string name="loading_app">Loading Live TV</string>
     <string name="label_version">Version:</string>
     <string name="app_icon">For App Icon</string>

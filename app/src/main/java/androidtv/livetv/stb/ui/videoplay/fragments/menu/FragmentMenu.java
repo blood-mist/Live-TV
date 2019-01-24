@@ -798,8 +798,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             @Override
             public void onPlayerError(ExoPlaybackException error) {
                 player.setPlayWhenReady(false);
-                player.removeListener(this);
                 Toast.makeText(getActivity(),"Preview not available",Toast.LENGTH_SHORT).show();
+                player.removeListener(this);
                 releasePlayer();
             }
 
