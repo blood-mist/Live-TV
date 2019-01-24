@@ -1247,7 +1247,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
                         login.getSession()), macAddress, item.getId());
-        videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
+    /*    videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
             @Override
             public void onChanged(@Nullable ChannelLinkResponseWrapper channelLinkResponse) {
                 if (channelLinkResponse != null) {
@@ -1278,27 +1278,46 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     videoLinkData.removeObserver(this);
                 }
             }
-        });
-//        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
-//                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-//                epgs.getChannelID(), date, startTime);
-//        dvrData.observe(this, new Observer<DvrLinkResponse>() {
-//            @Override
-//            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-//                if (channelLinkResponse != null) {
-//                    if (channelLinkResponse.getErrorCode() > 0) {
-//                        Log.d("dvr", "error");
-//                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
-//                        showDvrMenu();
-//                        hideProgressBar();
-//                    } else {
+        });*/
+        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                epgs.getChannelID(), date, startTime);
+        dvrData.observe(this, new Observer<DvrLinkResponse>() {
+            @Override
+            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                if (channelLinkResponse != null) {
+                    if (channelLinkResponse.getErrorCode() > 0) {
+                        Log.d("dvr", "error");
+                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
+                        showDvrMenu();
+                        hideProgressBar();
+                    } else {
 //                        setUpVideoController(item, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
-//                    }
-//                    dvrData.removeObserver(this);
-//
-//                }
-//            }
-//        });
+                        String url = channelLinkResponse.getLink();
+                        String[] parts = url.split(".m3u8");
+                        String part1 = parts[0];
+                        String part2 = "";
+                        try {
+                            part2 = parts[1];
+                        } catch (Exception ignored) {
+                        }
+//                        long milis = epgs.getStartTime().getTime();
+                        long millis = Calendar.getInstance().getTimeInMillis() - TimeUnit.MINUTES.toMillis(10);
+                        long diff = Calendar.getInstance().getTimeInMillis() - millis;
+                        millis = millis / 1000;
+
+//                        milis = milis / 1000;
+//                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
+                        long seconds = diff / 1000;
+                        String buildUrl = part1 + "_dvr_" + String.valueOf(millis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
+                        Log.d("buildurl", buildUrl);
+                        setUpVideoController(item, buildUrl, "");
+                    }
+                    dvrData.removeObserver(this);
+
+                }
+            }
+        });
 
 
     }
