@@ -3,86 +3,42 @@ package androidtv.livetv.stb.ui.videoplay;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ControlDispatcher;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.RenderersFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
-import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
-import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
-import com.google.android.exoplayer2.source.BehindLiveWindowException;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.PlayerControlView;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.TimeBar;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.UdpDataSource;
-import com.google.android.exoplayer2.util.Util;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import androidtv.livetv.stb.ApplicationMain;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
@@ -100,6 +56,8 @@ import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.ui.videoplay.fragments.menu.GridMenuFragment;
+import androidtv.livetv.stb.ui.videoplay.videocontroller.MyVideoController;
+import androidtv.livetv.stb.ui.videoplay.videocontroller.VideoControllerView;
 import androidtv.livetv.stb.utils.AppConfig;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
@@ -108,30 +66,19 @@ import androidtv.livetv.stb.utils.LinkConfig;
 import androidtv.livetv.stb.utils.MaxTvUnhandledException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import butterknife.OnClick;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 import static androidtv.livetv.stb.utils.LinkConfig.PLAYED_CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
-import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
 import static java.lang.Thread.sleep;
 
-public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction, EpgFragment.FragmentEpgInteraction,
-        DvrFragment.FragmentDvrInteraction, PlayerControlView.VisibilityListener, GridMenuFragment.OnFragmentInteractionListener {
+public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
+        SurfaceHolder.Callback, EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis {
 
-    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
-    private static final CookieManager DEFAULT_COOKIE_MANAGER;
-
-    static {
-        DEFAULT_COOKIE_MANAGER = new CookieManager();
-        DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
-    }
-
-    @BindView(R.id.txt_channel_name)
-    TextView currentPlayingDvrChannel;
     @BindView(R.id.img_play_pause)
     ImageView playPauseStatus;
     @BindView(R.id.videoStatus)
@@ -140,32 +87,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     AVLoadingIndicatorView progressBar;
     @BindView(R.id.tv_setchannelfrompriority)
     TextView txtChangeChannelFromPriority;
-
-    @BindView(R.id.exo_pause)
-    ImageButton controllerPause;
-
-    @BindView(R.id.exo_progress)
-    DefaultTimeBar controllerTimebar;
-
-    @BindView(R.id.exo_play)
-    ImageButton controllerPlay;
-
-    @BindView(R.id.exo_ffwd)
-    ImageButton controllerFwd;
-
-    @BindView(R.id.exo_rew)
-    ImageButton controllerRew;
-
     @BindView(R.id.tvboxID)
     TextView txtRandomDisplayBoxId;
+    @BindView(R.id.mainImage)
+    ImageView mainImage;
     @BindView(R.id.transparentLoadingBackground)
     LinearLayout backgroundTransparent;
     @BindView(R.id.container_movie_player)
     FrameLayout errorFrame;
     @BindView(R.id.videoSurfaceContainer)
     FrameLayout videoSurfaceContainer;
-    @BindView(R.id.video_view)
-    PlayerView videoSurfaceView;
+    @BindView(R.id.videoSurface)
+    SurfaceView videoSurfaceView;
     @BindView(R.id.menu_bg)
     ImageView menuBackground;
     @BindView(R.id.priority_view)
@@ -177,8 +110,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private FragmentMenu menuFragment = new FragmentMenu();
     private DvrFragment dvrFragment = new DvrFragment();
     private Fragment currentFragment;
-    private SimpleExoPlayer player;
+    private MediaPlayer player;
     private ChannelChangeObserver channelChangeObservable;
+    private VideoControllerView mVideoController;
     private Handler hideMenuHandler;
     private SharedPreferences lastPlayedPrefs;
     private SharedPreferences.Editor editor;
@@ -193,55 +127,23 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private int selectedDvrDate = 0;
     private Epgs currentPlayedEpg;
 
-    private DataSource.Factory dataSourceFactory;
-    private DefaultTrackSelector trackSelector;
-    private DefaultTrackSelector.Parameters trackSelectorParameters;
-    private TrackGroupArray lastSeenTrackGroupArray;
-
-    private boolean startAutoPlay;
-    private int startWindow;
-    private long startPosition;
-    private boolean inErrorState;
-    PlayerEventListener playerEventListener;
-    private int lastPlayedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
-
-        dataSourceFactory = buildDataSourceFactory(true);
-        trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
-        if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
-            CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
-        }
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-        clearStartPosition();
         chFrmPriorityHandler = new Handler();
         lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         ButterKnife.bind(this);
         hideMenuHandler = new Handler();
         macAddress = AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this);
         txtRandomDisplayBoxId.setText(macAddress);
+        initSurafaceView();
 
-        controllerTimebar.setOnFocusChangeListener((view, b) -> {
-            if (b) {
-                controllerTimebar.setScrubberColor(Color.RED);
-            } else {
-                controllerTimebar.setScrubberColor(Color.WHITE);
-            }
-        });
-
-    }
-
-
-    private void clearStartPosition() {
-        startAutoPlay = true;
-        startWindow = C.INDEX_UNSET;
-        startPosition = C.TIME_UNSET;
     }
 
     @OnClick(R.id.tv_setchannelfrompriority)
@@ -254,49 +156,23 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         searchChannelWithgivenPriorityNumber(txtChangeChannelFromPriority.getText().toString());
     }
 
-    private DataSource.Factory buildDataSourceFactory(boolean useBandWidthMeter) {
-        return ((ApplicationMain) getApplication()).buildDataSourceFactory(useBandWidthMeter ? BANDWIDTH_METER : null);
-    }
-
     @Override
     protected void onStart() {
         EventBus.getDefault().register(this);
         Log.d("activity_state", "onStart");
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
-        playLastPlayedChannel();
         getAllChannelListfromDB();
         if (gridMenuFragment == null) {
             gridMenuFragment = new GridMenuFragment();
         }
+
     }
 
-    private void playLastPlayedChannel() {
-        lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
-        if (lastPlayedId != -1) {
-            LiveData<ChannelItem> lastPlayedChData = videoPlayViewModel.getLastPlayedChannel(lastPlayedId);
-            lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
-                @Override
-                public void onChanged(@Nullable ChannelItem channelItem) {
-                    if (channelItem != null) {
-                        playChannel(channelItem);
-                        lastPlayedChData.removeObserver(this);
-                    }
-                }
-            });
-        } else {
-            LiveData<ChannelItem> firstPlayedData = videoPlayViewModel.getFirstChannel();
-            firstPlayedData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
-                @Override
-                public void onChanged(@Nullable ChannelItem channelItem) {
-                    if (channelItem != null) {
-                        playChannel(channelItem);
-                        firstPlayedData.removeObserver(this);
-                    }
-                }
-            });
-//            openErrorFragment();
-        }
+    private void initSurafaceView() {
+        SurfaceHolder videoHolder = videoSurfaceView.getHolder();
+        videoHolder.addCallback(this);
+        player = new MediaPlayer();
     }
 
     private void openFragment(Fragment fragment) {
@@ -304,7 +180,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         currentFragment = fragment;
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
     }
-
     public void openListMenu() {
         if (menuFragment != null)
             currentFragment = menuFragment;
@@ -321,36 +196,32 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(currentFragment).commit();
     }
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
-                if (currentFragment == null) {
-                    showMenu();
-                } else if (currentFragment instanceof EpgFragment) {
+                if (currentFragment instanceof EpgFragment) {
                     removeOptionalFragments();
 
                 } else {
                     try {
                         if (currentFragment instanceof DvrFragment) {
-                            if (!isDvrPlaying) {
+                            if (mVideoController == null) {
                                 removeOptionalFragments();
-                            } else {
-                                if (currentFragment.isHidden())
+                            }else{
+                                if(currentFragment.isHidden())
                                     showDvrMenu();
-                                else
-                                    hideMenuUI();
+                                else hideMenuUI();
                             }
-                        } else if (currentFragment instanceof FragmentMenu || currentFragment instanceof GridMenuFragment) {
+                        } else if(currentFragment instanceof FragmentMenu) {
 
-                            if (videoSurfaceView.getUseController() && currentFragment.isHidden()) {
+                            if(mVideoController != null && currentFragment.isHidden()) {
                                 dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
                                 dvrFragment.setGetSelectedDatePosition(selectedDvrDate);
                                 dvrFragment.setSelectedDvrPosition(selectedDvrPosition);
                                 load(dvrFragment, "dvr");
-                            } else if (player != null && (player.getPlayWhenReady())) {
+                            }else if(player != null && player.isPlaying()){
                                 if (currentFragment != null && currentFragment.isVisible())
                                     hideMenuUI();
                                 else {
@@ -365,44 +236,55 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
                 break;
 
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                try {
+                    if (mVideoController != null && !mVideoController.isShowing() && menuFrag.isHidden() && player.getCurrentPosition() > 0) {
+                        player.seekTo(player.getCurrentPosition() + 15000);
+                        return true;
+                    } else
+                        return false;
+                } catch (Exception ignored) {
+                    break;
+                }
+
+
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                try {
+                    if (mVideoController != null && !mVideoController.isShowing()&& menuFrag.isHidden() && player.getCurrentPosition() > 0) {
+                        player.seekTo(player.getCurrentPosition() - 15000);
+                        return true;
+                    } else
+                        return false;
+                } catch (Exception ignored) {
+                    break;
+                }
+
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
+                player.seekTo(player.getCurrentPosition() - 5 * 60 * 1000);
+                return true;
+
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+                player.seekTo(player.getCurrentPosition() + 5 * 60 * 1000);
+                return true;
+
 
             case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                if (!videoSurfaceView.getUseController()) {
+                if (mVideoController == null) {
                     hideMenuUI();
                     changeChannel(false);
                     return true;
                 } else {
                     return false;
                 }
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                if (dvrFragment != null && dvrFragment.isHidden() && isDvrPlaying && !videoSurfaceView.isControllerVisible()) {
-                    player.seekTo(player.getCurrentPosition() - 15000);
-                    return true;
-                } else
-                    return false;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                if (dvrFragment != null && dvrFragment.isHidden() && isDvrPlaying && !videoSurfaceView.isControllerVisible()) {
-                    player.seekTo(player.getCurrentPosition() + 15000);
-                    return true;
-                } else
-                    return false;
+
             case KeyEvent.KEYCODE_MEDIA_NEXT:
-                if (!videoSurfaceView.getUseController()) {
+                if (mVideoController == null) {
                     hideMenuUI();
                     changeChannel(true);
                     return true;
                 } else {
                     return false;
                 }
-
-            case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                if (isDvrPlaying) {
-                    if (player.getPlayWhenReady())
-                        player.setPlayWhenReady(false);
-                    else
-                        player.setPlayWhenReady(true);
-                }
-                return true;
 
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
                 hideMenuUI();
@@ -412,25 +294,17 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if (!videoSurfaceView.getUseController()) {
+                    if (mVideoController == null)
                         changeChannel(false);
-                        return true;
-                    } else {
-                        if (controllerTimebar.hasFocus()) {
-                            controllerPause.requestFocus();
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
+                    return true;
                 } else {
                     return false;
                 }
             case KeyEvent.KEYCODE_DPAD_CENTER:
             case KeyEvent.KEYCODE_ENTER:
             case 63:
-                if (isDvrPlaying) {
-                    videoSurfaceView.showController();
+                if (mVideoController != null) {
+                    mVideoController.show();
                     return true;
                 } else if ((menuFrag == null || menuFrag.isHidden()) && txtChangeChannelFromPriority.getVisibility() == View.GONE) {
                     showMenu();
@@ -449,18 +323,9 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (menuFrag == null || menuFrag.isHidden()) {
-                    if (!videoSurfaceView.getUseController()) {
+                    if (mVideoController == null)
                         changeChannel(true);
-                        return true;
-                    } else {
-                        if (controllerPause.hasFocus() || controllerPlay.hasFocus()
-                                || controllerRew.hasFocus() || controllerFwd.hasFocus()) {
-                            controllerTimebar.requestFocus();
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
+                    return true;
                 } else {
                     return false;
                 }
@@ -650,7 +515,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         chFrmPriorityHandler.postDelayed(runnableChangeChannelFromNumbers, 2000);
     }
 
-    private void getAllChannelListfromDB() {
+    private void getAllChannelListfromDB(){
         LiveData<List<ChannelItem>> listLiveData = videoPlayViewModel.getAllChannels();
         listLiveData.observe(this, new Observer<List<ChannelItem>>() {
             @Override
@@ -662,7 +527,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         });
     }
-
     private void searchChannelWithgivenPriorityNumber(String priorityNumber) {
         checkIfChannelExistsAndPlay(allChannelList, priorityNumber);
         txtChangeChannelFromPriority.setText("");
@@ -719,7 +583,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         });
 
-
     }
 
 
@@ -731,16 +594,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     }
 
-    private void releasePlayer() {
-        if (player != null) {
-            startAutoPlay = player.getPlayWhenReady();
-            updateResumePosition();
-            player.release();
-            player = null;
-            trackSelector = null;
-        }
-    }
-
     @Override
     public void onBackPressed() {
         if (currentFragment instanceof EpgFragment) {
@@ -749,16 +602,18 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             if (currentFragment instanceof DvrFragment) {
                 if (!isDvrPlaying) {
                     removeOptionalFragments();
-                } else {
-                    if (currentFragment.isHidden()) showDvrMenu();
+                }else{
+                    if(currentFragment.isHidden()) showDvrMenu();
                     else removeOptionalFragments();
                 }
-            } else if (menuFragment.isVisible()) {
+            } else if ((currentFragment instanceof FragmentMenu || currentFragment instanceof GridMenuFragment) && currentFragment.isVisible()) {
                 try {
-                    releasePlayer();
+                    player.stop();
+                    player.reset();
+                    player.release();
                 } catch (Exception ignored) {
                 }
-                getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
+                getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
                 finish();
                 super.onBackPressed();
             } else {
@@ -770,9 +625,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void removeOptionalFragments() {
         getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-//        currentFragment = menuFragment;
-        currentFragment = gridMenuFragment;
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(currentFragment).commit();
+        currentFragment = menuFragment;
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
 
     }
 
@@ -794,7 +648,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         }
     }
 
-   /* private void showMenuFrag(ErrorFragment errorFragment) {
+    private void showMenuFrag(ErrorFragment errorFragment) {
         Fragment menuFrag = (FragmentMenu) getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
         if (menuFrag == null)
             openFragment(menuFragment);
@@ -808,14 +662,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         menuFragment.setErrorFragMent(errorFragment);
         openFragment(menuFragment);
 
-    }*/
+    }
 
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
         stopCloseMenuHandler();
         try {
-            if (player.getCurrentPosition() > 0 && player.getPlayWhenReady())
+            if (player.getCurrentPosition() > 0 && player.isPlaying())
                 startCloseMenuHandler();
         } catch (Exception ignored) {
         }
@@ -883,13 +737,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannel(ChannelItem item) {
         saveCurrentInPrefs(item);
+        mVideoController = null;
         selectedDvrDate = 0;
-        selectedDvrPosition = 0;
+        selectedDvrPosition =0;
         currentPlayedEpg = null;
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
         try {
-            if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.getPlayWhenReady() && player.getCurrentPosition() > 0 && !isDvrPlaying) {
+            if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0 && !isDvrPlaying) {
                 hideMenuUI();
             } else {
                 showProgressBar();
@@ -906,9 +761,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             if (channelLinkResponse.getChannelLinkResponse() != null) {
                                 playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
                             } else if (channelLinkResponse.getException() != null) {
-
                                 setErrorFragment(channelLinkResponse.getException(), 0, 0);
-//                                playVideo("",false);
                             }
                             videoLinkData.removeObserver(this);
                         }
@@ -928,7 +781,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
         dvrFragment.setCurrentChannel(current);
         dvrFragment.setAllChannelList(allChannelList);
-        load(dvrFragment, dvr);
+        load(dvrFragment,dvr);
 
     }
 
@@ -943,7 +796,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
 
             } else
-                errorEntity = DataUtils.getErrorEntity(this, exception);
+                errorEntity = errorEntity = DataUtils.getErrorEntity(this, exception);
         } else {
             StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
             errorEntity = new PlayBackErrorEntity(2, sb.toString(), getString(R.string.err_media_error));
@@ -992,8 +845,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     protected void onPause() {
         EventBus.getDefault().unregister(this);
         Log.d("activity_state", "onPause");
-        if (Util.SDK_INT <= 23) {
-            releasePlayer();
+        try {
+            player.stop();
+            player.reset();
+            player.release();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
             getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
@@ -1011,128 +869,141 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     protected void onStop() {
         Log.d("activity_state", "onStop");
-        if (Util.SDK_INT > 23) {
-            releasePlayer();
+        try {
+            player.stop();
+            player.reset();
+            player.release();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
-            getSupportFragmentManager().beginTransaction().remove(gridMenuFragment).commit();
-            gridMenuFragment = null;
+            getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
+            menuFragment = null;
         } catch (Exception ignored) {
         }
+        ;
         finish();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
+        try {
+            player.stop();
+            player.reset();
+            player.release();
+        } catch (Exception e) {
+
+        }
         hideMacDisplayHandler();
         super.onDestroy();
     }
 
     private void playVideo(String channelLink, boolean isDvr) {
         Log.d("media", channelLink);
-        startAutoPlay = true;
-        inErrorState = false;
-
-        if (!isDvr) {
-            if (currentFragment instanceof FragmentMenu)
-                menuFragment.hideErrorFrag();
-            else if (currentFragment instanceof GridMenuFragment)
-                gridMenuFragment.hideErrorFrag();
-            releasePlayer();
+        if (player == null) {
+            player = new MediaPlayer();
         }
-        boolean needNewPlayer = player == null;
-        if (needNewPlayer) {
-            TrackSelection.Factory adaptiveTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory();
-            trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
-            trackSelector.setParameters(trackSelectorParameters);
-           /* DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
-            DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
-            DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
-            defaultLoadControl = loadControl.createDefaultLoadControl();*/
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, new DefaultLoadControl());
-        }
-        if (playerEventListener != null)
-            player.removeListener(playerEventListener);
-        playerEventListener = new PlayerEventListener();
-        player.addListener(playerEventListener);
-        player.setPlayWhenReady(true);
-        videoSurfaceView.setPlayer(player);
-        videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-        player.setVideoSurfaceView((SurfaceView) videoSurfaceView.getVideoSurfaceView());
-        videoSurfaceView.setControllerVisibilityListener(this);
-        if (isDvr) {
-            videoSurfaceView.setUseController(true);
-            recordedStatus.setVisibility(View.VISIBLE);
-            videoSurfaceView.showController();
-            isDvrPlaying = true;
-            menuFragment.setDvr(true);
-        } else {
-            videoSurfaceView.setUseController(false);
-            isDvrPlaying = false;
-            recordedStatus.setVisibility(View.GONE);
-            menuFragment.setDvr(false);
-            videoSurfaceView.hideController();
-            menuFragment.setDvrPlayedChannel(null);
-        }
-        String splitUrl = "udp://@239.1.20.1:8002";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
-
-        boolean haveResumePosition = startWindow != C.INDEX_UNSET;
-        if (haveResumePosition) {
-            player.seekTo(startWindow, startPosition);
-        }
-        player.prepare(mediaSource, !haveResumePosition, false);
-        inErrorState = false;
 
 //        String link = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+        try {
+            player.reset();
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            player.setDataSource(this, Uri.parse(channelLink));
+            player.prepareAsync();
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    VideoPlayActivity.this.hideMenuBg();
+                    player.setScreenOnWhilePlaying(true);
+                    player.start();
+                    hideProgressBar();
 
-    }
+                    if (threadToDisplayBoxId.getState() == Thread.State.NEW)
+                    {
+                        threadToDisplayBoxId.start();
+                    }
 
-    private MediaSource buildMediaSource(
-            Uri uri, boolean isDvr) {
-        @C.ContentType int type = Util.inferContentType(uri);
-        switch (type) {
-            case C.TYPE_DASH:
-                return new DashMediaSource.Factory(
-                        new DefaultDashChunkSource.Factory(dataSourceFactory),
-                        buildDataSourceFactory(false))
-                        .createMediaSource(uri);
-            case C.TYPE_SS:
-                return new SsMediaSource.Factory(
-                        new DefaultSsChunkSource.Factory(dataSourceFactory),
-                        buildDataSourceFactory(false))
-                        .createMediaSource(uri);
-            case C.TYPE_HLS:
-                if (isDvr) {
-                    return new HlsMediaSource.Factory(dataSourceFactory)
-                            .createMediaSource(uri);
-                } else {
-                    return new HlsMediaSource.Factory(dataSourceFactory)
-                            .setAllowChunklessPreparation(true)
-                            .createMediaSource(uri);
+                    startCloseMenuHandler();
+                    if (isDvr) {
+                        MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
+                        mVideoController = new VideoControllerView(VideoPlayActivity.this, true);
+                        mVideoController.setAnchorView(videoSurfaceContainer);
+                        mVideoController.setMediaPlayer(controller, player);
+                        mVideoController.show();
+                        recordedStatus.setVisibility(View.VISIBLE);
+                        isDvrPlaying = true;
+                        menuFragment.setDvr(true);
+                    } else {
+                        isDvrPlaying = false;
+                        recordedStatus.setVisibility(View.GONE);
+                        menuFragment.setDvr(false);
+                        menuFragment.setDvrPlayedChannel(null);
+
+
+                    }
+
+                    if (isDvr) {
+                        VideoPlayActivity.this.hideMenuUI();
+                    } else {
+                        VideoPlayActivity.this.startCloseMenuHandler();
+                        if (!menuFragment.isVisible())
+                            VideoPlayActivity.this.showPriorityNo();
+
+                        if (menuFragment != null || menuFragment.isVisible()) {
+                            menuFragment.hideErrorFrag();
+                        } else {
+                            menuFragment.setErrorFragMent(null);
+                        }
+                    }
+
+
                 }
-            case C.TYPE_OTHER:
-                try {
-                    UdpDataSource.Factory udpDataSource = dataSourceFactory;
-                    return new ExtractorMediaSource.Factory(udpDataSource)
-                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
-                            .createMediaSource(uri);
-                } catch (Exception e) {
-                    return new ExtractorMediaSource.Factory(dataSourceFactory)
-                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
-                            .createMediaSource(uri);
+            });
+
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    if (isDvr) {
+                        showDvrMenu();
+                        Toast.makeText(VideoPlayActivity.this, "Play back completed.Please choose another video to play", Toast.LENGTH_SHORT).show();
+                        //loadNextDvr();
+                    }
                 }
-            default: {
-                throw new IllegalStateException("Unsupported type: " + type);
-            }
+            });
+
+
+            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    if (what == -1003)
+                        player.setOnErrorListener(null);
+                    Timber.d("on error ");
+                    hideProgressBar();
+                    hideMacDisplayHandler();
+                    stopCloseMenuHandler();
+                    showDvrMenu();
+                    StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
+                    //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                    if (isDvr) {
+                        isDvrPlaying = false;
+                        Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                        VideoPlayActivity.this.stopCloseMenuHandler();
+
+                    } else {
+                        VideoPlayActivity.this.setErrorFragment(null, what, extra);
+                    }
+
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
+
 
     private void loadNextDvr() {
         showProgressBar();
@@ -1211,6 +1082,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         menuBackground.setVisibility(View.GONE);
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        player.setDisplay(surfaceHolder);
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+        player.setDisplay(surfaceHolder);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+    }
 
     private void hideProgressBar() {
         progressBar.smoothToHide();
@@ -1224,12 +1109,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir) {
         getSupportFragmentManager().popBackStack();
-        menuFragment.onClickChannel(getString(R.string.all_channels), 0, channelPositionById, allChannelList);
+        menuFragment.onClickChannel(getString(R.string.all_channels),0,channelPositionById,allChannelList);
 //        playChannel(channel);
     }
 
     @Override
-    public void playDvr(Epgs epgs, ChannelItem item, int selectedPosition, int selectedDatePosition) {
+    public void playDvr(Epgs epgs, ChannelItem item,int selectedPosition,int selectedDatePosition) {
         selectedDvrPosition = selectedPosition;
         selectedDvrDate = selectedDatePosition;
         currentPlayedEpg = epgs;
@@ -1240,7 +1125,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Login login = GlobalVariables.login;
         String date = DateUtils.dateAndTime.format(epgs.getStartTime());
         String startTime = DateUtils._24HrsTimeFormat.format(epgs.getStartTime());
-        LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
+        /*LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
                         login.getSession()), macAddress, item.getId());
         videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
@@ -1251,50 +1136,48 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         String url = channelLinkResponse.getChannelLinkResponse().getChannel().getLink();
                         String[] parts = url.split(".m3u8");
                         String part1 = parts[0];
-                        String part2 = "";
-                        try {
-                            part2 = parts[1];
-                        } catch (Exception ignored) {
-                        }
-//                        long milis = epgs.getStartTime().getTime();
-                        long millis = Calendar.getInstance().getTimeInMillis() - TimeUnit.MINUTES.toMillis(10);
-                        long diff = Calendar.getInstance().getTimeInMillis() - millis;
-                        millis = millis / 1000;
-
-//                        milis = milis / 1000;
-//                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
+                        String part2 = parts[1];
+                        long milis = epgs.getStartTime().getTime();
+                        milis = milis/1000;
+                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
                         long seconds = diff / 1000;
-                        String buildUrl = part1 + "_dvr_" + String.valueOf(millis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
-                        Log.d("buildurl", buildUrl);
-                        setUpVideoController(item, buildUrl, "");
+                        String buildUrl = part1+"-"+String.valueOf(milis)+"-"+String.valueOf(seconds)+".m3u8"+part2;
+                        Log.d("buiFldurl",buildUrl);
+                        setUpVideoController(item, buildUrl,"");
                     } else if (channelLinkResponse.getException() != null) {
-                        hideProgressBar();
                         Toast.makeText(VideoPlayActivity.this, "Dvr cannot be played", Toast.LENGTH_SHORT).show();
                     }
                     videoLinkData.removeObserver(this);
                 }
             }
+        });*/
+        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
+                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                epgs.getChannelID(), date, startTime);
+        dvrData.observe(this, new Observer<DvrLinkResponse>() {
+            @Override
+            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                if (channelLinkResponse != null) {
+                    if (channelLinkResponse.getLink() != null) {
+                        String url = channelLinkResponse.getLink();
+                        String[] parts = url.split(".m3u8");
+                        String part1 = parts[0];
+                        String part2 = parts[1];
+                        long milis = epgs.getStartTime().getTime();
+                        milis = milis/1000;
+                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
+                        long seconds = diff / 1000;
+                        String buildUrl = part1+"-"+String.valueOf(milis)+"-"+String.valueOf(seconds)+".m3u8"+part2;
+                        Log.d("buiFldurl",buildUrl);
+                        setUpVideoController(item, buildUrl,"");
+                    } else  {
+                        Toast.makeText(VideoPlayActivity.this, "Dvr cannot be played", Toast.LENGTH_SHORT).show();
+                    }
+                    dvrData.removeObserver(this);
+
+                }
+            }
         });
-//        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
-//                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-//                epgs.getChannelID(), date, startTime);
-//        dvrData.observe(this, new Observer<DvrLinkResponse>() {
-//            @Override
-//            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-//                if (channelLinkResponse != null) {
-//                    if (channelLinkResponse.getErrorCode() > 0) {
-//                        Log.d("dvr", "error");
-//                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
-//                        showDvrMenu();
-//                        hideProgressBar();
-//                    } else {
-//                        setUpVideoController(item, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
-//                    }
-//                    dvrData.removeObserver(this);
-//
-//                }
-//            }
-//        });
 
 
     }
@@ -1303,6 +1186,23 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         currentDvrChannelItem = item;
         nextVideoNameDvr = nextVideoName;
         VideoPlayActivity.this.playVideo(link, true);
+
+
+    }
+
+
+    @Override
+    public void onDvrStart() {
+        playPauseStatus.setVisibility(View.GONE);
+        player.start();
+    }
+
+    @Override
+    public void onDvrPause() {
+        playPauseStatus.setVisibility(View.VISIBLE);
+        playPauseStatus.bringToFront();
+        player.pause();
+
     }
 
 
@@ -1314,194 +1214,5 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         startActivity(i);
         finish();
 
-    }
-
-    @Override
-    public void onVisibilityChange(int visibility) {
-        if (visibility == VISIBLE) {
-            currentPlayingDvrChannel.setText(currentDvrChannelItem.getName());
-            currentPlayingDvrChannel.setVisibility(VISIBLE);
-        } else {
-            currentPlayingDvrChannel.setVisibility(GONE);
-        }
-
-    }
-
-    private class PlayerEventListener implements Player.EventListener {
-
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            if (playbackState == Player.STATE_ENDED) {
-//                showControls();
-                if (isDvrPlaying) {
-                    player.seekTo(0);
-                    player.setPlayWhenReady(false);
-                    videoSurfaceView.setUseController(false);
-                    Toast.makeText(VideoPlayActivity.this, "Play back completed.Please choose another video to play", Toast.LENGTH_SHORT).show();
-                    showDvrMenu();
-                    stopCloseMenuHandler();
-                    player.removeListener(this);
-
-
-                }
-            } else if (playWhenReady && playbackState == Player.STATE_READY) {
-                hideProgressBar();
-                hideMenuBg();
-                if (threadToDisplayBoxId.getState() == Thread.State.NEW) {
-                    threadToDisplayBoxId.start();
-                }
-                if (currentFragment != null && currentFragment.isVisible()) {
-                    if (currentFragment instanceof FragmentMenu)
-                        menuFragment.hideErrorFrag();
-                    else if (currentFragment instanceof GridMenuFragment)
-                        gridMenuFragment.hideErrorFrag();
-                } else {
-                    menuFragment.setErrorFragMent(null);
-                }
-                startCloseMenuHandler();
-                if (isDvrPlaying) {
-                    playPauseStatus.setVisibility(View.GONE);
-                    player.setPlayWhenReady(true);
-                    hideMenuUI();
-                } else {
-                    VideoPlayActivity.this.startCloseMenuHandler();
-                    if (!menuFragment.isVisible())
-                        VideoPlayActivity.this.showPriorityNo();
-                }
-            } else if (!playWhenReady && playbackState == Player.STATE_READY) {
-                if (isDvrPlaying) {
-                    playPauseStatus.setVisibility(View.VISIBLE);
-                    playPauseStatus.bringToFront();
-                }
-
-            }
-        }
-
-        @Override
-        public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason) {
-            if (inErrorState) {
-                // This will only occur if the user has performed a seek whilst in the error state. Update
-                // the resume position so that if the user then retries, playback will resume from the
-                // position to which they seeked.
-                updateResumePosition();
-                hideProgressBar();
-            }
-        }
-
-        @Override
-        public void onPlayerError(ExoPlaybackException e) {
-            String errorString = null;
-            switch (e.type) {
-                case ExoPlaybackException.TYPE_RENDERER:
-                    Exception cause = e.getRendererException();
-                    if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
-                        // Special case for decoder initialization failures.
-                        MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
-                                (MediaCodecRenderer.DecoderInitializationException) cause;
-                        if (decoderInitializationException.decoderName == null) {
-                            if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
-                                errorString = getString(R.string.error_querying_decoders);
-                            } else if (decoderInitializationException.secureDecoderRequired) {
-                                errorString = getString(R.string.error_no_secure_decoder,
-                                        decoderInitializationException.mimeType);
-                            } else {
-                                errorString = getString(R.string.error_no_decoder,
-                                        decoderInitializationException.mimeType);
-                            }
-                        } else {
-                            errorString = getString(R.string.error_instantiating_decoder,
-                                    decoderInitializationException.decoderName);
-                        }
-                    } else {
-                        errorString = e.getRendererException().getMessage();
-                    }
-                    break;
-                case ExoPlaybackException.TYPE_SOURCE:
-                    errorString = e.getSourceException().getMessage();
-                    break;
-                case ExoPlaybackException.TYPE_UNEXPECTED:
-                    errorString = e.getUnexpectedException().getMessage();
-                    break;
-            }
-
-
-            if (errorString != null) {
-                Timber.d("on error ");
-                hideProgressBar();
-                hideMacDisplayHandler();
-                stopCloseMenuHandler();
-                showDvrMenu();
-                //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                if (isDvrPlaying) {
-                    videoSurfaceView.setUseController(false);
-                    isDvrPlaying = false;
-                    Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + errorString, Toast.LENGTH_LONG).show();
-                } else {
-                    player.setPlayWhenReady(false);
-                    player.removeListener(playerEventListener);
-                    VideoPlayActivity.this.setErrorFragment(null, e.type, e.rendererIndex);
-                }
-
-            }
-            inErrorState = true;
-            if (isBehindLiveWindow(e)) {
-                clearResumePosition();
-            } else {
-                updateResumePosition();
-//                showControls();
-            }
-        }
-
-        private void showToast(int messageId) {
-            showToast(getString(messageId));
-        }
-
-        private void showToast(String message) {
-            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        @SuppressWarnings("ReferenceEquality")
-        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            if (trackGroups != lastSeenTrackGroupArray) {
-                MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-                if (mappedTrackInfo != null) {
-                    if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_VIDEO)
-                            == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-                        showToast(R.string.error_unsupported_video);
-                    }
-                    if (mappedTrackInfo.getTypeSupport(C.TRACK_TYPE_AUDIO)
-                            == MappingTrackSelector.MappedTrackInfo.RENDERER_SUPPORT_UNSUPPORTED_TRACKS) {
-                        showToast(R.string.error_unsupported_audio);
-                    }
-                }
-                lastSeenTrackGroupArray = trackGroups;
-            }
-        }
-
-    }
-
-    private void updateResumePosition() {
-        startWindow = player.getCurrentWindowIndex();
-        startPosition = Math.max(0, player.getContentPosition());
-    }
-
-    private void clearResumePosition() {
-        startWindow = C.INDEX_UNSET;
-        startPosition = C.TIME_UNSET;
-    }
-
-    private static boolean isBehindLiveWindow(ExoPlaybackException e) {
-        if (e.type != ExoPlaybackException.TYPE_SOURCE) {
-            return false;
-        }
-        Throwable cause = e.getSourceException();
-        while (cause != null) {
-            if (cause instanceof BehindLiveWindowException) {
-                return true;
-            }
-            cause = cause.getCause();
-        }
-        return false;
     }
 }

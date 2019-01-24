@@ -344,9 +344,9 @@
 
         <FrameLayout
             android:id="@+id/preview_container"
-            android:layout_width="300dp"
-            android:minWidth="300dp"
-            android:layout_height="200dp"
+            android:layout_width="400dp"
+            android:minWidth="400dp"
+            android:layout_height="250dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="120dp"
@@ -359,12 +359,12 @@
             android:layout_marginRight="21dp"
             tools:ignore="RtlHardcoded">
 
-            <com.google.android.exoplayer2.ui.PlayerView
+            <SurfaceView
                 android:id="@+id/preview_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="invisible"
-                app:use_controller="false" />
+                />
 
         </FrameLayout>
         <Button

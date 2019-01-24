@@ -27,12 +27,6 @@ android {
     }
     dependencies {
         implementation fileTree(dir: 'libs', include: ['*.jar'])
-        implementation project(':exoplayer-library-core')
-        implementation project(':exoplayer-library-dash')
-        implementation project(':exoplayer-library-ui')
-        implementation project(':exoplayer-library-hls')
-        implementation project(':exoplayer-library-smoothstreaming')
-        implementation project(':exoplayer-library')
 
         implementation 'com.android.support:appcompat-v7:27.1.1'
         implementation 'com.android.support:support-compat:27.1.1'

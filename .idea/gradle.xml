@@ -7,27 +7,6 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/cast" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/cronet" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/ffmpeg" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/flac" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/gvr" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/ima" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/jobdispatcher" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/leanback" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/mediasession" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/okhttp" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/opus" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/rtmp" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/extensions/vp9" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/all" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/core" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/dash" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/hls" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/smoothstreaming" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/library/ui" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/testutils" />
-            <option value="E:/ExoPlayerLib/ExoPlayer/testutils_robolectric" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>
