@@ -1,7 +1,8 @@
 package androidtv.livetv.stb.ui.videoplay.videocontroller;
 
 import android.content.Context;
-import android.media.MediaPlayer;
+
+import org.videolan.libvlc.MediaPlayer;
 
 import androidtv.livetv.stb.entity.ChannelItem;
 
@@ -31,7 +32,7 @@ public class MyVideoController implements VideoControllerView.MediaPlayerControl
     @Override
     public int getDuration() {
         try {
-            return player.getDuration();
+            return (int) player.getLength();
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -41,7 +42,7 @@ public class MyVideoController implements VideoControllerView.MediaPlayerControl
     @Override
     public int getCurrentPosition() {
         try {
-            return player.getCurrentPosition();
+            return (int) player.getTime();
         }catch (Exception e){
             e.printStackTrace();
             return 0;
@@ -50,7 +51,7 @@ public class MyVideoController implements VideoControllerView.MediaPlayerControl
 
     @Override
     public void seekTo(int pos) {
-       player.seekTo(pos);
+       player.setTime(pos);
     }
 
     @Override

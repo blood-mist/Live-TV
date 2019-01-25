@@ -18,7 +18,6 @@ package androidtv.livetv.stb.ui.videoplay.videocontroller;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -38,6 +37,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import org.videolan.libvlc.MediaPlayer;
 
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
@@ -142,9 +143,9 @@ public class VideoControllerView extends FrameLayout {
                 return;
             }
 
-            long duration = player.getDuration();
+            long duration = player.getLength();
             long newposition = (duration * progress) / 1000L;
-            player.seekTo((int) newposition);
+            player.setTime((int) newposition);
             if (mCurrentTime != null)
                 mCurrentTime.setText(stringForTime((int) newposition));
         }
@@ -480,7 +481,7 @@ public class VideoControllerView extends FrameLayout {
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
             if (uniqueDown && !mPlayer.isPlaying()) {
-                player.start();
+                player.play();
                 updatePausePlay();
                 show(sDefaultTimeout);
             }
@@ -522,7 +523,7 @@ public class VideoControllerView extends FrameLayout {
             Log.d("CheckingPuse", "Have to pause");
         } else {
            // TVPlayCustomController_.playPauseStatus.setVisibility(INVISIBLE);
-            player.start();
+            player.play();
         }
         updatePausePlay();
     }

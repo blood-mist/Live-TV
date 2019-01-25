@@ -30,31 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.RenderersFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.UdpDataSource;
-import com.google.android.exoplayer2.util.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -106,20 +81,16 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
  * A simple {@link Fragment} subclass to show menu
  */
 public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener, Observer {
-    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private static final int IS_FAV = 1;
     private static final int ALL_CHANNELS_ADDED = 99;
     private static final int CHANNEL_ITEMS_SPECIFIER = 9;
     private MenuViewModel menuViewModel;
     private FragmentMenuInteraction mListener;
-    private DefaultTrackSelector trackSelector;
     private ChannelListAdapter adapter;
     CategoryAdapter categoryAdapter;
     private SharedPreferences lastPlayedPrefs;
     private List<ChannelItem> currentPlayedCategoryItems;
     private View selectedCategoryView;
-    private SimpleExoPlayer player;
-    DataSource.Factory dataSourceFactory;
 
     private Handler watchPreviewHandler = new Handler();
 
@@ -165,7 +136,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.gv_channels)
     RecyclerView gvChannelsList;
     @BindView(R.id.preview_view)
-    PlayerView previewView;
+    SurfaceView previewView;
     @BindView(R.id.preview_container)
     FrameLayout previewContainer;
     @BindView(R.id.epg)
@@ -722,7 +693,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      */
     private void stopPreview() {
         DisposableManager.dispose();
-        releasePlayer();
+//        releasePlayer();
         previewView.setVisibility(View.INVISIBLE);
         previewContainer.setVisibility(View.INVISIBLE);
         watchPreviewHandler.removeCallbacksAndMessages(null);
@@ -761,101 +732,17 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         watchPreviewHandler.postDelayed(() -> fetchPreview(channelItem), TimeUnit.SECONDS.toMillis(3));
     }
 
-    private DataSource.Factory buildDataSourceFactory() {
-        return ((ApplicationMain) ((Objects.requireNonNull(getActivity())).getApplication())).buildDataSourceFactory(BANDWIDTH_METER);
-    }
     /**
      * initialise video view here
      *
      * @param link
      **/
     private void initVideoView(String link) {
-        boolean needNewPlayer = player == null;
-        if(needNewPlayer){
-             dataSourceFactory=buildDataSourceFactory();;
-            TrackSelection.Factory adaptiveTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory();
-            trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
-            DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
-            trackSelector.setParameters(trackSelectorParameters);
-            DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
-            DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
-            DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
-            defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(), DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-            player = ExoPlayerFactory.newSimpleInstance(getActivity(), renderersFactory, trackSelector, defaultLoadControl);
-        }
-        player.setVolume(0f);
-        player.setPlayWhenReady(true);
-        previewView.setPlayer(player);
-        previewView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
-        player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-        player.setVideoSurfaceView((SurfaceView) previewView.getVideoSurfaceView());
-        String splitUrl = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl));
-        player.prepare(mediaSource);
-        player.addListener(new Player.EventListener() {
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-                player.setPlayWhenReady(false);
-                player.removeListener(this);
-                Toast.makeText(getActivity(),"Preview not available",Toast.LENGTH_SHORT).show();
-                releasePlayer();
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                if(playWhenReady && playbackState==Player.STATE_READY){
-                    previewView.setVisibility(View.VISIBLE);
-                    previewContainer.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
     }
 
-    private void releasePlayer() {
-        if (player != null) {
-            player.release();
-            player = null;
-            trackSelector=null;
-        }
-    }
 
-    private MediaSource buildMediaSource(Uri uri) {
-        @C.ContentType int type = Util.inferContentType(uri);
-        switch (type) {
-            case C.TYPE_DASH:
-                return new DashMediaSource.Factory(
-                        new DefaultDashChunkSource.Factory(dataSourceFactory),
-                        buildDataSourceFactory())
-                        .createMediaSource(uri);
-            case C.TYPE_SS:
-                return new SsMediaSource.Factory(
-                        new DefaultSsChunkSource.Factory(dataSourceFactory),
-                        buildDataSourceFactory())
-                        .createMediaSource(uri);
-            case C.TYPE_HLS:
-                    return new HlsMediaSource.Factory(dataSourceFactory)
-                            .createMediaSource(uri);
-            case C.TYPE_OTHER:
-                try {
-                    UdpDataSource.Factory udpDataSource = dataSourceFactory;
-                    return new ExtractorMediaSource.Factory(udpDataSource)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
-                            .createMediaSource(uri);
-                } catch (Exception e) {
-                    return new ExtractorMediaSource.Factory(dataSourceFactory)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
-                            .createMediaSource(uri);
-                }
-            default: {
-                throw new IllegalStateException("Unsupported type: " + type);
-            }
-        }
-    }
+
 
     @Override
     public void onHiddenChanged(boolean hidden) {

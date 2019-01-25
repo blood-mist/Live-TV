@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -34,7 +33,12 @@ import com.wang.avi.AVLoadingIndicatorView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.Media;
+import org.videolan.libvlc.MediaPlayer;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -77,7 +81,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
 import static java.lang.Thread.sleep;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
-        SurfaceHolder.Callback, EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis {
+        EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis, IVLCVout.Callback,GridMenuFragment.OnFragmentInteractionListener {
 
     @BindView(R.id.img_play_pause)
     ImageView playPauseStatus;
@@ -117,6 +121,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private SharedPreferences lastPlayedPrefs;
     private SharedPreferences.Editor editor;
     String macAddress;
+    LibVLC libVLC;
     private ChannelItem currentDvrChannelItem;
     private String nextVideoNameDvr;
     private boolean isDvrPlaying;
@@ -126,6 +131,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private int selectedDvrPosition = 0;
     private int selectedDvrDate = 0;
     private Epgs currentPlayedEpg;
+    private int lastPlayedId;
 
 
     @Override
@@ -162,17 +168,45 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("activity_state", "onStart");
         super.onStart();
         videoPlayViewModel = ViewModelProviders.of(this).get(VideoPlayViewModel.class);
+        playLastPlayedChannel();
         getAllChannelListfromDB();
         if (gridMenuFragment == null) {
             gridMenuFragment = new GridMenuFragment();
         }
 
     }
-
+    private void playLastPlayedChannel() {
+        lastPlayedId = lastPlayedPrefs.getInt(CHANNEL_ID, -1);
+        if (lastPlayedId != -1) {
+            LiveData<ChannelItem> lastPlayedChData = videoPlayViewModel.getLastPlayedChannel(lastPlayedId);
+            lastPlayedChData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
+                @Override
+                public void onChanged(@Nullable ChannelItem channelItem) {
+                    if (channelItem != null) {
+                        playChannel(channelItem);
+                        lastPlayedChData.removeObserver(this);
+                    }
+                }
+            });
+        } else {
+            LiveData<ChannelItem> firstPlayedData = videoPlayViewModel.getFirstChannel();
+            firstPlayedData.observe(this, new android.arch.lifecycle.Observer<ChannelItem>() {
+                @Override
+                public void onChanged(@Nullable ChannelItem channelItem) {
+                    if (channelItem != null) {
+                        playChannel(channelItem);
+                        firstPlayedData.removeObserver(this);
+                    }
+                }
+            });
+//            openErrorFragment();
+        }
+    }
     private void initSurafaceView() {
+        libVLC = new LibVLC(this);
         SurfaceHolder videoHolder = videoSurfaceView.getHolder();
-        videoHolder.addCallback(this);
-        player = new MediaPlayer();
+//        videoHolder.addCallback(this);
+        player = new MediaPlayer(libVLC);
     }
 
     private void openFragment(Fragment fragment) {
@@ -180,6 +214,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         currentFragment = fragment;
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.container_movie_player, currentFragment).commit();
     }
+
     public void openListMenu() {
         if (menuFragment != null)
             currentFragment = menuFragment;
@@ -209,19 +244,19 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         if (currentFragment instanceof DvrFragment) {
                             if (mVideoController == null) {
                                 removeOptionalFragments();
-                            }else{
-                                if(currentFragment.isHidden())
+                            } else {
+                                if (currentFragment.isHidden())
                                     showDvrMenu();
                                 else hideMenuUI();
                             }
-                        } else if(currentFragment instanceof FragmentMenu) {
+                        } else if (currentFragment instanceof FragmentMenu) {
 
-                            if(mVideoController != null && currentFragment.isHidden()) {
+                            if (mVideoController != null && currentFragment.isHidden()) {
                                 dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
                                 dvrFragment.setGetSelectedDatePosition(selectedDvrDate);
                                 dvrFragment.setSelectedDvrPosition(selectedDvrPosition);
                                 load(dvrFragment, "dvr");
-                            }else if(player != null && player.isPlaying()){
+                            } else if (player != null && player.isPlaying()) {
                                 if (currentFragment != null && currentFragment.isVisible())
                                     hideMenuUI();
                                 else {
@@ -238,8 +273,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 try {
-                    if (mVideoController != null && !mVideoController.isShowing() && menuFrag.isHidden() && player.getCurrentPosition() > 0) {
-                        player.seekTo(player.getCurrentPosition() + 15000);
+                    if (mVideoController != null && !mVideoController.isShowing() && menuFrag.isHidden() && player.getTime() > 0) {
+                        player.setTime(player.getTime() + 15000);
                         return true;
                     } else
                         return false;
@@ -250,8 +285,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 try {
-                    if (mVideoController != null && !mVideoController.isShowing()&& menuFrag.isHidden() && player.getCurrentPosition() > 0) {
-                        player.seekTo(player.getCurrentPosition() - 15000);
+                    if (mVideoController != null && !mVideoController.isShowing() && menuFrag.isHidden() && player.getTime() > 0) {
+                        player.setTime(player.getTime() - 15000);
                         return true;
                     } else
                         return false;
@@ -260,11 +295,11 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
 
             case KeyEvent.KEYCODE_MEDIA_REWIND:
-                player.seekTo(player.getCurrentPosition() - 5 * 60 * 1000);
+                player.setTime(player.getTime() - 5 * 60 * 1000);
                 return true;
 
             case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
-                player.seekTo(player.getCurrentPosition() + 5 * 60 * 1000);
+                player.setTime(player.getTime() + 5 * 60 * 1000);
                 return true;
 
 
@@ -515,7 +550,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         chFrmPriorityHandler.postDelayed(runnableChangeChannelFromNumbers, 2000);
     }
 
-    private void getAllChannelListfromDB(){
+    private void getAllChannelListfromDB() {
         LiveData<List<ChannelItem>> listLiveData = videoPlayViewModel.getAllChannels();
         listLiveData.observe(this, new Observer<List<ChannelItem>>() {
             @Override
@@ -527,6 +562,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         });
     }
+
     private void searchChannelWithgivenPriorityNumber(String priorityNumber) {
         checkIfChannelExistsAndPlay(allChannelList, priorityNumber);
         txtChangeChannelFromPriority.setText("");
@@ -602,17 +638,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             if (currentFragment instanceof DvrFragment) {
                 if (!isDvrPlaying) {
                     removeOptionalFragments();
-                }else{
-                    if(currentFragment.isHidden()) showDvrMenu();
+                } else {
+                    if (currentFragment.isHidden()) showDvrMenu();
                     else removeOptionalFragments();
                 }
             } else if ((currentFragment instanceof FragmentMenu || currentFragment instanceof GridMenuFragment) && currentFragment.isVisible()) {
-                try {
-                    player.stop();
-                    player.reset();
-                    player.release();
-                } catch (Exception ignored) {
-                }
+                releasePlayer();
                 getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
                 finish();
                 super.onBackPressed();
@@ -621,6 +652,17 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             }
         }
 
+    }
+
+    private void releasePlayer() {
+        if (libVLC == null)
+            return;
+        player.stop();
+        final IVLCVout vout = player.getVLCVout();
+        vout.removeCallback(this);
+        vout.detachViews();
+        libVLC.release();
+        libVLC = null;
     }
 
     private void removeOptionalFragments() {
@@ -669,7 +711,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onUserInteraction();
         stopCloseMenuHandler();
         try {
-            if (player.getCurrentPosition() > 0 && player.isPlaying())
+            if (player.getTime() > 0 && player.isPlaying())
                 startCloseMenuHandler();
         } catch (Exception ignored) {
         }
@@ -739,12 +781,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         saveCurrentInPrefs(item);
         mVideoController = null;
         selectedDvrDate = 0;
-        selectedDvrPosition =0;
+        selectedDvrPosition = 0;
         currentPlayedEpg = null;
         Timber.d("Played Channel:" + item.getName());
         //TODO play Channels
         try {
-            if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getCurrentPosition() > 0 && !isDvrPlaying) {
+            if (currentPlayingChannel != null && currentPlayingChannel.getId() == item.getId() && player != null && player.isPlaying() && player.getTime() > 0 && !isDvrPlaying) {
                 hideMenuUI();
             } else {
                 showProgressBar();
@@ -781,7 +823,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
         dvrFragment.setCurrentChannel(current);
         dvrFragment.setAllChannelList(allChannelList);
-        load(dvrFragment,dvr);
+        load(dvrFragment, dvr);
 
     }
 
@@ -845,14 +887,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     protected void onPause() {
         EventBus.getDefault().unregister(this);
         Log.d("activity_state", "onPause");
-        try {
-            player.stop();
-            player.reset();
-            player.release();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        releasePlayer();
         try {
             getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
         } catch (Exception ignored) {
@@ -869,14 +904,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     protected void onStop() {
         Log.d("activity_state", "onStop");
-        try {
-            player.stop();
-            player.reset();
-            player.release();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        releasePlayer();
         try {
             getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
             menuFragment = null;
@@ -889,13 +917,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     @Override
     protected void onDestroy() {
-        try {
-            player.stop();
-            player.reset();
-            player.release();
-        } catch (Exception e) {
-
-        }
+        releasePlayer();
         hideMacDisplayHandler();
         super.onDestroy();
     }
@@ -903,228 +925,214 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private void playVideo(String channelLink, boolean isDvr) {
         Log.d("media", channelLink);
         if (player == null) {
-            player = new MediaPlayer();
+            player = new MediaPlayer(libVLC);
         }
-
-//        String link = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+        else{
+            player.stop();
+        }
+        String link = "udp://@239.1.20.1:8002";
         try {
-            player.reset();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            player.setDataSource(this, Uri.parse(channelLink));
-            player.prepareAsync();
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            player.setEventListener(new MediaPlayer.EventListener() {
                 @Override
-                public void onPrepared(MediaPlayer mp) {
-                    VideoPlayActivity.this.hideMenuBg();
-                    player.setScreenOnWhilePlaying(true);
-                    player.start();
-                    hideProgressBar();
+                public void onEvent(MediaPlayer.Event event) {
+                    switch (event.type) {
+                        case MediaPlayer.Event.EndReached:
+                            if (isDvr) {
+                                showDvrMenu();
+                                releasePlayer();
+                                Toast.makeText(VideoPlayActivity.this, "Play back completed.Please choose another video to play", Toast.LENGTH_SHORT).show();
+                                //loadNextDvr();
+                            }
+                            break;
+                        case MediaPlayer.Event.Playing:
+                            hideMenuBg();
+                            hideProgressBar();
 
-                    if (threadToDisplayBoxId.getState() == Thread.State.NEW)
-                    {
-                        threadToDisplayBoxId.start();
+                            if (threadToDisplayBoxId.getState() == Thread.State.NEW) {
+                                threadToDisplayBoxId.start();
+                            }
+
+                            startCloseMenuHandler();
+                            if (isDvr) {
+                                MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
+                                mVideoController = new VideoControllerView(VideoPlayActivity.this, true);
+                                mVideoController.setAnchorView(videoSurfaceContainer);
+                                mVideoController.setMediaPlayer(controller, player);
+                                mVideoController.show();
+                                recordedStatus.setVisibility(View.VISIBLE);
+                                isDvrPlaying = true;
+//                                menuFragment.setDvr(true);
+                            } else {
+                                isDvrPlaying = false;
+                                recordedStatus.setVisibility(View.GONE);
+//                                menuFragment.setDvr(false);
+//                                menuFragment.setDvrPlayedChannel(null);
+
+
+                            }
+
+                            if (isDvr) {
+                                hideMenuUI();
+                            } else {
+                                VideoPlayActivity.this.startCloseMenuHandler();
+                                /*if (!menuFragment.isVisible())
+                                    VideoPlayActivity.this.showPriorityNo();
+
+                                if (menuFragment != null && menuFragment.isAdded()&& menuFragment.isVisible()) {
+                                    menuFragment.hideErrorFrag();
+                                } else {
+                                    menuFragment.setErrorFragMent(null);
+                                }*/
+                            }
+
+                            break;
+                        case MediaPlayer.Event.EncounteredError:
+                            Timber.d("on error ");
+                            hideProgressBar();
+                            hideMacDisplayHandler();
+                            stopCloseMenuHandler();
+                            showDvrMenu();
+//                            StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(event.).append("E").append(extra);
+                            //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
+                            if (isDvr) {
+                                isDvrPlaying = false;
+                                Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media", Toast.LENGTH_LONG).show();
+                                VideoPlayActivity.this.stopCloseMenuHandler();
+
+                            } else {
+                                VideoPlayActivity.this.setErrorFragment(null, 404, 1);
+                            }
+                            break;
+                        case MediaPlayer.Event.Paused:
+                        case MediaPlayer.Event.Stopped:
+                        default:
+                            break;
                     }
-
-                    startCloseMenuHandler();
-                    if (isDvr) {
-                        MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
-                        mVideoController = new VideoControllerView(VideoPlayActivity.this, true);
-                        mVideoController.setAnchorView(videoSurfaceContainer);
-                        mVideoController.setMediaPlayer(controller, player);
-                        mVideoController.show();
-                        recordedStatus.setVisibility(View.VISIBLE);
-                        isDvrPlaying = true;
-                        menuFragment.setDvr(true);
-                    } else {
-                        isDvrPlaying = false;
-                        recordedStatus.setVisibility(View.GONE);
-                        menuFragment.setDvr(false);
-                        menuFragment.setDvrPlayedChannel(null);
-
-
-                    }
-
-                    if (isDvr) {
-                        VideoPlayActivity.this.hideMenuUI();
-                    } else {
-                        VideoPlayActivity.this.startCloseMenuHandler();
-                        if (!menuFragment.isVisible())
-                            VideoPlayActivity.this.showPriorityNo();
-
-                        if (menuFragment != null || menuFragment.isVisible()) {
-                            menuFragment.hideErrorFrag();
-                        } else {
-                            menuFragment.setErrorFragMent(null);
-                        }
-                    }
-
-
                 }
             });
+            final IVLCVout vout = player.getVLCVout();
+            vout.setVideoView(videoSurfaceView);
+            vout.addCallback(this);
+            vout.attachViews();
+            Media m = new Media(libVLC,Uri.parse(link));
+            player.setMedia(m);
+            player.play();
 
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    if (isDvr) {
-                        showDvrMenu();
-                        Toast.makeText(VideoPlayActivity.this, "Play back completed.Please choose another video to play", Toast.LENGTH_SHORT).show();
-                        //loadNextDvr();
-                    }
-                }
-            });
-
-
-            player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    if (what == -1003)
-                        player.setOnErrorListener(null);
-                    Timber.d("on error ");
-                    hideProgressBar();
-                    hideMacDisplayHandler();
-                    stopCloseMenuHandler();
-                    showDvrMenu();
-                    StringBuilder sb = new StringBuilder().append("MEDIA_ERROR:\t").append("W").append(what).append("E").append(extra);
-                    //Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                    if (isDvr) {
-                        isDvrPlaying = false;
-                        Toast.makeText(VideoPlayActivity.this, "PlayBack Error:: Playing Media" + sb.toString(), Toast.LENGTH_LONG).show();
-                        VideoPlayActivity.this.stopCloseMenuHandler();
-
-                    } else {
-                        VideoPlayActivity.this.setErrorFragment(null, what, extra);
-                    }
-
-                    return true;
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    private void loadNextDvr() {
-        showProgressBar();
-        long utc = GetUtc.getInstance().getTimestamp().getUtc();
-        Login login = GlobalVariables.login;
-        videoPlayViewModel.getNextDvrLink(login.getToken(), utc, login.getId(),
-                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-                currentDvrChannelItem.getId(), nextVideoNameDvr).observe(this, new Observer<DvrLinkResponse>() {
-            @Override
-            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-                if (channelLinkResponse != null) {
-                    if (channelLinkResponse.getErrorCode() > 0) {
-                        Log.d("dvr", "error");
-                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
-                        showDvrMenu();
-                        hideProgressBar();
-                    } else {
-                        setUpVideoController(currentDvrChannelItem, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
-                    }
-                }
-            }
-        });
-
-    }
-
-    private void showDvrMenu() {
-        Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-        if (menuFrag == null)
-//            openFragment(menuFragment);
-            openFragment(gridMenuFragment);
-        else {
-            try {
-                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
-            } catch (Exception ignored) {
-            }
-
-
-        }
-    }
-
-    private void startCloseMenuHandler() {
-        hideMenuHandler.postDelayed(closeFragmentRunnable, 15 * 1000);
-
-    }
-
-    public void stopCloseMenuHandler() {
-        hideMenuHandler.removeCallbacks(closeFragmentRunnable);
-    }
-
-    private Runnable closeFragmentRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-
-                hideMenuUI();
-
-
-            } catch (Exception e) {
+            } catch(Exception e){
                 e.printStackTrace();
             }
 
         }
-    };
 
-    private void hideMenuUI() {
-        Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-        if (menuFrag != null)
-            getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).hide(menuFrag).commit();
-    }
 
-    private void showMenuBg() {
-        menuBackground.setVisibility(View.VISIBLE);
-    }
+        private void loadNextDvr () {
+            showProgressBar();
+            long utc = GetUtc.getInstance().getTimestamp().getUtc();
+            Login login = GlobalVariables.login;
+            videoPlayViewModel.getNextDvrLink(login.getToken(), utc, login.getId(),
+                    LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                    currentDvrChannelItem.getId(), nextVideoNameDvr).observe(this, new Observer<DvrLinkResponse>() {
+                @Override
+                public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                    if (channelLinkResponse != null) {
+                        if (channelLinkResponse.getErrorCode() > 0) {
+                            Log.d("dvr", "error");
+                            Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
+                            showDvrMenu();
+                            hideProgressBar();
+                        } else {
+                            setUpVideoController(currentDvrChannelItem, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
+                        }
+                    }
+                }
+            });
 
-    private void hideMenuBg() {
-        menuBackground.setVisibility(View.GONE);
-    }
+        }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        player.setDisplay(surfaceHolder);
-    }
+        private void showDvrMenu () {
+            Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+            if (menuFrag == null)
+//            openFragment(menuFragment);
+                openFragment(gridMenuFragment);
+            else {
+                try {
+                    getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFrag).commit();
+                } catch (Exception ignored) {
+                }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        player.setDisplay(surfaceHolder);
-    }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+            }
+        }
 
-    }
+        private void startCloseMenuHandler () {
+            hideMenuHandler.postDelayed(closeFragmentRunnable, 15 * 1000);
 
-    private void hideProgressBar() {
-        progressBar.smoothToHide();
-    }
+        }
 
-    private void showProgressBar() {
-        progressBar.smoothToShow();
-        progressBar.bringToFront();
-    }
+        public void stopCloseMenuHandler () {
+            hideMenuHandler.removeCallbacks(closeFragmentRunnable);
+        }
 
-    @Override
-    public void playChannelFromOnAir(ChannelItem channel, int channelPositionById, boolean onAir) {
-        getSupportFragmentManager().popBackStack();
-        menuFragment.onClickChannel(getString(R.string.all_channels),0,channelPositionById,allChannelList);
+        private Runnable closeFragmentRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    hideMenuUI();
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+
+        private void hideMenuUI () {
+            Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+            if (menuFrag != null)
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).hide(menuFrag).commit();
+        }
+
+        private void showMenuBg () {
+            menuBackground.setVisibility(View.VISIBLE);
+        }
+
+        private void hideMenuBg () {
+            menuBackground.setVisibility(View.GONE);
+        }
+
+
+        private void hideProgressBar () {
+            progressBar.smoothToHide();
+        }
+
+        private void showProgressBar () {
+            progressBar.smoothToShow();
+            progressBar.bringToFront();
+        }
+
+        @Override
+        public void playChannelFromOnAir (ChannelItem channel,int channelPositionById, boolean onAir)
+        {
+            getSupportFragmentManager().popBackStack();
+            menuFragment.onClickChannel(getString(R.string.all_channels), 0, channelPositionById, allChannelList);
 //        playChannel(channel);
-    }
+        }
 
-    @Override
-    public void playDvr(Epgs epgs, ChannelItem item,int selectedPosition,int selectedDatePosition) {
-        selectedDvrPosition = selectedPosition;
-        selectedDvrDate = selectedDatePosition;
-        currentPlayedEpg = epgs;
-        saveCurrentInPrefs(item);
-        menuFragment.setDvrPlayedChannel(item);
-        showProgressBar();
-        long utc = GetUtc.getInstance().getTimestamp().getUtc();
-        Login login = GlobalVariables.login;
-        String date = DateUtils.dateAndTime.format(epgs.getStartTime());
-        String startTime = DateUtils._24HrsTimeFormat.format(epgs.getStartTime());
+        @Override
+        public void playDvr (Epgs epgs, ChannelItem item,int selectedPosition,
+        int selectedDatePosition){
+            selectedDvrPosition = selectedPosition;
+            selectedDvrDate = selectedDatePosition;
+            currentPlayedEpg = epgs;
+            saveCurrentInPrefs(item);
+            menuFragment.setDvrPlayedChannel(item);
+            showProgressBar();
+            long utc = GetUtc.getInstance().getTimestamp().getUtc();
+            Login login = GlobalVariables.login;
+            String date = DateUtils.dateAndTime.format(epgs.getStartTime());
+            String startTime = DateUtils._24HrsTimeFormat.format(epgs.getStartTime());
         /*LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
                         login.getSession()), macAddress, item.getId());
@@ -1151,68 +1159,79 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
             }
         });*/
-        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
-                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-                epgs.getChannelID(), date, startTime);
-        dvrData.observe(this, new Observer<DvrLinkResponse>() {
-            @Override
-            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-                if (channelLinkResponse != null) {
-                    if (channelLinkResponse.getLink() != null) {
-                        String url = channelLinkResponse.getLink();
-                        String[] parts = url.split(".m3u8");
-                        String part1 = parts[0];
-                        String part2 = parts[1];
-                        long milis = epgs.getStartTime().getTime();
-                        milis = milis/1000;
-                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
-                        long seconds = diff / 1000;
-                        String buildUrl = part1+"-"+String.valueOf(milis)+"-"+String.valueOf(seconds)+".m3u8"+part2;
-                        Log.d("buiFldurl",buildUrl);
-                        setUpVideoController(item, buildUrl,"");
-                    } else  {
-                        Toast.makeText(VideoPlayActivity.this, "Dvr cannot be played", Toast.LENGTH_SHORT).show();
+            LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
+                    LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+                    epgs.getChannelID(), date, startTime);
+            dvrData.observe(this, new Observer<DvrLinkResponse>() {
+                @Override
+                public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+                    if (channelLinkResponse != null) {
+                        if (channelLinkResponse.getLink() != null) {
+                            String url = channelLinkResponse.getLink();
+                            String[] parts = url.split(".m3u8");
+                            String part1 = parts[0];
+                            String part2 = parts[1];
+                            long milis = epgs.getStartTime().getTime();
+                            milis = milis / 1000;
+                            long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
+                            long seconds = diff / 1000;
+                            String buildUrl = part1 + "-" + String.valueOf(milis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
+                            Log.d("buiFldurl", buildUrl);
+                            setUpVideoController(item, buildUrl, "");
+                        } else {
+                            Toast.makeText(VideoPlayActivity.this, "Dvr cannot be played", Toast.LENGTH_SHORT).show();
+                        }
+                        dvrData.removeObserver(this);
+
                     }
-                    dvrData.removeObserver(this);
-
                 }
-            }
-        });
+            });
+
+
+        }
+
+        private void setUpVideoController (ChannelItem item, String link, String nextVideoName){
+            currentDvrChannelItem = item;
+            nextVideoNameDvr = nextVideoName;
+            VideoPlayActivity.this.playVideo(link, true);
+
+
+        }
+
+
+        @Override
+        public void onDvrStart () {
+            playPauseStatus.setVisibility(View.GONE);
+            player.play();
+        }
+
+        @Override
+        public void onDvrPause () {
+            playPauseStatus.setVisibility(View.VISIBLE);
+            playPauseStatus.bringToFront();
+            player.pause();
+
+        }
+
+
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onMessageEvent (LoginDataDelete event){
+            int vav = event.getLongVa();
+            Intent i = new Intent(VideoPlayActivity.this, SplashActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finish();
+
+        }
+
+        @Override
+        public void onSurfacesCreated (IVLCVout vlcVout){
+        }
+
+        @Override
+        public void onSurfacesDestroyed (IVLCVout vlcVout){
+
+        }
 
 
     }
-
-    private void setUpVideoController(ChannelItem item, String link, String nextVideoName) {
-        currentDvrChannelItem = item;
-        nextVideoNameDvr = nextVideoName;
-        VideoPlayActivity.this.playVideo(link, true);
-
-
-    }
-
-
-    @Override
-    public void onDvrStart() {
-        playPauseStatus.setVisibility(View.GONE);
-        player.start();
-    }
-
-    @Override
-    public void onDvrPause() {
-        playPauseStatus.setVisibility(View.VISIBLE);
-        playPauseStatus.bringToFront();
-        player.pause();
-
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(LoginDataDelete event) {
-        int vav = event.getLongVa();
-        Intent i = new Intent(VideoPlayActivity.this, SplashActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
-        finish();
-
-    }
-}
