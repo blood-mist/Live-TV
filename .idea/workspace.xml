@@ -18,25 +18,14 @@
     <list default="true" id="41cd07d5-b581-4097-a120-58e3be3b6f22" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ApplicationMain.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ApplicationMain.java" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/videocontroller/MyVideoController.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/videocontroller/MyVideoController.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/videocontroller/VideoControllerView.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/videocontroller/VideoControllerView.java" />
-      <change beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -67,17 +56,27 @@
       <file leaf-file-name="VideoPlayActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="208" column="8" lean-forward="false" selection-start-line="208" selection-start-column="8" selection-end-line="208" selection-end-column="8" />
+            <state relative-caret-position="399">
+              <caret line="211" column="63" lean-forward="true" selection-start-line="211" selection-start-column="63" selection-end-line="211" selection-end-column="63" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#46093#46094#0" expanded="true" />
-                <element signature="e#46159#46160#0" expanded="true" />
-                <element signature="e#46197#46198#0" expanded="true" />
-                <element signature="e#46260#46261#0" expanded="true" />
-                <element signature="e#46304#46305#0" expanded="true" />
-                <element signature="e#46354#46355#0" expanded="true" />
+                <element signature="e#46633#46634#0" expanded="true" />
+                <element signature="e#46699#46700#0" expanded="true" />
+                <element signature="e#46737#46738#0" expanded="true" />
+                <element signature="e#46800#46801#0" expanded="true" />
+                <element signature="e#46844#46845#0" expanded="true" />
+                <element signature="e#46894#46895#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LibVLC.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.mrmaffen/libvlc-android/2.1.12/d9666028cc98baad455f2a2b56616c97b40c5fcf/libvlc-android-2.1.12-sources.jar!/org/videolan/libvlc/LibVLC.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-3">
+              <caret line="135" column="2" lean-forward="false" selection-start-line="135" selection-start-column="2" selection-end-line="135" selection-end-column="2" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -206,8 +205,8 @@
       <find>onH</find>
       <find>buildMed</find>
       <find>onKeyDown</find>
-      <find>init</find>
       <find>playVideo</find>
+      <find>init</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -5913,12 +5912,12 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53782505" sideWeight="0.51611173" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293979" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3270366" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5371901" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3270366" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5371901" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286052" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32921588" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -5947,12 +5946,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1155</line>
+          <line>1166</line>
           <properties />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1158</line>
+          <line>1169</line>
           <properties />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
@@ -5994,13 +5993,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1035</line>
+          <line>1046</line>
           <properties />
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1029</line>
+          <line>1040</line>
           <properties />
           <option name="timeStamp" value="41" />
         </line-breakpoint>
@@ -6052,14 +6051,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-15">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/DefaultDataSourceFactory.java" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/DefaultDataSource.java" />
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultHttpDataSource.java">
@@ -6416,8 +6407,8 @@
         <state relative-caret-position="12875">
           <caret line="558" column="25" lean-forward="false" selection-start-line="558" selection-start-column="25" selection-end-line="558" selection-end-column="25" />
           <folding>
-            <element signature="e#20530#20531#0" expanded="true" />
-            <element signature="e#20584#20585#0" expanded="true" />
+            <element signature="e#20530#20531#0" expanded="false" />
+            <element signature="e#20584#20585#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -6435,18 +6426,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/de.mrmaffen/libvlc-android/2.1.12/d9666028cc98baad455f2a2b56616c97b40c5fcf/libvlc-android-2.1.12-sources.jar!/org/videolan/libvlc/LibVLC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3">
+          <caret line="135" column="2" lean-forward="false" selection-start-line="135" selection-start-column="2" selection-end-line="135" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="208" column="8" lean-forward="false" selection-start-line="208" selection-start-column="8" selection-end-line="208" selection-end-column="8" />
+        <state relative-caret-position="399">
+          <caret line="211" column="63" lean-forward="true" selection-start-line="211" selection-start-column="63" selection-end-line="211" selection-end-column="63" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#46093#46094#0" expanded="true" />
-            <element signature="e#46159#46160#0" expanded="true" />
-            <element signature="e#46197#46198#0" expanded="true" />
-            <element signature="e#46260#46261#0" expanded="true" />
-            <element signature="e#46304#46305#0" expanded="true" />
-            <element signature="e#46354#46355#0" expanded="true" />
+            <element signature="e#46633#46634#0" expanded="true" />
+            <element signature="e#46699#46700#0" expanded="true" />
+            <element signature="e#46737#46738#0" expanded="true" />
+            <element signature="e#46800#46801#0" expanded="true" />
+            <element signature="e#46844#46845#0" expanded="true" />
+            <element signature="e#46894#46895#0" expanded="true" />
           </folding>
         </state>
       </provider>

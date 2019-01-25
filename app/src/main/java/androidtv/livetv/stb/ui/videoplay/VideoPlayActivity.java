@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -81,7 +82,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
 import static java.lang.Thread.sleep;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
-        EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis, IVLCVout.Callback,GridMenuFragment.OnFragmentInteractionListener {
+        EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis, IVLCVout.Callback,GridMenuFragment.OnFragmentInteractionListener{
 
     @BindView(R.id.img_play_pause)
     ImageView playPauseStatus;
@@ -203,11 +204,23 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         }
     }
     private void initSurafaceView() {
+        int w = getWindow().getDecorView().getWidth();
+        int h = getWindow().getDecorView().getHeight();
+        /*ArrayList<String> options = new ArrayList<String>();
+        options.add("--subsdec-encoding <encoding>");
+        options.add("--aout=opensles");
+        options.add("--audio-time-stretch"); // time stretching
+        options.add("-vvv"); // verbosity*/
         libVLC = new LibVLC(this);
         SurfaceHolder videoHolder = videoSurfaceView.getHolder();
-//        videoHolder.addCallback(this);
-        player = new MediaPlayer(libVLC);
+        videoHolder.setFixedSize(w,h);
+       /* ViewGroup.LayoutParams lp = videoSurfaceView.getLayoutParams();
+        lp.width = w;
+        lp.height = h;
+        videoSurfaceView.setLayoutParams(lp);
+        videoSurfaceView.invalidate();*/
     }
+
 
     private void openFragment(Fragment fragment) {
         Log.d("frag", "called from activity");
@@ -924,12 +937,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void playVideo(String channelLink, boolean isDvr) {
         Log.d("media", channelLink);
-        if (player == null) {
-            player = new MediaPlayer(libVLC);
+        if (player != null) {
+           player.release();
         }
-        else{
-            player.stop();
-        }
+       player=new MediaPlayer(libVLC);
         String link = "udp://@239.1.20.1:8002";
         try {
             player.setEventListener(new MediaPlayer.EventListener() {
