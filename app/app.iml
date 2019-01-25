@@ -171,6 +171,7 @@
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.1" level="project" />
     <orderEntry type="module" module-name="exoplayer-library-hls" />
     <orderEntry type="module" module-name="exoplayer-library-smoothstreaming" />
+    <orderEntry type="module" module-name="exoplayer-extension-ffmpeg" />
     <orderEntry type="module" module-name="exoplayer-library-core" />
     <orderEntry type="module" module-name="exoplayer-library-dash" />
     <orderEntry type="module" module-name="exoplayer-library" />

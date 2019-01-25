@@ -1079,8 +1079,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "udp://@239.1.20.1:8002";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(channelLink), isDvr);
+        String splitUrl = "http://mpgedit.org/mpgedit/mpgedit/testdata/mpeg1/layer2/fl10.mp2";
+        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
         if (haveResumePosition) {
