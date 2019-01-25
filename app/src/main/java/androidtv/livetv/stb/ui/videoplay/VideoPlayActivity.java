@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
@@ -20,8 +22,10 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -82,8 +86,21 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
 import static java.lang.Thread.sleep;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction,
-        EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis, IVLCVout.Callback,GridMenuFragment.OnFragmentInteractionListener{
-
+        EpgFragment.FragmentEpgInteraction, DvrFragment.FragmentDvrInteraction, MyVideoController.MediaPlayerLis, IVLCVout.Callback,GridMenuFragment.OnFragmentInteractionListener,IVLCVout.OnNewVideoLayoutListener{
+    private static final boolean USE_SURFACE_VIEW = true;
+    private static final boolean ENABLE_SUBTITLES = true;
+    private static final int SURFACE_BEST_FIT = 0;
+    private static final int SURFACE_FIT_SCREEN = 1;
+    private static final int SURFACE_FILL = 2;
+    private static final int SURFACE_16_9 = 3;
+    private static final int SURFACE_4_3 = 4;
+    private static final int SURFACE_ORIGINAL = 5;
+    private static int CURRENT_SIZE = SURFACE_FIT_SCREEN;
+    private FrameLayout mVideoSurfaceFrame = null;
+    private SurfaceView mVideoSurface = null;
+    private SurfaceView mSubtitlesSurface = null;
+    private TextureView mVideoTexture = null;
+    private View mVideoView = null;
     @BindView(R.id.img_play_pause)
     ImageView playPauseStatus;
     @BindView(R.id.videoStatus)
@@ -102,8 +119,6 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     FrameLayout errorFrame;
     @BindView(R.id.videoSurfaceContainer)
     FrameLayout videoSurfaceContainer;
-    @BindView(R.id.videoSurface)
-    SurfaceView videoSurfaceView;
     @BindView(R.id.menu_bg)
     ImageView menuBackground;
     @BindView(R.id.priority_view)
@@ -115,14 +130,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private FragmentMenu menuFragment = new FragmentMenu();
     private DvrFragment dvrFragment = new DvrFragment();
     private Fragment currentFragment;
-    private MediaPlayer player;
+    private MediaPlayer player=null;
     private ChannelChangeObserver channelChangeObservable;
     private VideoControllerView mVideoController;
     private Handler hideMenuHandler;
     private SharedPreferences lastPlayedPrefs;
     private SharedPreferences.Editor editor;
     String macAddress;
-    LibVLC libVLC;
+    LibVLC libVLC=null;
     private ChannelItem currentDvrChannelItem;
     private String nextVideoNameDvr;
     private boolean isDvrPlaying;
@@ -133,6 +148,13 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     private int selectedDvrDate = 0;
     private Epgs currentPlayedEpg;
     private int lastPlayedId;
+
+    private int mVideoHeight = 0;
+    private int mVideoWidth = 0;
+    private int mVideoVisibleHeight = 0;
+    private int mVideoVisibleWidth = 0;
+    private int mVideoSarNum = 0;
+    private int mVideoSarDen = 0;
 
 
     @Override
@@ -204,21 +226,26 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         }
     }
     private void initSurafaceView() {
-        int w = getWindow().getDecorView().getWidth();
-        int h = getWindow().getDecorView().getHeight();
-        /*ArrayList<String> options = new ArrayList<String>();
-        options.add("--subsdec-encoding <encoding>");
-        options.add("--aout=opensles");
-        options.add("--audio-time-stretch"); // time stretching
-        options.add("-vvv"); // verbosity*/
-        libVLC = new LibVLC(this);
-        SurfaceHolder videoHolder = videoSurfaceView.getHolder();
-        videoHolder.setFixedSize(w,h);
-       /* ViewGroup.LayoutParams lp = videoSurfaceView.getLayoutParams();
-        lp.width = w;
-        lp.height = h;
-        videoSurfaceView.setLayoutParams(lp);
-        videoSurfaceView.invalidate();*/
+        final ArrayList<String> args = new ArrayList<>();
+        args.add("-vvv");
+        args.add("--no-ts-trust-pcr");
+        args.add("--ts-seek-percent");
+        libVLC = new LibVLC(this,args);
+        if (USE_SURFACE_VIEW) {
+            ViewStub stub =  findViewById(R.id.surface_stub);
+            mVideoSurface = (SurfaceView) stub.inflate();
+            if (ENABLE_SUBTITLES) {
+                stub =  findViewById(R.id.subtitles_surface_stub);
+                mSubtitlesSurface = (SurfaceView) stub.inflate();
+                mSubtitlesSurface.setZOrderMediaOverlay(true);
+                mSubtitlesSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+            }
+            mVideoView = mVideoSurface;
+        } else {
+            ViewStub stub =  findViewById(R.id.texture_stub);
+            mVideoTexture = (TextureView) stub.inflate();
+            mVideoView = mVideoTexture;
+        }
     }
 
 
@@ -247,8 +274,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+        currentFragment=menuFrag;
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
+                if (currentFragment == null) {
+                    showMenu();
+                }
                 if (currentFragment instanceof EpgFragment) {
                     removeOptionalFragments();
 
@@ -262,7 +293,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                     showDvrMenu();
                                 else hideMenuUI();
                             }
-                        } else if (currentFragment instanceof FragmentMenu) {
+                        } else if (currentFragment instanceof FragmentMenu || currentFragment instanceof GridMenuFragment) {
 
                             if (mVideoController != null && currentFragment.isHidden()) {
                                 dvrFragment.setCurrentPlayedEpg(currentPlayedEpg);
@@ -680,8 +711,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
     private void removeOptionalFragments() {
         getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
-        currentFragment = menuFragment;
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(menuFragment).commit();
+        currentFragment = gridMenuFragment;
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(currentFragment).commit();
 
     }
 
@@ -816,6 +847,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             if (channelLinkResponse.getChannelLinkResponse() != null) {
                                 playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
                             } else if (channelLinkResponse.getException() != null) {
+                                playVideo("",false);
                                 setErrorFragment(channelLinkResponse.getException(), 0, 0);
                             }
                             videoLinkData.removeObserver(this);
@@ -824,6 +856,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 });
             }
         } catch (Exception ignored) {
+            playVideo("",false);
             showMenu();
         }
     }
@@ -919,11 +952,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         Log.d("activity_state", "onStop");
         releasePlayer();
         try {
-            getSupportFragmentManager().beginTransaction().remove(menuFragment).commit();
-            menuFragment = null;
+            getSupportFragmentManager().beginTransaction().remove(gridMenuFragment).commit();
+            gridMenuFragment = null;
         } catch (Exception ignored) {
         }
-        ;
         finish();
         super.onStop();
     }
@@ -936,21 +968,31 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void playVideo(String channelLink, boolean isDvr) {
-        Log.d("media", channelLink);
-        if (player != null) {
-           player.release();
+        if (!isDvr) {
+            if (currentFragment instanceof FragmentMenu)
+                menuFragment.hideErrorFrag();
+            else if (currentFragment instanceof GridMenuFragment)
+                gridMenuFragment.hideErrorFrag();
+        }
+        if(player!=null){
+            player.release();
+            player=null;
         }
        player=new MediaPlayer(libVLC);
-        String link = "udp://@239.1.20.1:8002";
+        String link = "http://www.streambox.fr/playlists/test_001/stream.m3u8";
         try {
             player.setEventListener(new MediaPlayer.EventListener() {
                 @Override
                 public void onEvent(MediaPlayer.Event event) {
                     switch (event.type) {
                         case MediaPlayer.Event.EndReached:
-                            if (isDvr) {
+                            if (isDvrPlaying) {
+                                player.setTime(0);
+                                player.stop();
+                                mVideoController=null;
                                 showDvrMenu();
                                 releasePlayer();
+                                player.setEventListener(null);
                                 Toast.makeText(VideoPlayActivity.this, "Play back completed.Please choose another video to play", Toast.LENGTH_SHORT).show();
                                 //loadNextDvr();
                             }
@@ -963,6 +1005,16 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                 threadToDisplayBoxId.start();
                             }
 
+                            if (currentFragment != null && currentFragment.isVisible()) {
+                                if (currentFragment instanceof FragmentMenu)
+                                    menuFragment.hideErrorFrag();
+                                else if (currentFragment instanceof GridMenuFragment)
+                                    gridMenuFragment.hideErrorFrag();
+                            } else {
+                                menuFragment.setErrorFragMent(null);
+                                gridMenuFragment.setErrorFragMent(null);
+                            }
+
                             startCloseMenuHandler();
                             if (isDvr) {
                                 MyVideoController controller = new MyVideoController(VideoPlayActivity.this, player, currentDvrChannelItem, VideoPlayActivity.this);
@@ -972,20 +1024,24 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                 mVideoController.show();
                                 recordedStatus.setVisibility(View.VISIBLE);
                                 isDvrPlaying = true;
-//                                menuFragment.setDvr(true);
+                                menuFragment.setDvr(true);
                             } else {
+                                mVideoController=null;
                                 isDvrPlaying = false;
                                 recordedStatus.setVisibility(View.GONE);
-//                                menuFragment.setDvr(false);
-//                                menuFragment.setDvrPlayedChannel(null);
+                                menuFragment.setDvr(false);
+                                menuFragment.setDvrPlayedChannel(null);
 
 
                             }
 
                             if (isDvr) {
                                 hideMenuUI();
+                                playPauseStatus.setVisibility(View.GONE);
                             } else {
                                 VideoPlayActivity.this.startCloseMenuHandler();
+                                if (currentFragment==null ||!currentFragment.isVisible())
+                                    VideoPlayActivity.this.showPriorityNo();
                                 /*if (!menuFragment.isVisible())
                                     VideoPlayActivity.this.showPriorityNo();
 
@@ -1022,12 +1078,19 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                 }
             });
             final IVLCVout vout = player.getVLCVout();
-            vout.setVideoView(videoSurfaceView);
+            if (mVideoSurface != null) {
+                vout.setVideoView(mVideoSurface);
+                if (mSubtitlesSurface != null)
+                    vout.setSubtitlesView(mSubtitlesSurface);
+            } else
+                vout.setVideoView(mVideoTexture);
             vout.addCallback(this);
             vout.attachViews();
             Media m = new Media(libVLC,Uri.parse(link));
             player.setMedia(m);
+            m.release();
             player.play();
+            updateVideoSurfaces();
 
             } catch(Exception e){
                 e.printStackTrace();
@@ -1244,5 +1307,180 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
 
         }
 
-
+    @Override
+    public void onNewVideoLayout(IVLCVout ivlcVout,  int width, int height, int visibleWidth, int visibleHeight, int sarNum, int sarDen) {
+        mVideoWidth = width;
+        mVideoHeight = height;
+        mVideoVisibleWidth = visibleWidth;
+        mVideoVisibleHeight = visibleHeight;
+        mVideoSarNum = sarNum;
+        mVideoSarDen = sarDen;
+        updateVideoSurfaces();
     }
+
+    private void updateVideoSurfaces() {
+        int sw = getWindow().getDecorView().getWidth();
+        int sh = getWindow().getDecorView().getHeight();
+
+        // sanity check
+        if (sw * sh == 0) {
+            Log.e("VideoPlay", "Invalid surface size");
+            return;
+        }
+
+        player.getVLCVout().setWindowSize(sw, sh);
+
+        ViewGroup.LayoutParams lp = mVideoView.getLayoutParams();
+        if (mVideoWidth * mVideoHeight == 0) {
+            /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            mVideoView.setLayoutParams(lp);
+            lp = mVideoSurfaceFrame.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            mVideoSurfaceFrame.setLayoutParams(lp);
+            changeMediaPlayerLayout(sw, sh);
+            return;
+        }
+
+        if (lp.width == lp.height && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+            /* We handle the placement of the video using Android View LayoutParams */
+            player.setAspectRatio(null);
+            player.setScale(0);
+        }
+
+        double dw = sw, dh = sh;
+        final boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        if (sw > sh && isPortrait || sw < sh && !isPortrait) {
+            dw = sh;
+            dh = sw;
+        }
+
+        // compute the aspect ratio
+        double ar, vw;
+        if (mVideoSarDen == mVideoSarNum) {
+            /* No indication about the density, assuming 1:1 */
+            vw = mVideoVisibleWidth;
+            ar = (double) mVideoVisibleWidth / (double) mVideoVisibleHeight;
+        } else {
+            /* Use the specified aspect ratio */
+            vw = mVideoVisibleWidth * (double) mVideoSarNum / mVideoSarDen;
+            ar = vw / mVideoVisibleHeight;
+        }
+
+        // compute the display aspect ratio
+        double dar = dw / dh;
+
+        switch (CURRENT_SIZE) {
+            case SURFACE_BEST_FIT:
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_FIT_SCREEN:
+                if (dar >= ar)
+                    dh = dw / ar; /* horizontal */
+                else
+                    dw = dh * ar; /* vertical */
+                break;
+            case SURFACE_FILL:
+                break;
+            case SURFACE_16_9:
+                ar = 16.0 / 9.0;
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_4_3:
+                ar = 4.0 / 3.0;
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_ORIGINAL:
+                dh = mVideoVisibleHeight;
+                dw = vw;
+                break;
+        }
+
+        // set display size
+        lp.width = (int) Math.ceil(dw * mVideoWidth / mVideoVisibleWidth);
+        lp.height = (int) Math.ceil(dh * mVideoHeight / mVideoVisibleHeight);
+        mVideoView.setLayoutParams(lp);
+        if (mSubtitlesSurface != null)
+            mSubtitlesSurface.setLayoutParams(lp);
+
+        // set frame size (crop if necessary)
+        lp = mVideoSurfaceFrame.getLayoutParams();
+        lp.width = (int) Math.floor(dw);
+        lp.height = (int) Math.floor(dh);
+        mVideoSurfaceFrame.setLayoutParams(lp);
+
+        mVideoView.invalidate();
+        if (mSubtitlesSurface != null)
+            mSubtitlesSurface.invalidate();
+    }
+
+    private void changeMediaPlayerLayout(int sw, int sh) {
+        /* Change the video placement using the MediaPlayer API */
+        switch (CURRENT_SIZE) {
+            case SURFACE_BEST_FIT:
+                player.setAspectRatio(null);
+                player.setScale(0);
+                break;
+            case SURFACE_FIT_SCREEN:
+            case SURFACE_FILL: {
+                Media.VideoTrack vtrack = player.getCurrentVideoTrack();
+                if (vtrack == null)
+                    return;
+                final boolean videoSwapped = vtrack.orientation == Media.VideoTrack.Orientation.LeftBottom
+                        || vtrack.orientation == Media.VideoTrack.Orientation.RightTop;
+                if (CURRENT_SIZE == SURFACE_FIT_SCREEN) {
+                    int videoW = vtrack.width;
+                    int videoH = vtrack.height;
+
+                    if (videoSwapped) {
+                        int swap = videoW;
+                        videoW = videoH;
+                        videoH = swap;
+                    }
+                    if (vtrack.sarNum != vtrack.sarDen)
+                        videoW = videoW * vtrack.sarNum / vtrack.sarDen;
+
+                    float ar = videoW / (float) videoH;
+                    float dar = sw / (float) sh;
+
+                    float scale;
+                    if (dar >= ar)
+                        scale = sw / (float) videoW; /* horizontal */
+                    else
+                        scale = sh / (float) videoH; /* vertical */
+                    player.setScale(scale);
+                    player.setAspectRatio(null);
+                } else {
+                    player.setScale(0);
+                    player.setAspectRatio(!videoSwapped ? "" + sw + ":" + sh
+                            : "" + sh + ":" + sw);
+                }
+                break;
+            }
+            case SURFACE_16_9:
+                player.setAspectRatio("16:9");
+                player.setScale(0);
+                break;
+            case SURFACE_4_3:
+                player.setAspectRatio("4:3");
+                player.setScale(0);
+                break;
+            case SURFACE_ORIGINAL:
+                player.setAspectRatio(null);
+                player.setScale(1);
+                break;
+        }
+    }
+}
