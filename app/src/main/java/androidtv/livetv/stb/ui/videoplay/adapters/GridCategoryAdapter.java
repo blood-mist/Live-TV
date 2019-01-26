@@ -2,6 +2,7 @@ package androidtv.livetv.stb.ui.videoplay.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -202,7 +203,7 @@ public class GridCategoryAdapter extends RecyclerView.Adapter<GridCategoryAdapte
             mTitleView = itemView.findViewById(R.id.grid_cat_textView);
             mCategoryLayout = itemView.findViewById(R.id.grid_item_layout);
 
-            mTitleView.setOnClickListener(v -> {
+            mCategoryLayout.setOnClickListener(v -> {
 
                 selectedPos = getAdapterPosition();
                 if (getAdapterPosition() == 0)
@@ -229,15 +230,17 @@ public class GridCategoryAdapter extends RecyclerView.Adapter<GridCategoryAdapte
             /**
              * when focus changes
              */
-            mTitleView.setOnFocusChangeListener((v, hasFocus) -> {
+            mCategoryLayout.setOnFocusChangeListener((v, hasFocus) -> {
                 if (hasFocus) {
 //                    recyclerView.smoothScrollToPosition(getAdapterPosition());
                     mTitleView.setSelected(true);
                     mCategoryLayout.setScaleY(1.02f);
+                    ViewCompat.setElevation(mCategoryLayout,10);
                     mListener.onSelectCategory(getAdapterPosition(),v);
                     setSelectedCategoryView(mCategoryLayout);
                 } else {
                     mTitleView.setSelected(false);
+                    ViewCompat.setElevation(mCategoryLayout,0);
                     mCategoryLayout.setScaleX(1.0f);
                 }
             });

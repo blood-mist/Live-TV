@@ -398,11 +398,13 @@ public class SplashRepository {
                                 CatChannelError catChannelError = gson.fromJson(json, CatChannelError.class);
                                 catChannelWrapper.setCatChannelError(catChannelError);
                             }
+                            catChannelData.postValue(catChannelWrapper);
 
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
+                            onError(new HttpException(catChannelInfoResponse));
                         }
-                        catChannelData.postValue(catChannelWrapper);
+
                     }
 
                     @Override

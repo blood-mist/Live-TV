@@ -38,6 +38,10 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.mp4.FragmentedMp4Extractor;
+import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor;
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
 import com.google.android.exoplayer2.source.BehindLiveWindowException;
@@ -208,13 +212,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
-        try {
-            InetAddress group = InetAddress.getByName("239.0.0.0");
-            MulticastSocket s = new MulticastSocket();
-            s.joinGroup(group);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         dataSourceFactory = buildDataSourceFactory(true);
         trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
@@ -319,17 +317,17 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     }
 
     private void showChannelMenu(Fragment currentFragment) {
-        if (!currentFragment.isAdded())
+        if (currentFragment instanceof FragmentMenu && !currentFragment.isAdded())
             getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).add(R.id.container_movie_player, currentFragment).commit();
         else
             getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).show(currentFragment).commit();
-
     }
 
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
+        currentFragment=menuFrag;
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 if (currentFragment == null) {
@@ -912,8 +910,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                 playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
                             } else if (channelLinkResponse.getException() != null) {
 
-                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
-//                                playVideo("",false);
+//                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
+                                playVideo("",false);
                             }
                             videoLinkData.removeObserver(this);
                         }
@@ -1056,12 +1054,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
             defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(this);
-            player = ExoPlayerFactory.newSimpleInstance(
-                    renderersFactory,
-                    trackSelector, defaultLoadControl);
-
-
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+            player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, defaultLoadControl);
         }
         if (playerEventListener != null)
             player.removeListener(playerEventListener);
@@ -1087,7 +1081,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "udp://239.10.20.30:8002";
+        String splitUrl = "udp://239.1.21.105:8002";
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1125,13 +1119,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             .createMediaSource(uri);
                 }
             case C.TYPE_OTHER:
-                try {
+                /*try {
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
-                    return new ExtractorMediaSource.Factory(udpDataSource).createMediaSource(uri);
-                } catch (Exception e) {
-                    return new ExtractorMediaSource.Factory(dataSourceFactory)
+                    return new ExtractorMediaSource.Factory(udpDataSource)
+                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
+                                    .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
-                }
+                } catch (Exception e) {*/
+                    return new ExtractorMediaSource.Factory(dataSourceFactory)
+                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
+                                    .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
+                            .createMediaSource(uri);
+//                }
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
             }
@@ -1247,7 +1248,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         LiveData<ChannelLinkResponseWrapper> videoLinkData = videoPlayViewModel.getChannelLink(login.getToken(), utc, login.getId(),
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc),
                         login.getSession()), macAddress, item.getId());
-    /*    videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
+        videoLinkData.observe(VideoPlayActivity.this, new Observer<ChannelLinkResponseWrapper>() {
             @Override
             public void onChanged(@Nullable ChannelLinkResponseWrapper channelLinkResponse) {
                 if (channelLinkResponse != null) {
@@ -1278,46 +1279,27 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     videoLinkData.removeObserver(this);
                 }
             }
-        });*/
-        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
-                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
-                epgs.getChannelID(), date, startTime);
-        dvrData.observe(this, new Observer<DvrLinkResponse>() {
-            @Override
-            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
-                if (channelLinkResponse != null) {
-                    if (channelLinkResponse.getErrorCode() > 0) {
-                        Log.d("dvr", "error");
-                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
-                        showDvrMenu();
-                        hideProgressBar();
-                    } else {
-//                        setUpVideoController(item, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
-                        String url = channelLinkResponse.getLink();
-                        String[] parts = url.split(".m3u8");
-                        String part1 = parts[0];
-                        String part2 = "";
-                        try {
-                            part2 = parts[1];
-                        } catch (Exception ignored) {
-                        }
-//                        long milis = epgs.getStartTime().getTime();
-                        long millis = Calendar.getInstance().getTimeInMillis() - TimeUnit.MINUTES.toMillis(10);
-                        long diff = Calendar.getInstance().getTimeInMillis() - millis;
-                        millis = millis / 1000;
-
-//                        milis = milis / 1000;
-//                        long diff = epgs.getEndTime().getTime() - epgs.getStartTime().getTime();
-                        long seconds = diff / 1000;
-                        String buildUrl = part1 + "_dvr_" + String.valueOf(millis) + "-" + String.valueOf(seconds) + ".m3u8" + part2;
-                        Log.d("buildurl", buildUrl);
-                        setUpVideoController(item, buildUrl, "");
-                    }
-                    dvrData.removeObserver(this);
-
-                }
-            }
         });
+//        LiveData<DvrLinkResponse> dvrData = videoPlayViewModel.getDvrLink(login.getToken(), utc, login.getId(),
+//                LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()),
+//                epgs.getChannelID(), date, startTime);
+//        dvrData.observe(this, new Observer<DvrLinkResponse>() {
+//            @Override
+//            public void onChanged(@Nullable DvrLinkResponse channelLinkResponse) {
+//                if (channelLinkResponse != null) {
+//                    if (channelLinkResponse.getErrorCode() > 0) {
+//                        Log.d("dvr", "error");
+//                        Toast.makeText(VideoPlayActivity.this, "Dvr couldn't be played", Toast.LENGTH_SHORT).show();
+//                        showDvrMenu();
+//                        hideProgressBar();
+//                    } else {
+//                        setUpVideoController(item, channelLinkResponse.getLink(), channelLinkResponse.getNextVideoName());
+//                    }
+//                    dvrData.removeObserver(this);
+//
+//                }
+//            }
+//        });
 
 
     }
@@ -1380,6 +1362,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                         gridMenuFragment.hideErrorFrag();
                 } else {
                     menuFragment.setErrorFragMent(null);
+                    gridMenuFragment.setErrorFragMent(null);
                 }
                 startCloseMenuHandler();
                 if (isDvrPlaying) {
