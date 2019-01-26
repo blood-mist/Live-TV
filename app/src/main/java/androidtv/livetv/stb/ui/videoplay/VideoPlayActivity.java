@@ -3,7 +3,6 @@ package androidtv.livetv.stb.ui.videoplay;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,7 +13,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -30,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ControlDispatcher;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -39,8 +36,6 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.mp4.FragmentedMp4Extractor;
-import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor;
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
@@ -62,11 +57,9 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.UdpDataSource;
 import com.google.android.exoplayer2.util.Util;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -77,7 +70,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Calendar;
@@ -119,7 +111,6 @@ import static android.view.View.VISIBLE;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
 import static androidtv.livetv.stb.utils.LinkConfig.PLAYED_CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
-import static com.google.android.exoplayer2.ExoPlaybackException.TYPE_RENDERER;
 import static java.lang.Thread.sleep;
 
 public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu.FragmentMenuInteraction, EpgFragment.FragmentEpgInteraction,
@@ -336,7 +327,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Fragment menuFrag = getSupportFragmentManager().findFragmentById(R.id.container_movie_player);
-        currentFragment=menuFrag;
+        currentFragment = menuFrag;
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 if (currentFragment == null) {
@@ -920,7 +911,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             } else if (channelLinkResponse.getException() != null) {
 
 //                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
-                                playVideo("",false);
+                                playVideo("", false);
                             }
                             videoLinkData.removeObserver(this);
                         }
@@ -1063,7 +1054,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
             defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
             player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, defaultLoadControl);
         }
         if (playerEventListener != null)
@@ -1090,7 +1081,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "udp://@239.1.21.105:8002";
+//        String splitUrl = "udp://@224.0.0.2:8002";
+//        String splitUrl = "udp://@237.1.1.9:8002";
+        String splitUrl = "udp://@239.1.9.53:8002";
+
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1136,11 +1130,10 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                     .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
                 } catch (Exception e) {*/
-                    return new ExtractorMediaSource.Factory(dataSourceFactory)
-                            .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
-                                    .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
-                            .createMediaSource(uri);
+                return new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
+                        .createMediaSource(uri);
 //                }
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);

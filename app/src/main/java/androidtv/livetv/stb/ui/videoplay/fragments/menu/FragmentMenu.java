@@ -35,6 +35,8 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
@@ -57,6 +59,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -749,12 +753,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private void startPreview(ChannelItem channelItem) {
         //TODO enable preview here
-        watchPreviewHandler.postDelayed(() -> fetchPreview(channelItem), TimeUnit.SECONDS.toMillis(3));
+        watchPreviewHandler.postDelayed(() -> fetchPreview(channelItem), TimeUnit.SECONDS.toMillis(1));
     }
 
     private DataSource.Factory buildDataSourceFactory() {
         return ((ApplicationMain) ((Objects.requireNonNull(getActivity())).getApplication())).buildDataSourceFactory(BANDWIDTH_METER);
     }
+
     /**
      * initialise video view here
      *
@@ -762,18 +767,20 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      **/
     private void initVideoView(String link) {
         boolean needNewPlayer = player == null;
-        if(needNewPlayer){
-             dataSourceFactory=buildDataSourceFactory();;
+        if (needNewPlayer) {
+            dataSourceFactory = buildDataSourceFactory();
+            ;
             TrackSelection.Factory adaptiveTrackSelectionFactory =
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
+            trackSelectorParameters.buildUpon().setMaxVideoSize(300,200).build();
             trackSelector.setParameters(trackSelectorParameters);
             DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
             defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(), DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity());
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), renderersFactory, trackSelector, defaultLoadControl);
         }
         player.setVolume(0f);
@@ -782,21 +789,23 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         previewView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
         player.setVideoSurfaceView((SurfaceView) previewView.getVideoSurfaceView());
-        String splitUrl = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+        String splitUrl = "udp://@237.1.1.9:9000";
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl));
-        player.prepare(mediaSource);
+        player.prepare(mediaSource, true, true);
         player.addListener(new Player.EventListener() {
             @Override
             public void onPlayerError(ExoPlaybackException error) {
-                player.setPlayWhenReady(false);
-                Toast.makeText(getActivity(),"Preview not available",Toast.LENGTH_SHORT).show();
-                player.removeListener(this);
+                Toast.makeText(getActivity(), "Preview not available", Toast.LENGTH_SHORT).show();
+                if (player != null) {
+                    player.setPlayWhenReady(false);
+                    player.removeListener(this);
+                }
                 releasePlayer();
             }
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                if(playWhenReady && playbackState==Player.STATE_READY){
+                if (playWhenReady && playbackState == Player.STATE_READY) {
                     previewView.setVisibility(View.VISIBLE);
                     previewContainer.setVisibility(View.VISIBLE);
                 }
@@ -809,7 +818,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (player != null) {
             player.release();
             player = null;
-            trackSelector=null;
+            trackSelector = null;
         }
     }
 
@@ -827,21 +836,21 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                         buildDataSourceFactory())
                         .createMediaSource(uri);
             case C.TYPE_HLS:
-                    return new HlsMediaSource.Factory(dataSourceFactory)
-                            .createMediaSource(uri);
+                return new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri);
             case C.TYPE_OTHER:
-                try {
+              /*  try {
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
                     return new ExtractorMediaSource.Factory(udpDataSource)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
+                            *//*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*//*
                             .createMediaSource(uri);
-                } catch (Exception e) {
-                    return new ExtractorMediaSource.Factory(dataSourceFactory)
-                            /*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*/
-                            .createMediaSource(uri);
-                }
+                } catch (Exception e) {*/
+                return new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
+                        .createMediaSource(uri);
+//                }
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
             }
@@ -892,6 +901,15 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     + " must implement OnFragmentInteractionListener");
         }
         lastPlayedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        try {
+            InetAddress group1 = InetAddress.getByName("239.0.0.0");
+            InetAddress group2 = InetAddress.getByName("224.0.0.0");
+            MulticastSocket multicastSocket = new MulticastSocket();
+            multicastSocket.joinGroup(group1);
+            multicastSocket.joinGroup(group2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
