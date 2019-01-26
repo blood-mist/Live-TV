@@ -39,6 +39,8 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.mp4.FragmentedMp4Extractor;
+import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor;
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer;
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil;
@@ -908,8 +910,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                                 playVideo(channelLinkResponse.getChannelLinkResponse().getChannel().getLink(), false);
                             } else if (channelLinkResponse.getException() != null) {
 
-                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
-//                                playVideo("",false);
+//                                setErrorFragment(channelLinkResponse.getException(), 0, 0);
+                                playVideo("",false);
                             }
                             videoLinkData.removeObserver(this);
                         }
@@ -1048,12 +1050,12 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             trackSelector.setParameters(trackSelectorParameters);
-           /* DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
+            DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
-            defaultLoadControl = loadControl.createDefaultLoadControl();*/
+            defaultLoadControl = loadControl.createDefaultLoadControl();
             RenderersFactory renderersFactory = new DefaultRenderersFactory(this, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON,DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, new DefaultLoadControl());
+            player = ExoPlayerFactory.newSimpleInstance(this, renderersFactory, trackSelector, defaultLoadControl);
         }
         if (playerEventListener != null)
             player.removeListener(playerEventListener);
@@ -1079,7 +1081,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "http://mpgedit.org/mpgedit/mpgedit/testdata/mpeg1/layer2/fl10.mp2";
+        String splitUrl = "udp://239.1.21.105:8002";
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1121,12 +1123,14 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
                     return new ExtractorMediaSource.Factory(udpDataSource)
                             .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
+                                    .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
                 } catch (Exception e) {
                     return new ExtractorMediaSource.Factory(dataSourceFactory)
                             .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
+                                    .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
                 }
             default: {

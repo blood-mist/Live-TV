@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/category_color_blue" android:state_focused="true" />
-    <item android:drawable="@color/category_color_blu_click" android:state_pressed="true"/>
-    <item android:drawable="@color/color_blue_def" />
+    <item android:drawable="@drawable/round_category_bg" android:state_focused="true" />
+    <item android:drawable="@drawable/category_round_click" android:state_pressed="true"/>
+    <item android:drawable="@drawable/round_category_default" />
 </selector>
+

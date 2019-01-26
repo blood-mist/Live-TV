@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,9 +22,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
-
 import android.widget.ImageView;
-
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,14 +78,10 @@ import androidtv.livetv.stb.ui.videoplay.ChannelChangeObserver;
 import androidtv.livetv.stb.ui.videoplay.VideoPlayActivity;
 import androidtv.livetv.stb.ui.videoplay.adapters.CategoryAdapter;
 import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
-
-
+import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.utils.DisposableManager;
 import androidtv.livetv.stb.utils.LinkConfig;
-
-import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -98,8 +91,8 @@ import timber.log.Timber;
 
 import static android.view.View.GONE;
 import static androidtv.livetv.stb.utils.LinkConfig.CATEGORY_FAVORITE;
-import static androidtv.livetv.stb.utils.LinkConfig.PLAYED_CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.CHANNEL_ID;
+import static androidtv.livetv.stb.utils.LinkConfig.PLAYED_CATEGORY_NAME;
 import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
 
 /**
@@ -107,7 +100,6 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
  */
 public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener, Observer {
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
-    private static final int IS_FAV = 1;
     private static final int ALL_CHANNELS_ADDED = 99;
     private static final int CHANNEL_ITEMS_SPECIFIER = 9;
     private MenuViewModel menuViewModel;
@@ -127,7 +119,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private List<ChannelItem> allChannelItems, allFavItems;
     private boolean isFirstRun = false;
-    private int ALL_CAT_CHANNELS = 10;
 
     public FragmentMenu() {
         // Required empty public constructor

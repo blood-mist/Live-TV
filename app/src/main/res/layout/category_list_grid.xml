@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="200dp"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="200dp"
     android:layout_height="90dp"
     android:id="@+id/grid_item_layout"
     android:gravity="center"
+    android:translationZ="3dp"
+    android:background="@drawable/grid_cat_seletor"
+    android:focusable="true"
+    android:clickable="true"
     android:layout_gravity="center"
-    >
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/white_background">
+    tools:targetApi="lollipop">
         <TextView
             android:id="@+id/grid_cat_textView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:focusable="true"
-            android:clickable="true"
-            android:padding="10dp"
-            android:background="@drawable/grid_cat_seletor"
+            android:textSize="25sp"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"
+            android:padding="5dp"
             android:textStyle="bold"
             android:text="Enterainment"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
-    </LinearLayout>
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     </LinearLayout>
