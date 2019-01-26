@@ -16,31 +16,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41cd07d5-b581-4097-a120-58e3be3b6f22" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_cardview_v7_27_1_1.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/category_round_click.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/round_category_bg.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/round_category_default.xml" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
-      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
       <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/adapters/GridCategoryAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/adapters/GridCategoryAdapter.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/grid_cat_seletor.xml" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/grid_cat_seletor.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/category_list_grid.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/category_list_grid.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -71,43 +61,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="VideoPlayActivity.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="VideoPlayActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
-              <caret line="1117" column="63" lean-forward="false" selection-start-line="1117" selection-start-column="63" selection-end-line="1117" selection-end-column="63" />
+            <state relative-caret-position="21963">
+              <caret line="1086" column="33" lean-forward="false" selection-start-line="1086" selection-start-column="33" selection-end-line="1086" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#35935#35936#0" expanded="true" />
-                <element signature="e#36009#36010#0" expanded="true" />
-                <element signature="e#38051#38052#0" expanded="true" />
-                <element signature="e#38099#38100#0" expanded="true" />
-                <element signature="e#42128#42129#0" expanded="true" />
-                <element signature="e#42179#42180#0" expanded="true" />
-                <element signature="e#43026#43027#0" expanded="true" />
-                <element signature="e#43058#43059#0" expanded="true" />
-                <element signature="e#51195#51196#0" expanded="true" />
-                <element signature="e#51265#51266#0" expanded="true" />
-                <element signature="e#51896#51897#0" expanded="true" />
-                <element signature="e#51954#51955#0" expanded="true" />
-                <element signature="e#51987#51988#0" expanded="true" />
-                <element signature="e#52042#52043#0" expanded="true" />
-                <element signature="e#52081#52082#0" expanded="true" />
-                <element signature="e#52123#52124#0" expanded="true" />
-                <element signature="e#63524#63525#0" expanded="true" />
-                <element signature="e#63579#63580#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FragmentMenu.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="24">
-              <caret line="98" column="22" lean-forward="false" selection-start-line="98" selection-start-column="19" selection-end-line="98" selection-end-column="22" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#36356#36357#0" expanded="true" />
+                <element signature="e#36430#36431#0" expanded="true" />
+                <element signature="e#38472#38473#0" expanded="true" />
+                <element signature="e#38520#38521#0" expanded="true" />
+                <element signature="e#42549#42550#0" expanded="true" />
+                <element signature="e#42600#42601#0" expanded="true" />
+                <element signature="e#43447#43448#0" expanded="true" />
+                <element signature="e#43479#43480#0" expanded="true" />
+                <element signature="e#51623#51624#0" expanded="true" />
+                <element signature="e#51693#51694#0" expanded="true" />
+                <element signature="e#52324#52325#0" expanded="true" />
+                <element signature="e#52382#52383#0" expanded="true" />
+                <element signature="e#52415#52416#0" expanded="true" />
+                <element signature="e#52470#52471#0" expanded="true" />
+                <element signature="e#52509#52510#0" expanded="true" />
+                <element signature="e#52551#52552#0" expanded="true" />
+                <element signature="e#63952#63953#0" expanded="true" />
+                <element signature="e#64007#64008#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -119,8 +97,18 @@
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
+            <state relative-caret-position="225">
               <caret line="9" column="24" lean-forward="false" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LinkConfig.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="100">
+              <caret line="11" column="25" lean-forward="false" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -129,13 +117,19 @@
       <file leaf-file-name="GridCategoryAdapter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/adapters/GridCategoryAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="139">
+            <state relative-caret-position="4425">
               <caret line="199" column="28" lean-forward="false" selection-start-line="199" selection-start-column="28" selection-end-line="199" selection-end-column="28" />
-              <folding>
-                <element signature="e#4139#4160#0" expanded="true" />
-                <element signature="e#4666#4686#0" expanded="true" />
-                <element signature="e#5025#5045#0" expanded="true" />
-              </folding>
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SplashActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="12">
+              <caret line="98" column="31" lean-forward="false" selection-start-line="98" selection-start-column="31" selection-end-line="98" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -143,70 +137,54 @@
       <file leaf-file-name="SplashRepository.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1011">
-              <caret line="376" column="0" lean-forward="false" selection-start-line="376" selection-start-column="0" selection-end-line="376" selection-end-column="0" />
+            <state relative-caret-position="34">
+              <caret line="411" column="54" lean-forward="false" selection-start-line="411" selection-start-column="54" selection-end-line="411" selection-end-column="54" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="grid_cat_seletor.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/grid_cat_seletor.xml">
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
+      <file leaf-file-name="DefaultDataSource.java" pinned="false" current-in-tab="false">
+        <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultDataSource.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="175">
-              <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+            <state relative-caret-position="120">
+              <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UdpDataSource.java" pinned="false" current-in-tab="true">
+        <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/UdpDataSource.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="111">
+              <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
+              <folding>
+                <element signature="e#1322#1323#0" expanded="true" />
+                <element signature="e#1348#1349#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IOException.java" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Android/sdk/sources/android-28/java/io/IOException.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="563">
+              <caret line="98" column="12" lean-forward="false" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
+              <folding>
+                <element signature="e#3542#3543#0" expanded="true" />
+                <element signature="e#3570#3571#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="category_round_click.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/category_round_click.xml">
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="125">
               <caret line="5" column="8" lean-forward="false" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="round_category_default.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/round_category_default.xml">
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="5" column="8" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="round_category_bg.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/round_category_bg.xml">
-          <provider editor-type-id="android-designer2">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="5" column="8" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="white_background_round.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/white_background_round.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="5" column="8" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="5" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -228,7 +206,6 @@
       <find>categoryEditor</find>
       <find>playChannel</find>
       <find>build</find>
-      <find>playVideo</find>
       <find>onKeyD</find>
       <find>onStart</find>
       <find>update</find>
@@ -251,10 +228,11 @@
       <find>onKeyDown</find>
       <find>init</find>
       <find>split</find>
-      <find>splitU</find>
       <find>fetchPR</find>
       <find>playVide</find>
       <find>fra</find>
+      <find>playVideo</find>
+      <find>splitU</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -20916,16 +20894,13 @@
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/DefaultDataSource.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/RenderersFactory.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/DefaultRenderersFactory.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ApplicationMain.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/extractor/DefaultExtractorsFactory.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultDataSource.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/white_background_round.xml" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
@@ -20935,6 +20910,9 @@
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/category_round_click.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/category_list_grid.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/adapters/GridCategoryAdapter.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" />
       </list>
     </option>
@@ -20976,25 +20954,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="Scratches" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="AndroidTVLiveTV" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AndroidTVLiveTV" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="AndroidTVLiveTV" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AndroidTVLiveTV" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name=".idea" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
+      <pane id="PackagesPane" />
       <pane id="AndroidView">
         <subPane>
           <expand>
@@ -21045,6 +21006,16 @@
               <item name="livetv" type="462c0819:PsiDirectoryNode" />
               <item name="stb" type="462c0819:PsiDirectoryNode" />
               <item name="ui" type="462c0819:PsiDirectoryNode" />
+              <item name="splash" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="androidtv" type="cbb59c9e:AndroidPsiDirectoryNode" />
+              <item name="livetv" type="462c0819:PsiDirectoryNode" />
+              <item name="stb" type="462c0819:PsiDirectoryNode" />
+              <item name="ui" type="462c0819:PsiDirectoryNode" />
               <item name="videoplay" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -21069,12 +21040,24 @@
             </path>
             <path>
               <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="AndroidTVLiveTV" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AndroidTVLiveTV" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
             </path>
             <path>
-              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
-              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+              <item name="AndroidTVLiveTV" type="b2602c69:ProjectViewProjectNode" />
+              <item name="AndroidTVLiveTV" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name=".idea" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -21370,6 +21353,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286052" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -21378,17 +21362,16 @@
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53782505" sideWeight="0.51611173" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35875404" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293979" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3270366" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5371901" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.536643" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32821724" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32742316" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32921588" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24919441" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32994652" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -21402,6 +21385,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32163742" sideWeight="0.48770052" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35875404" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -21414,66 +21398,66 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1257</line>
+          <line>1266</line>
           <properties />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1260</line>
+          <line>1269</line>
           <properties />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java</url>
-          <line>186</line>
+          <line>177</line>
           <properties />
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java</url>
-          <line>549</line>
+          <line>540</line>
           <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java</url>
-          <line>540</line>
+          <line>531</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>350</line>
+          <line>359</line>
           <properties />
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>359</line>
+          <line>368</line>
           <properties />
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>354</line>
+          <line>363</line>
           <properties />
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>356</line>
+          <line>365</line>
           <properties />
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>357</line>
+          <line>366</line>
           <properties />
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>355</line>
+          <line>364</line>
           <properties />
           <option name="timeStamp" value="33" />
         </line-breakpoint>
@@ -21485,25 +21469,25 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java</url>
-          <line>436</line>
+          <line>437</line>
           <properties />
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java</url>
-          <line>220</line>
+          <line>211</line>
           <properties />
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1129</line>
+          <line>1138</line>
           <properties />
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>1122</line>
+          <line>1131</line>
           <properties />
           <option name="timeStamp" value="41" />
         </line-breakpoint>
@@ -21593,7 +21577,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>961</line>
+          <line>970</line>
           <properties />
           <option name="timeStamp" value="57" />
         </line-breakpoint>
@@ -21603,20 +21587,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/trackselection/AdaptiveTrackSelection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="63" column="41" lean-forward="false" selection-start-line="63" selection-start-column="41" selection-end-line="63" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="454" column="6" lean-forward="false" selection-start-line="454" selection-start-column="6" selection-end-line="454" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/dvr/DvrApiInterface.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -21725,20 +21695,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultDataSource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="301" column="65" lean-forward="false" selection-start-line="301" selection-start-column="65" selection-end-line="301" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/UdpDataSource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1600">
-          <caret line="45" column="26" lean-forward="false" selection-start-line="45" selection-start-column="26" selection-end-line="45" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/source/ExtractorMediaSource.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -21808,14 +21764,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="98" column="31" lean-forward="false" selection-start-line="98" selection-start-column="31" selection-end-line="98" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/local.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="200">
@@ -21853,14 +21801,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
           <caret line="24" column="71" lean-forward="false" selection-start-line="24" selection-start-column="71" selection-end-line="24" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="16" column="62" lean-forward="false" selection-start-line="16" selection-start-column="62" selection-end-line="16" selection-end-column="62" />
           <folding />
         </state>
       </provider>
@@ -21919,10 +21859,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
+        <state relative-caret-position="2450">
           <caret line="98" column="22" lean-forward="false" selection-start-line="98" selection-start-column="19" selection-end-line="98" selection-end-column="22" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -21987,7 +21927,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
+        <state relative-caret-position="225">
           <caret line="9" column="24" lean-forward="false" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
           <folding />
         </state>
@@ -21995,48 +21935,101 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/adapters/GridCategoryAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="139">
+        <state relative-caret-position="4425">
           <caret line="199" column="28" lean-forward="false" selection-start-line="199" selection-start-column="28" selection-end-line="199" selection-end-column="28" />
-          <folding>
-            <element signature="e#4139#4160#0" expanded="true" />
-            <element signature="e#4666#4686#0" expanded="true" />
-            <element signature="e#5025#5045#0" expanded="true" />
-          </folding>
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="11" column="25" lean-forward="false" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1011">
-          <caret line="376" column="0" lean-forward="false" selection-start-line="376" selection-start-column="0" selection-end-line="376" selection-end-column="0" />
+        <state relative-caret-position="34">
+          <caret line="411" column="54" lean-forward="false" selection-start-line="411" selection-start-column="54" selection-end-line="411" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultDataSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/sdk/sources/android-28/java/lang/Exception.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="100" column="11" lean-forward="false" selection-start-line="100" selection-start-column="11" selection-end-line="100" selection-end-column="11" />
+          <folding>
+            <element signature="e#4170#4171#0" expanded="false" />
+            <element signature="e#4198#4199#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/sdk/sources/android-28/java/io/IOException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="563">
+          <caret line="98" column="12" lean-forward="false" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
+          <folding>
+            <element signature="e#3542#3543#0" expanded="true" />
+            <element signature="e#3570#3571#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12">
+          <caret line="98" column="31" lean-forward="false" selection-start-line="98" selection-start-column="31" selection-end-line="98" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="1117" column="63" lean-forward="false" selection-start-line="1117" selection-start-column="63" selection-end-line="1117" selection-end-column="63" />
+        <state relative-caret-position="21963">
+          <caret line="1086" column="33" lean-forward="false" selection-start-line="1086" selection-start-column="33" selection-end-line="1086" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#35935#35936#0" expanded="true" />
-            <element signature="e#36009#36010#0" expanded="true" />
-            <element signature="e#38051#38052#0" expanded="true" />
-            <element signature="e#38099#38100#0" expanded="true" />
-            <element signature="e#42128#42129#0" expanded="true" />
-            <element signature="e#42179#42180#0" expanded="true" />
-            <element signature="e#43026#43027#0" expanded="true" />
-            <element signature="e#43058#43059#0" expanded="true" />
-            <element signature="e#51195#51196#0" expanded="true" />
-            <element signature="e#51265#51266#0" expanded="true" />
-            <element signature="e#51896#51897#0" expanded="true" />
-            <element signature="e#51954#51955#0" expanded="true" />
-            <element signature="e#51987#51988#0" expanded="true" />
-            <element signature="e#52042#52043#0" expanded="true" />
-            <element signature="e#52081#52082#0" expanded="true" />
-            <element signature="e#52123#52124#0" expanded="true" />
-            <element signature="e#63524#63525#0" expanded="true" />
-            <element signature="e#63579#63580#0" expanded="true" />
+            <element signature="e#36356#36357#0" expanded="true" />
+            <element signature="e#36430#36431#0" expanded="true" />
+            <element signature="e#38472#38473#0" expanded="true" />
+            <element signature="e#38520#38521#0" expanded="true" />
+            <element signature="e#42549#42550#0" expanded="true" />
+            <element signature="e#42600#42601#0" expanded="true" />
+            <element signature="e#43447#43448#0" expanded="true" />
+            <element signature="e#43479#43480#0" expanded="true" />
+            <element signature="e#51623#51624#0" expanded="true" />
+            <element signature="e#51693#51694#0" expanded="true" />
+            <element signature="e#52324#52325#0" expanded="true" />
+            <element signature="e#52382#52383#0" expanded="true" />
+            <element signature="e#52415#52416#0" expanded="true" />
+            <element signature="e#52470#52471#0" expanded="true" />
+            <element signature="e#52509#52510#0" expanded="true" />
+            <element signature="e#52551#52552#0" expanded="true" />
+            <element signature="e#63952#63953#0" expanded="true" />
+            <element signature="e#64007#64008#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/UdpDataSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="111">
+          <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
+          <folding>
+            <element signature="e#1322#1323#0" expanded="true" />
+            <element signature="e#1348#1349#0" expanded="true" />
           </folding>
         </state>
       </provider>

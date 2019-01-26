@@ -97,15 +97,6 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
-        try {
-            InetAddress group1 = InetAddress.getByName("239.0.0.0");
-            InetAddress group2 = InetAddress.getByName("224.0.0.0");
-            MulticastSocket multicastSocket = new MulticastSocket();
-            multicastSocket.joinGroup(group1);
-            multicastSocket.joinGroup(group2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         permissionutils = new PermissionUtils(this);
         macAddress = AppConfig.isDevelopment() ? AppConfig.getMac() : DeviceUtils.getMac(this);
         permissions = new ArrayList<>(

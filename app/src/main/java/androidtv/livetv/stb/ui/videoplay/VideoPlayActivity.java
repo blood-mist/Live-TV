@@ -77,6 +77,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Calendar;
@@ -212,7 +213,15 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onCreate(savedInstanceState);
         View decorView = getWindow().getDecorView();
         setContentView(R.layout.activity_video_play);
-
+        try {
+            InetAddress group1 = InetAddress.getByName("239.0.0.0");
+            InetAddress group2 = InetAddress.getByName("224.0.0.0");
+            MulticastSocket multicastSocket = new MulticastSocket();
+            multicastSocket.joinGroup(group1);
+            multicastSocket.joinGroup(group2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         dataSourceFactory = buildDataSourceFactory(true);
         trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
@@ -1081,7 +1090,7 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
             videoSurfaceView.hideController();
             menuFragment.setDvrPlayedChannel(null);
         }
-        String splitUrl = "udp://239.1.21.105:8002";
+        String splitUrl = "udp://@239.1.21.105:8002";
         MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl), isDvr);
 
         boolean haveResumePosition = startWindow != C.INDEX_UNSET;
@@ -1119,20 +1128,20 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
                             .createMediaSource(uri);
                 }
             case C.TYPE_OTHER:
-                try {
+               /* try {
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
                     return new ExtractorMediaSource.Factory(udpDataSource)
                             .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
                                     | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
                                     .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
-                } catch (Exception e) {
+                } catch (Exception e) {*/
                     return new ExtractorMediaSource.Factory(dataSourceFactory)
                             .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
                                     | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS).setMp4ExtractorFlags(Mp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS)
                                     .setFragmentedMp4ExtractorFlags(FragmentedMp4Extractor.FLAG_WORKAROUND_IGNORE_EDIT_LISTS))
                             .createMediaSource(uri);
-                }
+//                }
             default: {
                 throw new IllegalStateException("Unsupported type: " + type);
             }

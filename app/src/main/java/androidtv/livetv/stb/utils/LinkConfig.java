@@ -14,7 +14,8 @@ public class LinkConfig {
     public static final String TOKEN_CONFIG_FILE_NAME ="authCode" ;
     public static final String ACCOUNT_PACKAGE="androidtv.myaccount.stb";
 //    public static final String BASE_URL ="https://middleware.yourman.info/" ;
-    public static final String BASE_URL ="http://192.168.1.220/" ;
+//    public static final String BASE_URL ="http://192.168.1.220/" ;
+public static final String BASE_URL ="http://192.168.2.212/" ;
     public static final String CHECK_IF_SERVER_RECHABLE = "https://middleware.yourman.info";
     public static final String CHANNEL_LOGO_URL = "uploads/channel/";
     public static final String CHANNEL_LINK_URL = "api/v1/livetv/getchannels";
