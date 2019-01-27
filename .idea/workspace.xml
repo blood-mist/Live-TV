@@ -16,19 +16,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41cd07d5-b581-4097-a120-58e3be3b6f22" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Gradle__com_github_masterwok_libvlc_android_sdk_3_0_13.xml" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/fileHashes.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/fileHashes/resourceHashesCache.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/classAnalysis.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/jarAnalysis.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/javaCompile.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskHistory.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/javaCompile/taskJars.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.bin" />
       <change beforePath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.4/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" />
       <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" afterPath="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -62,18 +69,14 @@
       <file leaf-file-name="VideoPlayActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="1084" column="50" lean-forward="false" selection-start-line="1084" selection-start-column="29" selection-end-line="1084" selection-end-column="50" />
+            <state relative-caret-position="3486">
+              <caret line="350" column="0" lean-forward="false" selection-start-line="350" selection-start-column="0" selection-end-line="350" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#30247#30279#0" expanded="true" />
-                <element signature="e#30463#30499#0" expanded="true" />
-                <element signature="e#30794#30826#0" expanded="true" />
                 <element signature="e#35841#35842#0" expanded="true" />
                 <element signature="e#35915#35916#0" expanded="true" />
                 <element signature="e#37957#37958#0" expanded="true" />
                 <element signature="e#38005#38006#0" expanded="true" />
-                <element signature="e#41174#41209#0" expanded="true" />
                 <element signature="e#42035#42036#0" expanded="true" />
                 <element signature="e#42086#42087#0" expanded="true" />
                 <element signature="e#42933#42934#0" expanded="true" />
@@ -86,16 +89,8 @@
                 <element signature="e#51851#51852#0" expanded="true" />
                 <element signature="e#51890#51891#0" expanded="true" />
                 <element signature="e#51932#51933#0" expanded="true" />
-                <element signature="e#52253#52285#0" expanded="true" />
-                <element signature="e#60896#60939#0" expanded="true" />
-                <element signature="e#61082#61206#0" expanded="true" />
-                <element signature="e#61291#61408#0" expanded="true" />
-                <element signature="e#61515#61642#0" expanded="true" />
                 <element signature="e#63333#63334#0" expanded="true" />
                 <element signature="e#63388#63389#0" expanded="true" />
-                <element signature="e#63565#63603#0" expanded="true" />
-                <element signature="e#64143#64175#0" expanded="true" />
-                <element signature="e#64416#64448#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -104,8 +99,8 @@
       <file leaf-file-name="DefaultRenderersFactory.java" pinned="false" current-in-tab="false">
         <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/DefaultRenderersFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="249">
-              <caret line="278" column="32" lean-forward="true" selection-start-line="278" selection-start-column="32" selection-end-line="278" selection-end-column="32" />
+            <state relative-caret-position="5925">
+              <caret line="278" column="32" lean-forward="false" selection-start-line="278" selection-start-column="32" selection-end-line="278" selection-end-column="32" />
               <folding>
                 <element signature="e#4115#4116#0" expanded="true" />
                 <element signature="e#4167#4168#0" expanded="true" />
@@ -114,7 +109,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MediaCodecAudioRenderer.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MediaCodecAudioRenderer.java" pinned="false" current-in-tab="false">
         <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/audio/MediaCodecAudioRenderer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="262">
@@ -124,83 +119,271 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LinkConfig.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+            <state relative-caret-position="337">
+              <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FragmentMenu.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="350">
+              <caret line="26" column="42" lean-forward="false" selection-start-line="26" selection-start-column="42" selection-end-line="26" selection-end-column="42" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FragmentMenu.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="782" column="62" lean-forward="false" selection-start-line="782" selection-start-column="62" selection-end-line="782" selection-end-column="62" />
+            <state relative-caret-position="174">
+              <caret line="841" column="22" lean-forward="true" selection-start-line="841" selection-start-column="22" selection-end-line="841" selection-end-column="22" />
               <folding>
-                <element signature="e#37889#37890#0" expanded="true" />
-                <element signature="e#37921#37922#0" expanded="true" />
-                <element signature="e#42765#42766#0" expanded="true" />
-                <element signature="e#42804#42805#0" expanded="true" />
+                <element signature="e#16537#16571#0" expanded="true" />
+                <element signature="e#16574#16609#0" expanded="true" />
+                <element signature="e#16835#16869#0" expanded="true" />
+                <element signature="e#22170#22202#0" expanded="true" />
+                <element signature="e#22626#22658#0" expanded="true" />
+                <element signature="method#onHiddenChanged#0;class#FragmentMenu#0" expanded="false" />
+                <element signature="e#40236#40237#0" expanded="true" />
+                <element signature="e#40268#40269#0" expanded="true" />
+                <element signature="method#update#0;class#FragmentMenu#0" expanded="false" />
+                <element signature="e#43125#43157#0" expanded="true" />
+                <element signature="e#45112#45113#0" expanded="true" />
+                <element signature="e#45151#45152#0" expanded="true" />
+                <element signature="e#45637#45669#0" expanded="true" />
+                <element signature="e#47300#47332#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DefaultTrackSelector.java" pinned="false" current-in-tab="false">
-        <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/trackselection/DefaultTrackSelector.java">
+      <file leaf-file-name="LibVLC.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/libvlc-android-sdk-3.0.13.aar/c3f90722c5a98742d4dc0f2b823758f1/jars/classes.jar!/org/videolan/libvlc/LibVLC.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="378" column="29" lean-forward="false" selection-start-line="378" selection-start-column="29" selection-end-line="378" selection-end-column="29" />
+            <state relative-caret-position="-970">
+              <caret line="21" column="11" lean-forward="false" selection-start-line="21" selection-start-column="11" selection-end-line="21" selection-end-column="11" />
               <folding>
-                <element signature="e#12519#12520#0" expanded="true" />
-                <element signature="e#12566#12567#0" expanded="true" />
+                <marker date="1548419183485" expanded="false" signature="0:104" ph="/.../" />
+                <marker date="1548419183485" expanded="false" signature="143:431" ph="..." />
+                <marker date="1548419183485" expanded="true" signature="677:2466" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="2502:2513" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="2544:2550" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="2757:2785" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="2823:2834" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="2855:2861" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="2917:2928" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="2964:2970" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="3201:5322" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="5371:5449" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="5406:5421" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="5433:5443" ph=" }" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SplashActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java">
+      <file leaf-file-name="Scheduler.java" pinned="false" current-in-tab="false">
+        <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/scheduler/Scheduler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="24">
-              <caret line="134" column="30" lean-forward="false" selection-start-line="134" selection-start-column="30" selection-end-line="134" selection-end-column="30" />
+            <state relative-caret-position="700">
+              <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AndroidManifest.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-          <provider editor-type-id="android-manifest">
+      <file leaf-file-name="MediaPlayer.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/libvlc-android-sdk-3.0.13.aar/c3f90722c5a98742d4dc0f2b823758f1/jars/classes.jar!/org/videolan/libvlc/MediaPlayer.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="463">
+              <caret line="681" column="36" lean-forward="true" selection-start-line="681" selection-start-column="36" selection-end-line="681" selection-end-column="36" />
+              <folding>
+                <marker date="1548419183485" expanded="false" signature="0:104" ph="/.../" />
+                <marker date="1548419183485" expanded="false" signature="143:850" ph="..." />
+                <marker date="1548419183485" expanded="true" signature="1481:2595" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="1535:2148" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="2204:2589" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="2813:2881" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="2991:3072" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="3176:3248" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="3346:3696" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="3742:4019" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="4072:4548" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="4625:5343" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="4642:4735" ph="onReceive(context, intent) → {" />
+                <marker date="1548419183485" expanded="false" signature="5321:5336" ph="}" />
+                <marker date="1548419183485" expanded="true" signature="5420:5920" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="6001:7759" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="6044:7752" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="6171:6474" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="6581:7201" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="7312:7742" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="7836:8223" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="8278:8630" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="8670:9010" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="9048:9618" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="9652:9663" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="9683:9689" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="9729:10233" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="10280:10291" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="10327:10333" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="10377:10388" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="10415:10421" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="10464:10579" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="10604:11437" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="11462:11649" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="11715:11782" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="11811:11822" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="11851:11857" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="11896:11907" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="11934:11940" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="11976:11987" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="12022:12028" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="12075:12086" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="12120:12126" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="12163:12262" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="12364:12447" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="12509:12972" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="13052:13427" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="13505:14101" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="14194:14756" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="14809:14876" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="14920:14931" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="14961:14967" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="15024:15035" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="15072:15078" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="15116:15127" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="15167:15173" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="15233:15244" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="15279:15285" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="15317:15328" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="15362:15368" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="15414:15566" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="15622:16270" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="16317:16725" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="16763:16774" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="16814:16820" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="16880:16891" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="16926:16932" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="16964:16975" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17009:17015" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="17060:17071" ph=" { " />
+                <marker date="1548419183485" expanded="true" signature="17110:17116" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17149:17160" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17194:17200" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17246:17257" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17296:17302" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17338:17349" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17387:17393" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17451:17462" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17495:17501" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17531:17542" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17574:17580" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17623:17634" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17671:17677" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17708:17719" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17751:17757" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="17801:17812" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="17849:17855" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="17922:17980" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="18045:18129" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="18198:18279" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="19170:19219" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="19330:20433" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="20472:20694" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="22828:24951" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="22890:22905" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="22922:22932" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="22970:22985" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23017:23027" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="23080:23220" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="23274:23289" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23324:23334" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="23408:23472" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="23516:23531" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23561:23571" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="23626:23641" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23675:23685" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="23727:23742" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23770:23780" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="23837:23852" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23889:23899" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="23933:23948" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="23978:23988" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="24036:24051" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="24087:24097" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="24137:24152" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="24184:24194" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="24247:24262" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="24299:24309" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="24994:25187" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="25114:25181" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="25221:25528" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="25401:25522" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="25560:26216" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="25726:25837" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="25870:25885" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="25914:25924" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="25964:25979" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="26008:26018" ph=" }" />
+                <marker date="1548419183485" expanded="true" signature="26055:26210" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="26185:26200" ph="{}" />
+                <marker date="1548419183485" expanded="true" signature="26251:26510" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="26493:26504" ph="{}" />
+                <marker date="1548419183485" expanded="true" signature="26545:27039" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="27022:27033" ph="{}" />
+                <marker date="1548419183485" expanded="true" signature="27112:27119" ph="{...}" />
+                <marker date="1548419183485" expanded="true" signature="27168:29137" ph="{...}" />
+                <marker date="1548419183485" expanded="false" signature="28057:28072" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28084:28094" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28140:28155" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28173:28183" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28240:28255" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28279:28289" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28336:28351" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28369:28379" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28417:28432" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28449:28459" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28499:28514" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28531:28541" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28584:28599" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28617:28627" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28662:28677" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28699:28709" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28748:28763" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28785:28795" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28832:28847" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28869:28879" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="28917:28932" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="28955:28965" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="29003:29018" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="29041:29051" ph=" }" />
+                <marker date="1548419183485" expanded="false" signature="29088:29103" ph=" { " />
+                <marker date="1548419183485" expanded="false" signature="29121:29131" ph=" }" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fragment_fragment_menu.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml">
+          <provider editor-type-id="android-designer2">
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="25" column="28" lean-forward="false" selection-start-line="21" selection-start-column="10" selection-end-line="25" selection-end-column="28" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UdpDataSource.java" pinned="false" current-in-tab="false">
-        <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/UdpDataSource.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SplashRepository.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-291">
-              <caret line="303" column="53" lean-forward="false" selection-start-line="303" selection-start-column="53" selection-end-line="303" selection-end-column="53" />
-              <folding />
+            <state relative-caret-position="530">
+              <caret line="361" column="24" lean-forward="false" selection-start-line="361" selection-start-column="24" selection-end-line="361" selection-end-column="24" />
+              <folding>
+                <element signature="e#2638#4611#0" expanded="false" />
+                <element signature="e#4621#15779#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -219,9 +402,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>update</find>
-      <find>onGlo</find>
-      <find>onKEY</find>
       <find>DVR</find>
       <find>buildA</find>
       <find>buildAud</find>
@@ -237,7 +417,6 @@
       <find>hideErrorFr</find>
       <find>setErr</find>
       <find>onKeyDown</find>
-      <find>init</find>
       <find>fetchPR</find>
       <find>fra</find>
       <find>playVideo</find>
@@ -249,6 +428,10 @@
       <find>spli</find>
       <find>fetchPre</find>
       <find>codec</find>
+      <find>init</find>
+      <find>playP</find>
+      <find>playPreview</find>
+      <find>mAudioOutput</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -20914,10 +21097,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ApplicationMain.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/extractor/DefaultExtractorsFactory.java" />
         <option value="E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/DefaultDataSource.java" />
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/white_background_round.xml" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/round_category_bg.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/round_category_default.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/grid_cat_seletor.xml" />
@@ -20930,6 +21111,9 @@
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java" />
+        <option value="$PROJECT_DIR$/build.gradle" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
+        <option value="$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java" />
       </list>
     </option>
@@ -20957,7 +21141,7 @@
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
+    <navigator currentView="AndroidView" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -20971,7 +21155,26 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="AndroidView">
+        <subPane>
+          <expand>
+            <path>
+              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+            </path>
+            <path>
+              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+            </path>
+            <path>
+              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
+              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -21015,27 +21218,18 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView">
+      <pane id="Scope" />
+      <pane id="Scratches">
         <subPane>
           <expand>
             <path>
-              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-            </path>
-            <path>
-              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-            </path>
-            <path>
-              <item name="AndroidTVLiveTV" type="1abcf292:AndroidViewProjectNode" />
-              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+              <item name="Scratches" type="d62648e6:ScratchProjectViewPane$MyRootNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -21043,7 +21237,7 @@
     <property name="settings.editor.selected.configurable" value="instant.run" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="device.picker.selection" value="192.168.0.163:5555" />
-    <property name="DEBUGGABLE_DEVICE" value="rockchip-ngtvx3-192.168.137.62:5555" />
+    <property name="DEBUGGABLE_DEVICE" value="rockchip-ngtvx3-192.168.0.163:5555" />
     <property name="DEBUGGABLE_PROCESS" value="livetv.demo.nitv" />
     <property name="SHOW_ALL_PROCESSES" value="false" />
     <property name="DEBUGGER_ID" value="Auto" />
@@ -21326,7 +21520,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286052" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -21335,21 +21528,22 @@
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53782505" sideWeight="0.51611173" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35875404" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3293979" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32624114" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.536643" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32585597" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53600943" sideWeight="0.4838883" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24489796" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32742316" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3270366" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32921588" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24919441" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3931523" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32994652" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3931523" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32994652" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -21358,7 +21552,6 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32163742" sideWeight="0.48770052" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35875404" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -21434,42 +21627,6 @@
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>350</line>
-          <properties />
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>359</line>
-          <properties />
-          <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>354</line>
-          <properties />
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>356</line>
-          <properties />
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>357</line>
-          <properties />
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
-          <line>355</line>
-          <properties />
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java</url>
           <line>391</line>
           <properties />
@@ -21501,87 +21658,51 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>708</line>
-          <properties />
-          <option name="timeStamp" value="42" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>707</line>
-          <properties />
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>696</line>
-          <properties />
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>671</line>
+          <line>688</line>
           <properties />
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>799</line>
+          <line>819</line>
           <properties />
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>809</line>
+          <line>829</line>
           <properties />
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>808</line>
+          <line>828</line>
           <properties />
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>768</line>
+          <line>788</line>
           <properties />
           <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>793</line>
+          <line>813</line>
           <properties />
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>794</line>
+          <line>814</line>
           <properties />
           <option name="timeStamp" value="52" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>807</line>
+          <line>827</line>
           <properties />
           <option name="timeStamp" value="53" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>736</line>
-          <properties />
-          <option name="timeStamp" value="54" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>738</line>
-          <properties />
-          <option name="timeStamp" value="55" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
-          <line>742</line>
-          <properties />
-          <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java</url>
@@ -21589,43 +21710,24 @@
           <properties />
           <option name="timeStamp" value="57" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
+          <line>1114</line>
+          <properties />
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java</url>
+          <line>1117</line>
+          <properties />
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="58" />
+      <option name="time" value="63" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/RenderersFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="42" column="13" lean-forward="false" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/extensions/ffmpeg/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-150">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/ExoPlayerLib/ExoPlayer/extensions/ffmpeg/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="16" column="58" lean-forward="false" selection-start-line="16" selection-start-column="58" selection-end-line="16" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashViewModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="113" column="49" lean-forward="false" selection-start-line="113" selection-start-column="49" selection-end-line="113" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/extensions/ffmpeg/src/main/java/com/google/android/exoplayer2/ext/ffmpeg/FfmpegAudioRenderer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-100">
@@ -21802,28 +21904,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="32" column="56" lean-forward="false" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="361" column="24" lean-forward="false" selection-start-line="361" selection-start-column="24" selection-end-line="361" selection-end-column="24" />
-          <folding>
-            <element signature="e#2638#4611#0" expanded="false" />
-            <element signature="e#4621#15779#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/white_background_round.xml">
       <provider editor-type-id="android-designer2">
         <state />
@@ -21841,7 +21921,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="5" column="8" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21852,7 +21931,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="5" column="8" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="5" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21863,7 +21941,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="175">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21874,7 +21951,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="125">
           <caret line="5" column="8" lean-forward="false" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21885,7 +21961,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
           <caret line="9" column="24" lean-forward="false" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21893,7 +21968,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4425">
           <caret line="199" column="28" lean-forward="false" selection-start-line="199" selection-start-column="28" selection-end-line="199" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21901,7 +21975,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5900">
           <caret line="260" column="0" lean-forward="false" selection-start-line="260" selection-start-column="0" selection-end-line="260" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -21916,29 +21989,18 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1725">
           <caret line="98" column="12" lean-forward="false" selection-start-line="98" selection-start-column="12" selection-end-line="98" selection-end-column="12" />
-          <folding>
-            <element signature="e#3542#3543#0" expanded="false" />
-            <element signature="e#3570#3571#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashRepository.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-291">
+        <state relative-caret-position="5925">
           <caret line="303" column="53" lean-forward="false" selection-start-line="303" selection-start-column="53" selection-end-line="303" selection-end-column="53" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/raw.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/raw.xml" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/utils/LinkConfig.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -21948,19 +22010,19 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
+        <state relative-caret-position="625">
           <caret line="25" column="28" lean-forward="false" selection-start-line="21" selection-start-column="10" selection-end-line="25" selection-end-column="28" />
           <folding />
         </state>
       </provider>
+      <provider editor-type-id="android-manifest">
+        <state />
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/splash/SplashActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="24">
+        <state relative-caret-position="1525">
           <caret line="134" column="30" lean-forward="false" selection-start-line="134" selection-start-column="30" selection-end-line="134" selection-end-column="30" />
           <folding />
         </state>
@@ -21968,80 +22030,27 @@
     </entry>
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/upstream/UdpDataSource.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
+        <state relative-caret-position="3675">
           <caret line="176" column="0" lean-forward="false" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="1084" column="50" lean-forward="false" selection-start-line="1084" selection-start-column="29" selection-end-line="1084" selection-end-column="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#30247#30279#0" expanded="true" />
-            <element signature="e#30463#30499#0" expanded="true" />
-            <element signature="e#30794#30826#0" expanded="true" />
-            <element signature="e#35841#35842#0" expanded="true" />
-            <element signature="e#35915#35916#0" expanded="true" />
-            <element signature="e#37957#37958#0" expanded="true" />
-            <element signature="e#38005#38006#0" expanded="true" />
-            <element signature="e#41174#41209#0" expanded="true" />
-            <element signature="e#42035#42036#0" expanded="true" />
-            <element signature="e#42086#42087#0" expanded="true" />
-            <element signature="e#42933#42934#0" expanded="true" />
-            <element signature="e#42965#42966#0" expanded="true" />
-            <element signature="e#51004#51005#0" expanded="true" />
-            <element signature="e#51074#51075#0" expanded="true" />
-            <element signature="e#51705#51706#0" expanded="true" />
-            <element signature="e#51763#51764#0" expanded="true" />
-            <element signature="e#51796#51797#0" expanded="true" />
-            <element signature="e#51851#51852#0" expanded="true" />
-            <element signature="e#51890#51891#0" expanded="true" />
-            <element signature="e#51932#51933#0" expanded="true" />
-            <element signature="e#52253#52285#0" expanded="true" />
-            <element signature="e#60896#60939#0" expanded="true" />
-            <element signature="e#61082#61206#0" expanded="true" />
-            <element signature="e#61291#61408#0" expanded="true" />
-            <element signature="e#61515#61642#0" expanded="true" />
-            <element signature="e#63333#63334#0" expanded="true" />
-            <element signature="e#63388#63389#0" expanded="true" />
-            <element signature="e#63565#63603#0" expanded="true" />
-            <element signature="e#64143#64175#0" expanded="true" />
-            <element signature="e#64416#64448#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/trackselection/DefaultTrackSelector.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
+        <state relative-caret-position="8250">
           <caret line="378" column="29" lean-forward="false" selection-start-line="378" selection-start-column="29" selection-end-line="378" selection-end-column="29" />
           <folding>
-            <element signature="e#12519#12520#0" expanded="true" />
-            <element signature="e#12566#12567#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="782" column="62" lean-forward="false" selection-start-line="782" selection-start-column="62" selection-end-line="782" selection-end-column="62" />
-          <folding>
-            <element signature="e#37889#37890#0" expanded="true" />
-            <element signature="e#37921#37922#0" expanded="true" />
-            <element signature="e#42765#42766#0" expanded="true" />
-            <element signature="e#42804#42805#0" expanded="true" />
+            <element signature="e#12519#12520#0" expanded="false" />
+            <element signature="e#12566#12567#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/DefaultRenderersFactory.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="278" column="32" lean-forward="true" selection-start-line="278" selection-start-column="32" selection-end-line="278" selection-end-column="32" />
+        <state relative-caret-position="5925">
+          <caret line="278" column="32" lean-forward="false" selection-start-line="278" selection-start-column="32" selection-end-line="278" selection-end-column="32" />
           <folding>
             <element signature="e#4115#4116#0" expanded="true" />
             <element signature="e#4167#4168#0" expanded="true" />
@@ -22054,6 +22063,289 @@
         <state relative-caret-position="262">
           <caret line="242" column="9" lean-forward="false" selection-start-line="242" selection-start-column="9" selection-end-line="242" selection-end-column="9" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="26" column="42" lean-forward="false" selection-start-line="26" selection-start-column="42" selection-end-line="26" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/VideoPlayActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3486">
+          <caret line="350" column="0" lean-forward="false" selection-start-line="350" selection-start-column="0" selection-end-line="350" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#35841#35842#0" expanded="true" />
+            <element signature="e#35915#35916#0" expanded="true" />
+            <element signature="e#37957#37958#0" expanded="true" />
+            <element signature="e#38005#38006#0" expanded="true" />
+            <element signature="e#42035#42036#0" expanded="true" />
+            <element signature="e#42086#42087#0" expanded="true" />
+            <element signature="e#42933#42934#0" expanded="true" />
+            <element signature="e#42965#42966#0" expanded="true" />
+            <element signature="e#51004#51005#0" expanded="true" />
+            <element signature="e#51074#51075#0" expanded="true" />
+            <element signature="e#51705#51706#0" expanded="true" />
+            <element signature="e#51763#51764#0" expanded="true" />
+            <element signature="e#51796#51797#0" expanded="true" />
+            <element signature="e#51851#51852#0" expanded="true" />
+            <element signature="e#51890#51891#0" expanded="true" />
+            <element signature="e#51932#51933#0" expanded="true" />
+            <element signature="e#63333#63334#0" expanded="true" />
+            <element signature="e#63388#63389#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_fragment_menu.xml">
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="530">
+          <caret line="361" column="24" lean-forward="false" selection-start-line="361" selection-start-column="24" selection-end-line="361" selection-end-column="24" />
+          <folding>
+            <element signature="e#2638#4611#0" expanded="false" />
+            <element signature="e#4621#15779#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/ExoPlayerLib/ExoPlayer/library/core/src/main/java/com/google/android/exoplayer2/scheduler/Scheduler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/libvlc-android-sdk-3.0.13.aar/c3f90722c5a98742d4dc0f2b823758f1/jars/classes.jar!/org/videolan/libvlc/LibVLC.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-970">
+          <caret line="21" column="11" lean-forward="false" selection-start-line="21" selection-start-column="11" selection-end-line="21" selection-end-column="11" />
+          <folding>
+            <marker date="1548419183485" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1548419183485" expanded="false" signature="143:431" ph="..." />
+            <marker date="1548419183485" expanded="true" signature="677:2466" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="2502:2513" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="2544:2550" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="2757:2785" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="2823:2834" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="2855:2861" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="2917:2928" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="2964:2970" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="3201:5322" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="5371:5449" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="5406:5421" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="5433:5443" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/libvlc-android-sdk-3.0.13.aar/c3f90722c5a98742d4dc0f2b823758f1/jars/classes.jar!/org/videolan/libvlc/MediaPlayer.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="463">
+          <caret line="681" column="36" lean-forward="true" selection-start-line="681" selection-start-column="36" selection-end-line="681" selection-end-column="36" />
+          <folding>
+            <marker date="1548419183485" expanded="false" signature="0:104" ph="/.../" />
+            <marker date="1548419183485" expanded="false" signature="143:850" ph="..." />
+            <marker date="1548419183485" expanded="true" signature="1481:2595" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="1535:2148" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="2204:2589" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="2813:2881" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="2991:3072" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="3176:3248" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="3346:3696" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="3742:4019" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="4072:4548" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="4625:5343" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="4642:4735" ph="onReceive(context, intent) → {" />
+            <marker date="1548419183485" expanded="false" signature="5321:5336" ph="}" />
+            <marker date="1548419183485" expanded="true" signature="5420:5920" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="6001:7759" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="6044:7752" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="6171:6474" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="6581:7201" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="7312:7742" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="7836:8223" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="8278:8630" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="8670:9010" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="9048:9618" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="9652:9663" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="9683:9689" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="9729:10233" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="10280:10291" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="10327:10333" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="10377:10388" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="10415:10421" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="10464:10579" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="10604:11437" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="11462:11649" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="11715:11782" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="11811:11822" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="11851:11857" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="11896:11907" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="11934:11940" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="11976:11987" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="12022:12028" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="12075:12086" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="12120:12126" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="12163:12262" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="12364:12447" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="12509:12972" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="13052:13427" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="13505:14101" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="14194:14756" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="14809:14876" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="14920:14931" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="14961:14967" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="15024:15035" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="15072:15078" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="15116:15127" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="15167:15173" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="15233:15244" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="15279:15285" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="15317:15328" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="15362:15368" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="15414:15566" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="15622:16270" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="16317:16725" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="16763:16774" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="16814:16820" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="16880:16891" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="16926:16932" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="16964:16975" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17009:17015" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="17060:17071" ph=" { " />
+            <marker date="1548419183485" expanded="true" signature="17110:17116" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17149:17160" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17194:17200" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17246:17257" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17296:17302" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17338:17349" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17387:17393" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17451:17462" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17495:17501" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17531:17542" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17574:17580" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17623:17634" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17671:17677" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17708:17719" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17751:17757" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="17801:17812" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="17849:17855" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="17922:17980" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="18045:18129" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="18198:18279" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="19170:19219" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="19330:20433" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="20472:20694" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="22828:24951" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="22890:22905" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="22922:22932" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="22970:22985" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23017:23027" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="23080:23220" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="23274:23289" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23324:23334" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="23408:23472" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="23516:23531" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23561:23571" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="23626:23641" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23675:23685" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="23727:23742" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23770:23780" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="23837:23852" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23889:23899" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="23933:23948" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="23978:23988" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="24036:24051" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="24087:24097" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="24137:24152" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="24184:24194" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="24247:24262" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="24299:24309" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="24994:25187" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="25114:25181" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="25221:25528" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="25401:25522" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="25560:26216" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="25726:25837" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="25870:25885" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="25914:25924" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="25964:25979" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="26008:26018" ph=" }" />
+            <marker date="1548419183485" expanded="true" signature="26055:26210" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="26185:26200" ph="{}" />
+            <marker date="1548419183485" expanded="true" signature="26251:26510" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="26493:26504" ph="{}" />
+            <marker date="1548419183485" expanded="true" signature="26545:27039" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="27022:27033" ph="{}" />
+            <marker date="1548419183485" expanded="true" signature="27112:27119" ph="{...}" />
+            <marker date="1548419183485" expanded="true" signature="27168:29137" ph="{...}" />
+            <marker date="1548419183485" expanded="false" signature="28057:28072" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28084:28094" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28140:28155" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28173:28183" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28240:28255" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28279:28289" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28336:28351" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28369:28379" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28417:28432" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28449:28459" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28499:28514" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28531:28541" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28584:28599" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28617:28627" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28662:28677" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28699:28709" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28748:28763" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28785:28795" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28832:28847" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28869:28879" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="28917:28932" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="28955:28965" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="29003:29018" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="29041:29051" ph=" }" />
+            <marker date="1548419183485" expanded="false" signature="29088:29103" ph=" { " />
+            <marker date="1548419183485" expanded="false" signature="29121:29131" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/androidtv/livetv/stb/ui/videoplay/fragments/menu/FragmentMenu.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="841" column="22" lean-forward="true" selection-start-line="841" selection-start-column="22" selection-end-line="841" selection-end-column="22" />
+          <folding>
+            <element signature="e#16537#16571#0" expanded="true" />
+            <element signature="e#16574#16609#0" expanded="true" />
+            <element signature="e#16835#16869#0" expanded="true" />
+            <element signature="e#22170#22202#0" expanded="true" />
+            <element signature="e#22626#22658#0" expanded="true" />
+            <element signature="method#onHiddenChanged#0;class#FragmentMenu#0" expanded="false" />
+            <element signature="e#40236#40237#0" expanded="true" />
+            <element signature="e#40268#40269#0" expanded="true" />
+            <element signature="method#update#0;class#FragmentMenu#0" expanded="false" />
+            <element signature="e#43125#43157#0" expanded="true" />
+            <element signature="e#45112#45113#0" expanded="true" />
+            <element signature="e#45151#45152#0" expanded="true" />
+            <element signature="e#45637#45669#0" expanded="true" />
+            <element signature="e#47300#47332#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

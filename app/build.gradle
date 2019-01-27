@@ -74,6 +74,33 @@ android {
         implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
         implementation 'com.jakewharton.timber:timber:4.6.1'
         implementation 'org.greenrobot:eventbus:3.1.1'
+        implementation 'com.github.masterwok:libvlc-android-sdk:3.0.13'
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            universalApk false
+        }
     }
 }
 
+import com.android.build.OutputFile
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        def baseAbiVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
+
+        if (baseAbiVersionCode != null) {
+            output.versionCodeOverride = baseAbiVersionCode * 10000000 + variant.versionCode
+        }
+    }
+}
+
+ext.abiCodes = [
+        'armeabi-v7a': 1,
+        'arm64-v8a'  : 2,
+        'x86'        : 3,
+        'x86_64'     : 4
+]

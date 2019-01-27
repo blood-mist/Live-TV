@@ -5,6 +5,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -58,6 +60,10 @@ import com.google.android.exoplayer2.util.Util;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.Media;
+import org.videolan.libvlc.MediaPlayer;
 
 import java.net.InetAddress;
 import java.net.MulticastSocket;
@@ -102,7 +108,7 @@ import static androidtv.livetv.stb.utils.LinkConfig.SELECTED_CATEGORY_NAME;
 /**
  * A simple {@link Fragment} subclass to show menu
  */
-public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener, Observer {
+public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClickListener, ChannelListAdapter.ChannelListClickListener, Observer, IVLCVout.Callback, MediaPlayer.EventListener {
     private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
     private static final int ALL_CHANNELS_ADDED = 99;
     private static final int CHANNEL_ITEMS_SPECIFIER = 9;
@@ -114,7 +120,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private SharedPreferences lastPlayedPrefs;
     private List<ChannelItem> currentPlayedCategoryItems;
     private View selectedCategoryView;
-    private SimpleExoPlayer player;
+    private MediaPlayer player;
     DataSource.Factory dataSourceFactory;
 
     private Handler watchPreviewHandler = new Handler();
@@ -123,6 +129,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
     private List<ChannelItem> allChannelItems, allFavItems;
     private boolean isFirstRun = false;
+    private LibVLC libVLC=null;
+    private View mVideoView=null;
 
     public FragmentMenu() {
         // Required empty public constructor
@@ -160,7 +168,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.gv_channels)
     RecyclerView gvChannelsList;
     @BindView(R.id.preview_view)
-    PlayerView previewView;
+    SurfaceView previewView;
     @BindView(R.id.preview_container)
     FrameLayout previewContainer;
     @BindView(R.id.epg)
@@ -226,6 +234,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         gvChannelsList.setAdapter(adapter);
         getAllChannels();
+        initSurfaceView();
         layoutFav.setNextFocusRightId(layoutFav.getId());
         gvChannelsList.setNextFocusRightId(layoutEpg.getId());
 
@@ -335,6 +344,14 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }*/
         });
 
+    }
+
+    private void initSurfaceView() {
+        final ArrayList<String> args = new ArrayList<>();
+        args.add("-vvv");
+        args.add("--aout=no");
+        libVLC = new LibVLC(Objects.requireNonNull(getActivity()),args);
+        mVideoView=previewView;
     }
 
     private void getAllChannels() {
@@ -734,13 +751,16 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 LinkConfig.getHashCode(String.valueOf(login.getId()), String.valueOf(utc), login.getSession()), channelItem.getId()).observe(this, channelLinkResponse -> {
             if (channelLinkResponse != null) {
                 try {
-                    initVideoView(channelLinkResponse.getChannel().getLink());
+//                    initVideoView(channelLinkResponse.getChannel().getLink());
+                    playPreview(channelLinkResponse.getChannel().getLink());
                 } catch (Exception e) {
-                    initVideoView("");
+//                    initVideoView("");
+                    playPreview("");
                     e.printStackTrace();
                 }
             }
-            initVideoView("");
+//            initVideoView("");
+            playPreview("");
         });
 
     }
@@ -765,7 +785,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
      *
      * @param link
      **/
-    private void initVideoView(String link) {
+   /* private void initVideoView(String link) {
         boolean needNewPlayer = player == null;
         if (needNewPlayer) {
             dataSourceFactory = buildDataSourceFactory();
@@ -812,17 +832,73 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }
         });
 
+    }*/
+
+
+  private void  playPreview(String link){
+      String splitUrl = "udp://@237.1.1.9:9000";
+      if(player!=null){
+          player.release();
+          player=null;
+      }
+      player=new MediaPlayer(libVLC);
+      player.setEventListener(this);
+      player.setAudioOutput("--aout=false");
+      player.setVolume(0);
+      final IVLCVout vout = player.getVLCVout();
+      vout.setVideoView(previewView);
+      vout.addCallback(this);
+      vout.attachViews();
+      Media m = new Media(libVLC,Uri.parse(splitUrl));
+      player.setMedia(m);
+      m.release();
+      player.play();
+//      updateVideoSurfaces();
+
+      }
+
+
+
+    private void updateVideoSurfaces() {
+        int sw = previewView.getWidth();
+        int sh = previewView.getHeight();
+
+        // sanity check
+        if (sw * sh == 0) {
+            Log.e("VideoPlay", "Invalid surface size");
+            return;
+        }
+        player.getVLCVout().setWindowSize(sw, sh);
+        double dw = sw, dh = sh;
+        double dar = dw / dh;
+       double ar = 4.0 / 3.0;
+        if (dar < ar)
+            dh = dw / ar;
+        else
+            dw = dh * ar;
+        ViewGroup.LayoutParams lp = previewView.getLayoutParams();
+        lp.width = (int) Math.floor(dw);
+        lp.height = (int) Math.floor(dh);
+        previewView.setLayoutParams(lp);
+        mVideoView.invalidate();
     }
 
     private void releasePlayer() {
         if (player != null) {
+            if (libVLC == null)
+                return;
+            final IVLCVout vout = player.getVLCVout();
+            vout.removeCallback(this);
+            vout.detachViews();
+            libVLC.release();
             player.release();
-            player = null;
-            trackSelector = null;
+            libVLC = null;
+            player=null;
+
         }
     }
 
-    private MediaSource buildMediaSource(Uri uri) {
+   /* private MediaSource buildMediaSource(Uri uri) {
         @C.ContentType int type = Util.inferContentType(uri);
         switch (type) {
             case C.TYPE_DASH:
@@ -839,13 +915,13 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 return new HlsMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(uri);
             case C.TYPE_OTHER:
-              /*  try {
+              *//*  try {
                     UdpDataSource.Factory udpDataSource = dataSourceFactory;
                     return new ExtractorMediaSource.Factory(udpDataSource)
-                            *//*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*//*
+                            *//**//*.setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))*//**//*
                             .createMediaSource(uri);
-                } catch (Exception e) {*/
+                } catch (Exception e) {*//*
                 return new ExtractorMediaSource.Factory(dataSourceFactory)
                         .setExtractorsFactory(new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
                                 | DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS))
@@ -855,7 +931,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 throw new IllegalStateException("Unsupported type: " + type);
             }
         }
-    }
+    }*/
 
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -1019,6 +1095,34 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             currentPlayed = allChannelItems.get(position);
             currentPlayedCategoryItems = allChannelItems;
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onSurfacesCreated(IVLCVout ivlcVout) {
+
+    }
+
+    @Override
+    public void onSurfacesDestroyed(IVLCVout ivlcVout) {
+
+    }
+
+    @Override
+    public void onEvent(MediaPlayer.Event event) {
+        switch(event.type){
+            case MediaPlayer.Event.Playing:
+                previewContainer.setVisibility(View.VISIBLE);
+                break;
+                case MediaPlayer.Event.EncounteredError:
+                    previewContainer.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getActivity(), "Preview not available", Toast.LENGTH_SHORT).show();
+                    if (player != null) {
+                        player.setEventListener(null);
+                    }
+                    releasePlayer();
+                    break;
+                    
         }
     }
 

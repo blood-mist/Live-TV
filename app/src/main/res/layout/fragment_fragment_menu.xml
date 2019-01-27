@@ -354,17 +354,15 @@
             android:background="@color/color_black"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_alignParentRight="true"
             android:layout_marginRight="21dp"
             tools:ignore="RtlHardcoded">
 
-            <com.google.android.exoplayer2.ui.PlayerView
+            <SurfaceView
                 android:id="@+id/preview_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"
-                app:use_controller="false" />
+                android:layout_height="match_parent"/>
 
         </FrameLayout>
         <Button
