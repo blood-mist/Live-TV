@@ -110,7 +110,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/desc_layout"
             android:layout_width="match_parent"
@@ -202,7 +201,7 @@
                 <LinearLayout
                     android:id="@+id/options_container"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="50dp"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:baselineAligned="false"
@@ -217,7 +216,7 @@
                     <LinearLayout
                         android:id="@+id/layout_epg"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="40dp"
                         android:focusable="true"
                         android:layout_weight="2"
                         android:gravity="center"
@@ -225,16 +224,19 @@
                         android:clickable="true"
                         android:importantForAccessibility="yes"
                         android:orientation="horizontal"
-                        android:layout_marginEnd="5dp">
+                        android:layout_marginEnd="5dp"
+                        tools:ignore="RtlHardcoded">
 
                         <ImageView
                             android:id="@+id/epg"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
                             android:clickable="false"
                             android:focusable="false"
+                            android:scaleType="fitXY"
+                            android:adjustViewBounds="true"
                             android:focusableInTouchMode="false"
                             android:importantForAccessibility="no"
                             android:src="@drawable/epg" />
@@ -251,15 +253,16 @@
                             android:importantForAccessibility="no"
                             android:singleLine="true"
                             android:text="@string/epg"
+                            android:textStyle="bold"
                             android:textColor="@color/dvr_text_color"
-                            android:textSize="15sp" />
+                           android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/layout_dvr"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="40dp"
                         android:focusable="true"
                         android:layout_weight="2"
                         android:gravity="center"
@@ -271,8 +274,8 @@
 
                         <ImageView
                             android:id="@+id/dvr"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
                             android:clickable="false"
@@ -292,16 +295,17 @@
                             android:importantForAccessibility="no"
                             android:singleLine="true"
                             android:text="@string/dvr"
+                            android:textStyle="bold"
                             android:textColor="@color/dvr_text_color"
-                            android:textSize="15sp" />
+                           android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/layout_fav"
                         android:layout_width="0dp"
-                        android:layout_weight="2"
-                        android:layout_height="30dp"
+                        android:layout_weight="3"
+                        android:layout_height="40dp"
                         android:focusable="true"
                         android:gravity="center_vertical"
                         android:importantForAccessibility="yes"
@@ -311,8 +315,8 @@
 
                         <ImageView
                             android:id="@+id/fav"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginStart="10dp"
                             android:focusable="false"
@@ -333,30 +337,27 @@
                             android:singleLine="true"
                             android:text="@string/set_fav"
                             android:textAllCaps="true"
+                            android:textStyle="bold"
                             android:textColor="@color/dvr_text_color"
-                            android:textSize="15sp"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
                             app:fontAssetName="@string/font_exo_regular" />
 
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
-
         <FrameLayout
             android:id="@+id/preview_container"
-            android:layout_width="400dp"
+            android:layout_width="450dp"
+            android:layout_below="@id/category_list_container"
+            android:layout_alignParentStart="true"
             android:minWidth="400dp"
-            android:layout_height="250dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="120dp"
-            android:layout_marginEnd="21dp"
+            android:layout_height="300dp"
             android:background="@color/color_black"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="invisible"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="21dp"
             tools:ignore="RtlHardcoded">
 
             <com.google.android.exoplayer2.ui.PlayerView
@@ -374,7 +375,6 @@
             android:layout_below="@+id/category_list_container"
             android:focusable="true"
             android:importantForAccessibility="yes" />
-
         <FrameLayout
             android:id="@+id/error_layout"
             android:layout_width="match_parent"

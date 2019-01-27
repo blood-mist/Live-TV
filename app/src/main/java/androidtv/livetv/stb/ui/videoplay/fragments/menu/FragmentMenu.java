@@ -780,7 +780,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
             defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity());
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(),DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), renderersFactory, trackSelector, defaultLoadControl);
         }
         player.setVolume(0f);
