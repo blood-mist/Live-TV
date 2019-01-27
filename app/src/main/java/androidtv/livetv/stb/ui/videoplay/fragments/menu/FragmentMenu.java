@@ -52,6 +52,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.UdpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
@@ -757,7 +758,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     private DataSource.Factory buildDataSourceFactory() {
-        return ((ApplicationMain) ((Objects.requireNonNull(getActivity())).getApplication())).buildDataSourceFactory(BANDWIDTH_METER);
+        return new DefaultDataSourceFactory(getActivity(),Util.getUserAgent(getActivity(), getString(R.string.app_name)));
     }
 
     /**
@@ -769,19 +770,18 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         boolean needNewPlayer = player == null;
         if (needNewPlayer) {
             dataSourceFactory = buildDataSourceFactory();
-            ;
             TrackSelection.Factory adaptiveTrackSelectionFactory =
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
             trackSelectorParameters.buildUpon().setMaxVideoSize(300,200).build();
             trackSelector.setParameters(trackSelectorParameters);
-            DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
+            /*DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
             DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
             DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
             defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(),DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
-            player = ExoPlayerFactory.newSimpleInstance(getActivity(), renderersFactory, trackSelector, defaultLoadControl);
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(),DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);*/
+            player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         }
         player.setVolume(0f);
         player.setPlayWhenReady(true);

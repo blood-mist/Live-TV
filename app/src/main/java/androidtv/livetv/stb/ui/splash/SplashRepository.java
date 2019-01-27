@@ -232,9 +232,7 @@ public class SplashRepository {
                         String json = null;
                         try {
                             json = versionInfoResponse.body().string();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+
                         switch (isResponseArray(json)) {
                             case IS_JSON_ARRAY:
                                 List<AppVersionInfo> appDataList = new ArrayList<>();
@@ -262,6 +260,10 @@ public class SplashRepository {
                             default:
                                 onError(new Throwable("ERR_RESPONSE_UNEXPECTED"));
                                 break;
+                        }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            onError(new Throwable("ERR_RESPONSE_UNEXPECTED"));
                         }
                     }
 
