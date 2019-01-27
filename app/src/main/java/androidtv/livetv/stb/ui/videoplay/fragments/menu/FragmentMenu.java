@@ -349,7 +349,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private void initSurfaceView() {
         final ArrayList<String> args = new ArrayList<>();
         args.add("-vvv");
-        args.add("--aout=no");
+        args.add("--noaudio");
+        args.add("--no-sout-audio");
         libVLC = new LibVLC(Objects.requireNonNull(getActivity()),args);
         mVideoView=previewView;
     }
