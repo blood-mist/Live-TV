@@ -16,7 +16,9 @@ public class LinkConfig {
     public static final String ACCOUNT_PACKAGE="androidtv.myaccount.stb";
     public static final String BASE_URL ="https://middleware.yourman.info/" ;
     /*public static final String BASE_URL ="https://maxtv.bitbytenepal.com/" ;*/
+  // public static final String BASE_URL = "https://demo.newitventure.com/api/v1/";
     public static final String CHECK_IF_SERVER_RECHABLE = "https://middleware.yourman.info";
+   // public static final String CHECK_IF_SERVER_RECHABLE = "https://demo.newitventure.com";
     public static final String CHANNEL_LOGO_URL = "uploads/channel/";
     public static final String CHANNEL_LINK_URL = "api/v1/livetv/getchannels";
     public static final String NEW_CHANNEL_LINK="api/v1/livetv/package_validation";
