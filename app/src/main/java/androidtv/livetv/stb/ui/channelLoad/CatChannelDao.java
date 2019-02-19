@@ -43,7 +43,7 @@ public interface CatChannelDao {
     @Query("SELECT count(*)FROM CATEGORY_TABLE")
     LiveData<Integer> getCatTableSize();
 
-    @Query("SELECT * FROM EPG_TABLE WHERE channel_id = :id")
+    @Query("SELECT * FROM EPG_TABLE WHERE channel_id = :id ORDER BY date ASC")
     LiveData<List<Epgs>> getEpgs(int id);
 
     @Query("SELECT count(*)FROM CHANNEL_TABLE")

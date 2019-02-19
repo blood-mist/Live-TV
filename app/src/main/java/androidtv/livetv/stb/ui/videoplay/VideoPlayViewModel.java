@@ -16,6 +16,7 @@ import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
+import androidtv.livetv.stb.entity.NewDvrEntity;
 
 public class VideoPlayViewModel extends AndroidViewModel {
 
@@ -39,7 +40,7 @@ public class VideoPlayViewModel extends AndroidViewModel {
 
     }
 
-    public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, int id, String hashCode, int channelId, String date, String startTime) {
+    public LiveData<NewDvrEntity> getDvrLink(String token, long utc, int id, String hashCode, int channelId, String date, String startTime) {
        return videoPlayRepository.getDvrLink(token, utc, String.valueOf(id), String.valueOf(hashCode), String.valueOf(channelId),date,startTime);
     }
 

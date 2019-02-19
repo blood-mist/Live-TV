@@ -13,7 +13,6 @@
     <color name="signup_form_text_color">#CCCCCC</color>
     <color name="color_text_silver">#a9a9a9</color>
 
-
     <color name="transp">#cc000000</color>
     <color name="mac_id_bg">#35080808</color>
     <color name="no_color">#00000000</color>
@@ -40,9 +39,11 @@
     <color name="dvr_text_color">#9b9b9b</color>
     <color name="darkgrey">#848484</color>
     <color name="darkgrey_trans">#88bfbfbf</color>
-    <color name="category_color_blue">#66303F9F</color>
-    <color name="category_color_blu_click">#661976D2</color>
-    <color name="color_blue_def">#662196F3</color>
+    <color name="category_color_blue">#CC303F9F</color>
+    <color name="category_color_blu_click">#CC1976D2</color>
+    <color name="color_blue_def">#CC2196F3</color>
+    <color name="grid_cat_bg">#cc1b1c1e</color>
+    <color name="epg_bg_color">#CCFFFFFF</color>
 
 
 </resources>

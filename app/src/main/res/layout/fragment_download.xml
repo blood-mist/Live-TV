@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:background="@drawable/white_background">
 
@@ -12,7 +13,7 @@
         android:background="@color/color_black"
         android:orientation="vertical">
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/fragment_header_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -20,13 +21,15 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/update"
             android:padding="10dp"
+            app:fontAssetName="@string/font_helvetica_medium"
             android:textColor="@color/text_color_heading"/>
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:padding="10dp"
             android:id="@+id/downloadTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_color"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:text="@string/downloading"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
         <LinearLayout
@@ -66,18 +69,20 @@
             android:visibility="visible"
             android:maxWidth="700sp"
            />
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/download_percent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0%"
             android:padding="5dp"
             android:layout_gravity="end"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:layout_marginRight="10dp"
             android:textColor="@color/text_color"
             android:layout_marginBottom="8dp"
             android:visibility="visible"
-            android:layout_marginEnd="10dp" />
+            android:layout_marginEnd="10dp"
+            tools:ignore="RtlHardcoded" />
 
     </LinearLayout>
 

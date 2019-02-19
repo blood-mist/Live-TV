@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_black"
@@ -14,7 +15,7 @@
         android:background="@drawable/signup_border_grey"
         android:gravity="center">
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/label_sign_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -22,10 +23,11 @@
             android:padding="10dp"
             android:text="@string/sign_in"
             android:textColor="@color/text_color_heading"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            app:fontAssetName="@string/font_helvetica_bold"/>
 
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/label_userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,11 +36,12 @@
             android:layout_below="@+id/label_sign_in"
             android:padding="10dp"
             android:text="@string/username"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:textColor="@color/signup_form_text_color"
             android:textSize="20sp" />
 
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/userNamePS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,11 +50,13 @@
             android:layout_toRightOf="@+id/label_userName"
             android:ems="15"
             android:padding="10dp"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:textColor="@color/signup_form_text_color"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="RtlHardcoded" />
 
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/loginPasswordLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -59,6 +64,7 @@
             android:layout_alignStart="@id/label_sign_in"
             android:layout_below="@+id/label_userName"
             android:padding="10dp"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:text="@string/label_password"
             android:textColor="@color/signup_form_text_color"
             android:textSize="20sp" />
@@ -78,7 +84,8 @@
             android:singleLine="true"
             android:textColor="@color/signup_form_text_color"
             android:textColorHint="@color/color_text_silver"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="RtlHardcoded" />
 
         <Button
             android:id="@+id/loginButtonPS"

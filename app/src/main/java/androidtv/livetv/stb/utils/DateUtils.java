@@ -14,11 +14,13 @@ import java.util.Locale;
  * Created by rupak on 31/10/2015.
  */
 public class DateUtils {
-    public static SimpleDateFormat dateAndTime = new SimpleDateFormat("yyyy-MM-dd");
-    public static SimpleDateFormat _12HrsTimeFormat = new SimpleDateFormat("hh:mm");
-    public static SimpleDateFormat _24HrsTimeFormat = new SimpleDateFormat("HH:mm");
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss Z");
-    public static SimpleDateFormat smalldateFormat = new SimpleDateFormat("E, MMM dd");
+    public static SimpleDateFormat daymonthFormat=new SimpleDateFormat("dd MMM, yyyy",Locale.US);
+    public static SimpleDateFormat dateAndTime = new SimpleDateFormat("yyyy-MM-dd",Locale.US);
+    public static SimpleDateFormat _12HrsTimeFormat = new SimpleDateFormat("hh:mm",Locale.US);
+    public static SimpleDateFormat _24HrsTimeFormat = new SimpleDateFormat("HH:mm",Locale.US);
+    public static SimpleDateFormat epgDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.US);
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss Z",Locale.US);
+    public static SimpleDateFormat smalldateFormat = new SimpleDateFormat("E, MMM dd",Locale.US);
     public static SimpleDateFormat fullDayFormat =  new SimpleDateFormat("EEE", Locale.US);
 
     public static Date convertTimeTo24hrs(String time) throws ParseException {
@@ -40,6 +42,10 @@ public class DateUtils {
         Date date = dateFormat.parse(dateStr);
 
         return date;
+    }
+
+    public static Date convertStringToTime(String startDate,String startTime) throws ParseException{
+        return epgDateFormat.parse(startDate+" "+startTime);
     }
     public static Date convertStringToDateNew(String dateStr)throws ParseException {
 

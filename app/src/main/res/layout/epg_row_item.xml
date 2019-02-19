@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_txt_img_hor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/main_dvr_list_selector"
+    android:importantForAccessibility="yes"
     android:focusable="true"
-    android:paddingTop="0dp"
-    android:paddingBottom="0dp"
     android:focusedByDefault="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:targetApi="o">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -31,8 +33,9 @@
             android:paddingTop="10dp"
             android:scaleType="centerInside"
             android:src="@drawable/red_circle"
-            android:visibility="visible" />
-        <TextView
+            android:visibility="visible"
+            tools:ignore="RtlHardcoded" />
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:layout_marginLeft="-2dp"
             android:id="@+id/on_air_text"
             android:layout_width="wrap_content"
@@ -41,31 +44,36 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:visibility="visible"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:text="ON AIR"
             android:textSize="20sp"
             android:textColor="@color/selector_epg_prgm_name"
             android:layout_marginStart="-20dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10dp" />
-        <TextView
+            android:layout_marginEnd="10dp"
+            tools:ignore="RtlHardcoded" />
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/txt_prgm_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:maxLines="1"
             android:text="sadasdasadsaddfs"
-            android:textColor="#ddefde"
+            android:textColor="@color/selector_epg_prgm_name"
             android:textSize="20sp"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            tools:ignore="RtlHardcoded" />
 
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/txt_prgm_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:padding="10dp"
+            app:fontAssetName="@string/font_helvetica_regular"
             android:layout_toLeftOf="@+id/ico_alarm_play"
             android:layout_toRightOf="@+id/txt_prgm_time"
             android:maxLines="1"
@@ -73,7 +81,8 @@
             android:textColor="@color/selector_epg_prgm_name"
             android:textSize="20sp"
             android:layout_toStartOf="@+id/ico_alarm_play"
-            android:layout_toEndOf="@+id/txt_prgm_time" />
+            android:layout_toEndOf="@+id/txt_prgm_time"
+            tools:ignore="RtlHardcoded" />
 
 
     </RelativeLayout>

@@ -18,27 +18,41 @@ import java.util.concurrent.TimeoutException;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.EpgItem;
+import androidtv.livetv.stb.entity.EpgTokenListItem;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.entity.PlayBackErrorEntity;
 
 public class DataUtils {
-    public static List<Epgs> getEpgsListFrom(List<EpgItem> epgItemList, String channelId) {
+    public static List<Epgs> getEpgsListFrom(List<EpgTokenListItem> epgItemList, String channelId) {
         List<Epgs> epgsList = new ArrayList<>();
         if(epgItemList != null){
-            for (EpgItem epgItem : epgItemList) {
+            for (EpgTokenListItem epgItem : epgItemList) {
                 Epgs epgs = new Epgs();
-                epgs.setId(String.valueOf(channelId) + epgItem.getStartTime());
-                epgs.setDate(getParsedDate(epgItem.getStartTime()));
-                epgs.setStartTime(getParsedDate(epgItem.getStartTime()));
-                epgs.setEndTime(getParsedDate(epgItem.getEndTime()));
+                try {
+                    epgs.setId(String.valueOf(channelId) + DateUtils.convertStringToTime(epgItem.getStartDate(),epgItem.getStartTime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                epgs.setDate(getParsedDate(epgItem.getStartDate()));
+                epgs.setStartTime(getParsedTime(epgItem.getStartDate(),epgItem.getStartTime()));
+                epgs.setEndTime(getParsedTime(epgItem.getStartDate(),epgItem.getEndTime()));
                 epgs.setProgramTitle(epgItem.getProgramName());
                 epgs.setChannelID(Integer.parseInt(channelId));
-                epgs.setTimeZone(getTimeZone(epgItem.getStartTime()));
+//                epgs.setTimeZone(getTimeZone(epgItem.getStartTime()));
                 epgsList.add(epgs);
             }
         }
 
         return epgsList;
+    }
+
+    private static Date getParsedTime(String startDate,String startTime) {
+        try {
+            return DateUtils.convertStringToTime(startDate,startTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String getTimeZone(String startTime) {
@@ -51,10 +65,10 @@ public class DataUtils {
     }
 
 
-    public static Date getParsedDate(String startTime) {
+    public static Date getParsedDate(String startDate) {
         Date d = null;
         try {
-            d = DateUtils.convertStringToDate(startTime);
+            d = DateUtils.convertStringToDateNew(startDate);
             System.out.print("date = "+d.toString());
 
         } catch (ParseException e) {

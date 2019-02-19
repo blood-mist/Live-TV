@@ -41,8 +41,8 @@ public class EpgViewModel extends AndroidViewModel {
         return channelListMediator;
     }
 
-    public LiveData<Boolean> getEpgs(String token, long utc, String userId , String hashValue, String channelId){
-        return epgRepositary.getEpgs(token, utc, userId, hashValue, channelId);
+    public LiveData<Boolean> getEpgs(String epgurl, String token, String channelId){
+        return epgRepositary.getEpgs(epgurl,token, channelId);
 
     }
 

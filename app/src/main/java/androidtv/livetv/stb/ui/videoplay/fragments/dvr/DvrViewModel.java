@@ -37,8 +37,8 @@ public class DvrViewModel extends AndroidViewModel {
         return channelListMediator;
     }
 
-    public LiveData<List<Epgs>> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
-      return dvrRepositary.getEpgs(token, utc, userId, hashValue, channelId);
+    public LiveData<List<Epgs>> getEpgs(String url,String token ,String channelId,String date) {
+      return dvrRepositary.getEpgs(url,token,channelId,date);
 
     }
 

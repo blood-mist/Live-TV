@@ -5,14 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Timer;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
@@ -28,6 +31,7 @@ public class GridCategoryAdapter extends RecyclerView.Adapter<GridCategoryAdapte
     private OnListClickListener mListener;
     private int selectedPos;
     private RecyclerView recyclerView;
+    private Context context;
     private List<ChannelItem> allFavList,allChannelList;
 
     public View getSelectedCategoryView() {
@@ -48,6 +52,8 @@ public class GridCategoryAdapter extends RecyclerView.Adapter<GridCategoryAdapte
      */
     public GridCategoryAdapter(Context context, OnListClickListener lis) {
         mInflater = LayoutInflater.from(context);
+        this.context=context;
+
         this.mListener = lis;
     }
 
@@ -196,11 +202,19 @@ public class GridCategoryAdapter extends RecyclerView.Adapter<GridCategoryAdapte
 
 
     class MyCategoryViewHolder extends RecyclerView.ViewHolder {
+
+
+
         private TextView mTitleView;
         private LinearLayout mCategoryLayout;
         CategoriesWithChannels finalCategoryItem ;
         private MyCategoryViewHolder(View itemView) {
             super(itemView);
+           /* ViewGroup.LayoutParams layoutParams=itemView.getLayoutParams();
+            layoutParams.height= (int) (itemView.getLayoutParams().height/scale);
+            layoutParams.width= (int) (itemView.getLayoutParams().width/scale);
+            itemView.setLayoutParams(layoutParams);
+            itemView.requestLayout();*/
             mTitleView = itemView.findViewById(R.id.grid_cat_textView);
             mCategoryLayout = itemView.findViewById(R.id.grid_item_layout);
 

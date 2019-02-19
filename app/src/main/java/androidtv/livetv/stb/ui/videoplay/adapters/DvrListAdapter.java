@@ -61,38 +61,33 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
             holder.LayoutTxtImgHor.setTag("12");
             holder.alarmPlay.setImageResource(R.drawable.red_circle);
             holder.onAirText.setText("ON AIR");
-            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
             listener.onOnAirSetup(epg);
-
-
         } else {
-            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
-            holder.alarmPlay.setImageResource(R.drawable.play);
+            holder.alarmPlay.setImageResource(R.drawable.dvr_play_selector);
             holder.onAirText.setText("");
             holder.LayoutTxtImgHor.setTag("10");
 
         }
 
-        if(selectedFocusedPosition == position){
-            holder.LayoutTxtImgHor.setSelected(true);
+        if (selectedFocusedPosition == position) {
+//            holder.LayoutTxtImgHor.setSelected(true);
+            holder.prgmName.setSelected(true);
+            holder.prgmTime.setSelected(true);
+            holder.alarmPlay.setSelected(true);
             holder.LayoutTxtImgHor.requestFocus();
-        }else{
-            holder.LayoutTxtImgHor.setSelected(false);
-        }
-
-        if(holder.LayoutTxtImgHor.isSelected()){
-            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
-        }else{
-            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
         }
 
         holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+                    holder.prgmName.setSelected(true);
+                    holder.prgmTime.setSelected(true);
+                    holder.alarmPlay.setSelected(true);
                 } else {
-                    holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
+                    holder.prgmName.setSelected(false);
+                    holder.prgmTime.setSelected(false);
+                    holder.alarmPlay.setSelected(false);
                 }
             }
         });
@@ -103,7 +98,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
                 if (v.getTag() == "12") {
                     listener.onAirClick(epg);
                 } else {
-                    listener.clickDvr(epg,position);
+                    listener.clickDvr(epg, position);
                     v.requestFocus();
 
                 }
@@ -116,6 +111,11 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
         }
 
 
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override
@@ -145,15 +145,15 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
     }
 
     public int getPosition(Epgs currentPlayedEpg) {
-            if (mList != null && mList.size() > 0) {
-                for (int i = 0; i < mList.size(); i++) {
-                    Epgs epg = mList.get(i);
-                    if (currentPlayedEpg != null) {
-                        if (currentPlayedEpg.getId() != null && epg.getId().equals(currentPlayedEpg.getId())){
-                            return i;
-                        }
+        if (mList != null && mList.size() > 0) {
+            for (int i = 0; i < mList.size(); i++) {
+                Epgs epg = mList.get(i);
+                if (currentPlayedEpg != null) {
+                    if (currentPlayedEpg.getId() != null && epg.getId().equals(currentPlayedEpg.getId())) {
+                        return i;
                     }
                 }
+            }
 
             return mList.size() - 1;
         } else {
@@ -163,7 +163,7 @@ public class DvrListAdapter extends RecyclerView.Adapter<DvrViewHolder> {
 
 
     public interface OnClickDvrList {
-        void clickDvr(Epgs epg,int position);
+        void clickDvr(Epgs epg, int position);
 
         void onOnAirSetup(Epgs epg);
 

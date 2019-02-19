@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="5dp"
     tools:context="androidtv.livetv.stb.ui.videoplay.fragments.menu.GridMenuFragment"
     android:background="#99111111"
     android:layout_gravity="center">
@@ -13,31 +15,38 @@
 
     </FrameLayout>
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:padding="20dp"
         android:gravity="center">
-        <TextView
+        <androidtv.livetv.stb.ui.custom_views.CustomTextView
             android:id="@+id/txt_genre"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/genres"
+            android:textAllCaps="true"
             android:gravity="center"
-            android:background="#40111111"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/text_size_large"
+            android:shadowColor="@color/color_black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            app:fontAssetName="@string/font_helvetica_bold"
+            android:shadowRadius="2"
+            android:visibility="gone"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:padding="20dp"/>
+            android:padding="@dimen/spacing"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/menu_grid"
-        android:foregroundGravity="center"
         android:layout_below="@+id/txt_genre"
-        android:layout_centerInParent="true"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:clipToPadding="false"
-        android:padding="@dimen/spacing"
+        android:clipChildren="false"
         android:importantForAccessibility="auto"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
     </RelativeLayout>
 </FrameLayout>

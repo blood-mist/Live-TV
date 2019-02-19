@@ -23,6 +23,7 @@ import androidtv.livetv.stb.entity.ChannelLinkResponse;
 import androidtv.livetv.stb.entity.ChannelLinkResponseWrapper;
 import androidtv.livetv.stb.entity.DvrLinkResponse;
 import androidtv.livetv.stb.entity.LoginDataDelete;
+import androidtv.livetv.stb.entity.NewDvrEntity;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
 import androidtv.livetv.stb.ui.splash.SplashRepository;
 import androidtv.livetv.stb.utils.ApiInterface;
@@ -149,21 +150,21 @@ public class VideoPlayRepository {
         return responseMediatorLiveData;
     }
 
-    public LiveData<DvrLinkResponse> getDvrLink(String token, long utc, String userId, String hashValue, String channelId, String date, String startTime) {
-        MediatorLiveData<DvrLinkResponse> responseMediatorLiveData = new MediatorLiveData<>();
+    public LiveData<NewDvrEntity> getDvrLink(String token, long utc, String userId, String hashValue, String channelId, String date, String startTime) {
+        MediatorLiveData<NewDvrEntity> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<DvrLinkResponse>> call = videoPlayApiInterface.getDvrLink(token, utc, userId, hashValue, channelId, date, startTime);
+        io.reactivex.Observable<Response<NewDvrEntity>> call = videoPlayApiInterface.getDvrLink(token, utc, userId, hashValue, channelId);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
-                .subscribe(new io.reactivex.Observer<Response<DvrLinkResponse>>() {
+                .subscribe(new io.reactivex.Observer<Response<NewDvrEntity>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(Response<DvrLinkResponse> channelLinkResponseResponse) {
+                    public void onNext(Response<NewDvrEntity> channelLinkResponseResponse) {
                         if (channelLinkResponseResponse.code() == 200) {
-                            DvrLinkResponse response = channelLinkResponseResponse.body();
+                            NewDvrEntity response = channelLinkResponseResponse.body();
                             responseMediatorLiveData.postValue(response);
                         } else {
                             responseMediatorLiveData.postValue(null);

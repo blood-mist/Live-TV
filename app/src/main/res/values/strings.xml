@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Live TV Demo</string>
+    <string name="app_name">Live TV</string>
     <string name="loading_app">Loading Live TV</string>
     <string name="label_version">Version:</string>
     <string name="app_icon">For App Icon</string>
@@ -25,8 +25,8 @@
     <string name="user_not_approved">Your user account has not been approved .Please contact your service provider.</string>
     <string name="mac_not_registered">Your device has not been registered into our system.\nPlease contact your service provider and register device mac address to use our services</string>
     <string name="register_success_message">You have successfully registered to our system. Please check your email and click the activation link to complete your registration. \\n\\nYou can login to the system only after our team reviews your request once your have activated your account. This process might take time so you are requested to wait our email confirmation of your Registration approval.\\nIf you did not receive any email or face any other issue regarding registration process, please email us at info@artemisiaiofcaria.com</string>
-    <string name="request_permissions"><![CDATA[AndroidTV LiveTV needs an access to your <b>Extenal Storage</b>.]]></string>
-    <string name="msg_update">A new version of AndroidTV LiveTV is available.\n Download Now.</string>
+    <string name="request_permissions"><![CDATA[LiveTV needs an access to your <b>Extenal Storage</b>.]]></string>
+    <string name="msg_update">A new version of LiveTV is available.\n Download Now.</string>
     <string name="btn_update">Update</string>
     <string name="downloading">Downloading…</string>
     <string name="update">Update Found</string>
@@ -160,7 +160,10 @@
     <string name="font_exo_medium">Exo2-Medium.otf</string>
     <string name="font_exo_Light">Exo2-Light.otf</string>
     <string name="font_exo_Bold">Exo2-Bold.otf</string>
-
+    <string name="font_helvetica_bold">Helvetica_Neu_Bold.ttf</string>
+    <string name="font_helvetica_lt">HelveticaNeuL.ttf</string>
+    <string name="font_helvetica_medium">Helvetica_Neue_Medium.ttf</string>
+    <string name="font_helvetica_regular">HelveticaNeue.ttf</string>
 
     <string name="epg">EPG</string>
     <string name="dvr">DVR</string>
@@ -201,6 +204,8 @@
 
     <string name="sample_list_load_error">One or more sample lists failed to load</string>
     <string name="genres">Genres</string>
+    <string name="onair">On Air</string>
+    <string name="press_back_to_exit">Press back again to exit.</string>
 
 
 </resources>

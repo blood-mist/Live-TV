@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_error"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -37,15 +38,17 @@
             android:background="@drawable/round_shape"
             android:orientation="vertical"
             android:padding="10dp"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="8dp"
+            tools:ignore="RtlHardcoded">
 
-            <TextView
+            <androidtv.livetv.stb.ui.custom_views.CustomTextView
                 android:id="@+id/dialog_heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:gravity="center_horizontal"
                 android:text="@string/error"
+                app:fontAssetName="@string/font_helvetica_regular"
                 android:textColor="#dadada"
                 android:textSize="25sp" />
 
@@ -63,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp">
 
-                <TextView
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/macaddress_fixed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -71,9 +74,10 @@
                     android:text="@string/mac_address"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#dadada"
+                    app:fontAssetName="@string/font_helvetica_regular"
                     android:textStyle="bold" />
 
-                <TextView
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/macaddress_variable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,26 +86,29 @@
                     android:text="@string/empty_text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#dadada"
+                    app:fontAssetName="@string/font_helvetica_regular"
                     android:layout_marginEnd="20dp" />
 
-                <TextView
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/app_version_fixed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="2"
                     android:text="@string/app_version"
+                    app:fontAssetName="@string/font_helvetica_regular"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#dadada"
                     android:textStyle="bold"
                     android:layout_marginStart="20dp" />
 
-                <TextView
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/app_version_variable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:text="@string/empty_text"
+                    app:fontAssetName="@string/font_helvetica_regular"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#dadada" />
             </LinearLayout>
@@ -129,24 +136,26 @@
                     />
 
 
-                <TextView
+                <androidtv.livetv.stb.ui.custom_views.CustomTextView
                     android:id="@+id/message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:textColor="#dadada"
                     android:textSize="16sp"
+                    app:fontAssetName="@string/font_helvetica_regular"
                     android:layout_margin="10dp"
                     android:visibility="visible" />
             </LinearLayout>
 
-            <TextView
+            <androidtv.livetv.stb.ui.custom_views.CustomTextView
                 android:id="@+id/txt_error_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:gravity="center_horizontal"
                 android:padding="10dp"
+                app:fontAssetName="@string/font_helvetica_regular"
                 android:text="ERROR CODE 98978"
                 android:textColor="#dadada" />
 

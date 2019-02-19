@@ -54,7 +54,7 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull DateViewHolder holder, int position) {
-        Date d = dateList.get(position);
+        Date d = dateList.get(holder.getAdapterPosition());
         String txtToSet = DateUtils.smalldateFormat.format(d);
         holder.prgmDetails.setText(txtToSet);
         Log.d("dates",txtToSet);
@@ -65,29 +65,26 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
                     holder.prgmDetails.setFont(mContext.getResources().getString(R.string.font_exo_Bold));
                     holder.prgmDetails.setScaleX(1.05f);
                     holder.prgmDetails.setScaleY(1.05f);
-                    holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
+                    holder.prgmDetails.setSelected(true);
                 }
                 // listener.onClick(position,dateList.get(position));
                 else {
                     holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_regular));
                     holder.prgmDetails.setScaleX(1f);
                     holder.prgmDetails.setScaleY(1f);
-                    holder.layoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
+                    holder.prgmDetails.setSelected(false);
                 }
 
             }
         });
 
         if (getPositionClicked() == position) {
+            holder.layoutTxtImgHor.setSelected(true);
             holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Bold));
-            holder.prgmDetails.setTextColor(Color.parseColor("#FFFFFF"));
-            holder.mainLayout.setBackgroundColor(Color.parseColor("#9e1e27"));
-            holder.layoutTxtImgHor.requestFocus();
+            holder.prgmDetails.setSelected(false);
         } else {
+            holder.layoutTxtImgHor.setSelected(false);
             holder.prgmDetails.setFont(mContext.getString(R.string.font_exo_Light));
-            holder.prgmDetails.setTextColor(Color.parseColor("#ddefde"));
-            holder.mainLayout.setBackgroundColor(mContext.getResources().getColor(R.color.no_color));
-
         }
 
 
@@ -96,7 +93,6 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
             public void onClick(View v) {
                 setPositionClicked(position);
                 listener.onClick(position, dateList.get(position));
-                v.requestFocus();
 
             }
         });

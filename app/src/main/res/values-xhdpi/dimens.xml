@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="media_controller_size">250dp</dimen>
+    <dimen name="spacing">10dp</dimen>
+    <dimen name="genre_width">180dp</dimen>
+    <dimen name="genre_geight">50dp</dimen>
+    <dimen name="padding_space">10dp</dimen>
+    <dimen name="text_size_large">28sp</dimen>
+    <dimen name="padding_20">10dp</dimen>
+</resources>

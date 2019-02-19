@@ -24,6 +24,7 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
     private List<Epgs> mList;
     private Context mContext;
     private EpgListAdapterListener listener;
+    private int onAirPos=-1;
 
 
     public EpgListAdapter(Context context,EpgListAdapterListener lis){
@@ -46,13 +47,14 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull EpgViewHolder holder, int position) {
-        Epgs epg = mList.get(position);
+        Epgs epg = mList.get(holder.getAdapterPosition());
         holder.prgmName.setText(epg.getProgramTitle());
         holder.prgmTime.setText(DataUtils.getPrgmTime(epg.getStartTime(),epg.getEndTime()));
         Calendar currentCal = Calendar.getInstance();
         Date currentDateTime = currentCal.getTime();
         if((epg.getStartTime().before(currentDateTime) && epg.getEndTime().after(currentDateTime)) || epg.getStartTime() == currentDateTime || epg.getEndTime() == currentDateTime){
             holder.LayoutTxtImgHor.setClickable(true);
+            onAirPos=holder.getAdapterPosition();
             holder.alarmPlay.setImageResource(R.drawable.red_circle);
             holder.onAirText.setText("ON AIR");
             holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.transp));
@@ -61,30 +63,29 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
             holder.LayoutTxtImgHor.setTag("click");
         }else{
             holder.LayoutTxtImgHor.setTag("no");
-            holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
-            holder.alarmPlay.setImageResource(R.drawable.icon_alarm);
+            holder.alarmPlay.setImageResource(R.drawable.alarm_selector);
             holder.onAirText.setText("");
             holder.LayoutTxtImgHor.setClickable(false);
         }
 
-        holder.LayoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-               if(hasFocus){
-                   holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.darkgrey));
-               } else{
-                   holder.LayoutTxtImgHor.setBackgroundColor(mContext.getResources().getColor(R.color.epg_transp));
-               }
-            }
-        });
 
-        holder.LayoutTxtImgHor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(v.getTag().equals("click"))
-                listener.onEpgClicked(epg);
-            }
+        holder.LayoutTxtImgHor.setOnClickListener(v -> {
+            if(v.getTag().equals("click"))
+            listener.onEpgClicked(epg);
         });
+       holder. LayoutTxtImgHor.setOnFocusChangeListener((v, hasFocus) -> {
+           if (hasFocus) {
+               if(onAirPos!=holder.getAdapterPosition()) {
+                   holder.prgmName.setSelected(true);
+                   holder.prgmTime.setSelected(true);
+                   holder.alarmPlay.setSelected(true);
+               }
+           } else {
+               holder. prgmName.setSelected(false);
+               holder.prgmTime.setSelected(false);
+               holder.alarmPlay.setSelected(false);
+           }
+       });
 
 
 
@@ -99,6 +100,11 @@ public class EpgListAdapter extends RecyclerView.Adapter<EpgViewHolder> {
     public void clear() {
         mList = null;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     public interface EpgListAdapterListener {

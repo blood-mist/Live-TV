@@ -3,12 +3,19 @@ package androidtv.livetv.stb.ui.videoplay.fragments.epg;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.util.Log;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.EpgEntity;
+import androidtv.livetv.stb.entity.EpgMasterResponse;
 import androidtv.livetv.stb.entity.EpgResponse;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
@@ -59,50 +66,53 @@ public class EpgRepositary {
         return channelList;
     }
 
-    public LiveData<Boolean> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
+    public LiveData<Boolean> getEpgs(String epgUrl,String token,String channelId) {
         epLiveData=new MediatorLiveData<>();
         epLiveData.setValue(null);
-        io.reactivex.Observable<Response<EpgResponse>> call = epgApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
+        String timeZone=TimeZone.getDefault().getID();
+        Log.d("timezone",timeZone);
+        io.reactivex.Observable<Response<List<EpgMasterResponse>>> call = epgApiInterface.getEpgs(epgUrl, token, getDateinRequiredFormat(),"Asia/Kolkata");
         call.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread()).
                 unsubscribeOn(Schedulers.io()).
-                subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
+                subscribe(new io.reactivex.Observer<Response<List<EpgMasterResponse>>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         DisposableManager.addEpgDisposable(d);
                     }
 
                     @Override
-                    public void onNext(Response<EpgResponse> epgResponseResponse) {
+                    public void onNext(Response<List<EpgMasterResponse>> epgResponseResponse) {
                         if (epgResponseResponse.code() == 200) {
-                            EpgResponse response = epgResponseResponse.body();
+                            List<EpgMasterResponse> response = epgResponseResponse.body();
+                            List<Epgs> epgs =new ArrayList<>();
                             if (response != null) {
-                                if (response.getError_code() <= 0) {
-                                    List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
-                                    if (epgs != null && epgs.size() > 0) {
-                                        insertToDb(epgs).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
-                                            @Override
-                                            public void onSubscribe(Disposable d) {
+                                for(EpgMasterResponse epgResponse:response) {
+                                    epgs.addAll(DataUtils.getEpgsListFrom(epgResponse.getEpgTokenList(), channelId));
+                                }
+                                if (epgs.size() > 0) {
+                                    insertToDb(epgs).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
+                                        @Override
+                                        public void onSubscribe(Disposable d) {
 
-                                            }
+                                        }
 
-                                            @Override
-                                            public void onComplete() {
-                                                epLiveData.postValue(true);
-                                            }
+                                        @Override
+                                        public void onComplete() {
+                                            epLiveData.postValue(true);
+                                        }
 
-                                            @Override
-                                            public void onError(Throwable e) {
-                                                epLiveData.postValue(true);
-                                            }
-                                        });
-                                    }
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            epLiveData.postValue(true);
+                                        }
+                                    });
+                                }
 
                                 }else{
                                     epLiveData.postValue(true);
                                 }
                             }
-                        }
 
 
                     }
@@ -122,9 +132,13 @@ public class EpgRepositary {
 
     }
 
+    private String  getDateinRequiredFormat() {
+        SimpleDateFormat epgDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        return epgDateFormat.format(Calendar.getInstance().getTime());
+    }
+
     private Completable insertToDb(List<Epgs> epgs) {
-      Completable insertionTaskObservable= Completable.fromRunnable(() -> catChannelDao.insertEpgs(epgs));
-      return insertionTaskObservable;
+        return Completable.fromRunnable(() -> catChannelDao.insertEpgs(epgs));
     }
 
 

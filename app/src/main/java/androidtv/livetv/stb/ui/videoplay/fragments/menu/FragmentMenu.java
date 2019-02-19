@@ -12,11 +12,13 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -27,13 +29,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.RenderersFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ts.DefaultTsPayloadReaderFactory;
@@ -47,13 +47,9 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.UdpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
 import org.greenrobot.eventbus.EventBus;
@@ -71,7 +67,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 
-import androidtv.livetv.stb.ApplicationMain;
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.CategoriesWithChannels;
 import androidtv.livetv.stb.entity.ChannelItem;
@@ -86,6 +81,7 @@ import androidtv.livetv.stb.ui.videoplay.adapters.ChannelListAdapter;
 import androidtv.livetv.stb.ui.videoplay.fragments.epg.EpgFragment;
 import androidtv.livetv.stb.ui.videoplay.fragments.error.ErrorFragment;
 import androidtv.livetv.stb.utils.DisposableManager;
+import androidtv.livetv.stb.utils.GlideApp;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -148,6 +144,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     TextView channelDescription;
     @BindView(R.id.channelNo)
     TextView channelNo;
+    @BindView(R.id.txt_language)
+    TextView channelLanguage;
     @BindView(R.id.currentcategory)
     TextView currentCategoryTitleView;
     @BindView(R.id.categoryList)
@@ -161,17 +159,24 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.gv_channels)
     RecyclerView gvChannelsList;
     @BindView(R.id.preview_view)
-    PlayerView previewView;
+    TextureView previewView;
     @BindView(R.id.preview_container)
     FrameLayout previewContainer;
     @BindView(R.id.epg)
     ImageView btnEpg;
+
+    @BindView(R.id.view_focusHelper)
+    View catFocushelper;
+
 
     @BindView(R.id.dvr)
     ImageView btnDvr;
 
     @BindView(R.id.fav)
     ImageView btnFav;
+
+    @BindView(R.id.img_descLogo)
+    ImageView channelDescLogo;
 
     private int catId = -1;
 
@@ -223,119 +228,83 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         categoryAdapter = new CategoryAdapter(getActivity(), FragmentMenu.this);
         categoryList.setLayoutManager(categoryLayoutManager);
         categoryList.setAdapter(categoryAdapter);
+        DividerItemDecoration itemDecor = new DividerItemDecoration(Objects.requireNonNull(getContext()), DividerItemDecoration.HORIZONTAL);
+        categoryList.addItemDecoration(itemDecor);
         adapter = new ChannelListAdapter(getActivity(), this);
         gvChannelsList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         gvChannelsList.setAdapter(adapter);
         getAllChannels();
         layoutFav.setNextFocusRightId(layoutFav.getId());
-        gvChannelsList.setNextFocusRightId(layoutEpg.getId());
-
-
-        layoutFav.setOnFocusChangeListener((view12, hasFocus) -> {
-            if (hasFocus) {
-                btnFav.setScaleX(1.4f);
-                btnFav.setScaleY(1.4f);
-                txtFavUnfav.setScaleX(1.3f);
-                txtFavUnfav.setScaleY(1.3f);
-                txtFavUnfav.setTextColor(getResources().getColor(R.color.red_selector));
-                btnFav.setColorFilter(getResources().getColor(R.color.red_selector));
-
-            } else {
-                txtFavUnfav.setTextColor(getResources().getColor(R.color.dvr_text_color));
-                btnFav.setColorFilter(getResources().getColor(R.color.dvr_text_color));
-                btnFav.setScaleX(1.0f);
-                btnFav.setScaleY(1.0f);
-                txtFavUnfav.setScaleX(1.0f);
-                txtFavUnfav.setScaleY(1.0f);
-                try {
-                    int index = categoryLayoutManager.findFirstVisibleItemPosition();
-                    View v = categoryLayoutManager.getChildAt(0);
-                    int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
-                    categoryLayoutManager.scrollToPositionWithOffset(index, top);
-                    layoutFav.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-          /*  try {
-                layoutFav.setNextFocusUpId(categoryList.getChildAt(0).getId());
-            } catch (Exception ignored) {
-            }*/
-        });
-
+        layoutDvr.setNextFocusRightId(layoutDvr.getId());
+        layoutEpg.setNextFocusRightId(layoutEpg.getId());
+        gvChannelsList.setNextFocusRightId(layoutDvr.getId());
+        setUpCategoryFocus();
 
         layoutDvr.setOnFocusChangeListener((view1, hasFocus) -> {
-            if (hasFocus) {
-                btnDvr.setScaleX(1.4f);
-                btnDvr.setScaleY(1.4f);
-                txtDvr.setScaleX(1.3f);
-                txtDvr.setScaleY(1.3f);
-                txtDvr.setTextColor(getResources().getColor(R.color.red_selector));
-                btnDvr.setColorFilter(getResources().getColor(R.color.red_selector));
-
-            } else {
-                txtDvr.setTextColor(getResources().getColor(R.color.dvr_text_color));
-                btnDvr.setColorFilter(getResources().getColor(R.color.dvr_text_color));
-                btnDvr.setScaleX(1.0f);
-                btnDvr.setScaleY(1.0f);
-                txtDvr.setScaleX(1.0f);
-                txtDvr.setScaleY(1.0f);
-
+            if (!hasFocus) {
                 try {
                     int index = categoryLayoutManager.findFirstVisibleItemPosition();
                     View v = categoryLayoutManager.getChildAt(0);
                     int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
                     categoryLayoutManager.scrollToPositionWithOffset(index, top);
-                    layoutDvr.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
+                    layoutDvr.setNextFocusUpId(Objects.requireNonNull(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition))
+                            .itemView.findViewById(R.id.channelCategory_layout).getId());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
             }
-           /* try {
-                layoutDvr.setNextFocusUpId(categoryList.getChildAt(0).getId());
-            } catch (Exception ignored) {
-            }*/
 
 
         });
 
-        layoutEpg.setOnFocusChangeListener((view1, hasFocus) -> {
-            if (hasFocus) {
-                btnEpg.setScaleX(1.4f);
-                btnEpg.setScaleY(1.4f);
-                txtEpg.setScaleX(1.3f);
-                txtEpg.setScaleY(1.3f);
-                txtEpg.setTextColor(getResources().getColor(R.color.red_selector));
-                btnEpg.setColorFilter(getResources().getColor(R.color.red_selector));
-
-            } else {
-                txtEpg.setTextColor(getResources().getColor(R.color.dvr_text_color));
-                btnEpg.setColorFilter(getResources().getColor(R.color.dvr_text_color));
-                btnEpg.setScaleX(1.0f);
-                btnEpg.setScaleY(1.0f);
-                txtEpg.setScaleX(1.0f);
-                txtEpg.setScaleY(1.0f);
+        /*layoutEpg.setOnFocusChangeListener((view1, hasFocus) -> {
+            if (!hasFocus) {
                 try {
                     int index = categoryLayoutManager.findFirstVisibleItemPosition();
                     View v = categoryLayoutManager.getChildAt(0);
                     int top = (v == null) ? 0 : (v.getTop() - categoryLayoutManager.getPaddingTop());
                     categoryLayoutManager.scrollToPositionWithOffset(index, top);
-                    layoutEpg.setNextFocusUpId(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition).itemView.findViewById(R.id.channelCategory_layout).getId());
+                    layoutEpg.setNextFocusUpId(Objects.requireNonNull(categoryList.findViewHolderForAdapterPosition(selectedCategoryPosition))
+                            .itemView.findViewById(R.id.channelCategory_layout).getId());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
             }
-          /*  try {
-                layoutEpg.setNextFocusUpId(categoryList.getChildAt(0).getId());
-            } catch (Exception ignored) {
-            }*/
+        });*/
+
+    }
+
+    private void setUpCategoryFocus() {
+        currentCategoryTitleView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    try {
+                        gvChannelsList.getChildAt(0).requestFocus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        gvChannelsList.requestFocus();
+                    }
+                }
+            }
         });
 
+        catFocushelper.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    try {
+                        categoryList.getChildAt(0).requestFocus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        categoryList.requestFocus();
+                    }
+                }
+            }
+        });
     }
 
     private void getAllChannels() {
@@ -460,9 +429,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             checkListAndClickFav(allChannelItems, favlItemList);
         else {
             String finalLastPlayedCategory = lastPlayedCategory;
-            io.reactivex.Observable.just(allCategoryChannels).map((List<CategoriesWithChannels> allCategoryChannels1) -> selectLastPlayedCatAndChannel(allCategoryChannels1, finalLastPlayedCategory)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(channelItemList -> {
-                onClickCategory(finalLastPlayedCategory, currentPlayingCategoryPosition, channelItemList);
-            });
+            io.reactivex.Observable.just(allCategoryChannels).map((List<CategoriesWithChannels> allCategoryChannels1) -> selectLastPlayedCatAndChannel(allCategoryChannels1, finalLastPlayedCategory)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(channelItemList -> FragmentMenu.this.onClickCategory(finalLastPlayedCategory, currentPlayingCategoryPosition, channelItemList));
         }
     }
 
@@ -565,23 +533,18 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
                                     }
                                     try {
-                                        selectedCategoryView = categoryList.findViewHolderForAdapterPosition(pos).itemView.findViewById(R.id.channelCategory_layout);
+                                        selectedCategoryView = Objects.requireNonNull(categoryList.findViewHolderForAdapterPosition(pos)).itemView.findViewById(R.id.channelCategory_layout);
                                         selectedCategoryView.setNextFocusDownId(gvChannelsList.getChildAt(0).getId());
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-                                    try {
-                                        layoutEpg.setNextFocusLeftId(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.getId());
-                                    } catch (Exception ignored) {
-                                        try {
-                                            layoutEpg.setNextFocusLeftId(gvChannelsList.getLayoutManager().findViewByPosition(selectedChannelPosition).getId());
-                                        } catch (Exception ignored2) {
-                                            layoutEpg.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
-                                        }
-                                    }
+                                   setFocusForEpgBtn();
+                                    setFocusForDvrBtn();
+                                    setFocusForFavBtn();
+
 
                                     try {
-                                        gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition).itemView.findViewById(R.id.relative_layout).requestFocus();
+                                        Objects.requireNonNull(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition)).itemView.findViewById(R.id.relative_layout).requestFocus();
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                         try {
@@ -610,6 +573,45 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
             }
         }
 
+    }
+
+    private void setFocusForFavBtn() {
+        try {
+            layoutFav.setNextFocusLeftId(Objects.requireNonNull(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition)).itemView.getId());
+        } catch (Exception ignored) {
+            try {
+                layoutFav.setNextFocusLeftId(Objects.requireNonNull(Objects.requireNonNull(
+                        gvChannelsList.getLayoutManager()).findViewByPosition(selectedChannelPosition)).getId());
+            } catch (Exception ignored2) {
+                layoutFav.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
+            }
+        }
+    }
+
+    private void setFocusForDvrBtn() {
+        try {
+            layoutDvr.setNextFocusLeftId(Objects.requireNonNull(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition)).itemView.getId());
+        } catch (Exception ignored) {
+            try {
+                layoutDvr.setNextFocusLeftId(Objects.requireNonNull(Objects.requireNonNull(
+                        gvChannelsList.getLayoutManager()).findViewByPosition(selectedChannelPosition)).getId());
+            } catch (Exception ignored2) {
+                layoutDvr.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
+            }
+        }
+    }
+
+    private void setFocusForEpgBtn() {
+        try {
+            layoutEpg.setNextFocusLeftId(Objects.requireNonNull(gvChannelsList.findViewHolderForAdapterPosition(selectedChannelPosition)).itemView.getId());
+        } catch (Exception ignored) {
+            try {
+                layoutEpg.setNextFocusLeftId(Objects.requireNonNull(Objects.requireNonNull(
+                        gvChannelsList.getLayoutManager()).findViewByPosition(selectedChannelPosition)).getId());
+            } catch (Exception ignored2) {
+                layoutEpg.setNextFocusLeftId(gvChannelsList.getChildAt(0).getId());
+            }
+        }
     }
 
 
@@ -697,9 +699,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     public void onChannelFocused(int position) {
         stopPreview();
         try {
-            View currentFocusedView = gvChannelsList.findViewHolderForLayoutPosition(position).itemView;
-            if (currentFocusedView != null)
-                currentFocusedView.setNextFocusRightId(layoutEpg.getId());
+            View currentFocusedView = Objects.requireNonNull(gvChannelsList.findViewHolderForLayoutPosition(position)).itemView;
+            currentFocusedView.setNextFocusRightId(layoutDvr.getId());
             selectedChannelPosition = position;
             setValues(adapter.getmList().get(position));
             currentSelected = adapter.getmList().get(position);
@@ -737,11 +738,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 try {
                     initVideoView(channelLinkResponse.getChannel().getLink());
                 } catch (Exception e) {
-                    initVideoView("");
+//                    initVideoView("");
                     e.printStackTrace();
+                    Toast.makeText(getActivity(), "Preview not found", Toast.LENGTH_SHORT).show();
                 }
             }
-            initVideoView("");
         });
 
     }
@@ -758,7 +759,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     }
 
     private DataSource.Factory buildDataSourceFactory() {
-        return new DefaultDataSourceFactory(getActivity(),Util.getUserAgent(getActivity(), getString(R.string.app_name)));
+        return new DefaultDataSourceFactory(getActivity(), Util.getUserAgent(getActivity(), getString(R.string.app_name)));
     }
 
     /**
@@ -774,23 +775,17 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
-            trackSelectorParameters.buildUpon().setMaxVideoSize(300,200).build();
+            trackSelectorParameters.buildUpon().setMaxVideoSizeSd().build();
             trackSelector.setParameters(trackSelectorParameters);
-            /*DefaultAllocator allocator = new DefaultAllocator(true, 64 * 1024);
-            DefaultLoadControl defaultLoadControl = new DefaultLoadControl();
-            DefaultLoadControl.Builder loadControl = new DefaultLoadControl.Builder().setAllocator(allocator).setBufferDurationsMs(5000, 60000, 1000, 1000);
-            defaultLoadControl = loadControl.createDefaultLoadControl();
-            RenderersFactory renderersFactory = new DefaultRenderersFactory(getActivity(),DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);*/
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         }
         player.setVolume(0f);
         player.setPlayWhenReady(true);
-        previewView.setPlayer(player);
-        previewView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
         player.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-        player.setVideoSurfaceView((SurfaceView) previewView.getVideoSurfaceView());
-        String splitUrl = "udp://@237.1.1.9:9000";
-        MediaSource mediaSource = buildMediaSource(Uri.parse(splitUrl));
+        player.setVideoTextureView(previewView);
+        Log.d("preiew_link", link);
+//        String splitUrl = "udp://@237.1.1.9:9000";
+        MediaSource mediaSource = buildMediaSource(Uri.parse(link));
         player.prepare(mediaSource, true, true);
         player.addListener(new Player.EventListener() {
             @Override
@@ -862,6 +857,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         if (hidden) {
             stopPreview();
             isFirstRun = false;
+            gvChannelsList.setVisibility(View.VISIBLE);
         } else {
             if (errorFragment != null)
                 showErrorFrag(errorFragment);
@@ -955,6 +951,12 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     private void setValues(ChannelItem item) {
         if (item != null) {
             channelName.setText(item.getName());
+            GlideApp.with(this).asBitmap()
+                    .load(LinkConfig.BASE_URL + LinkConfig.CHANNEL_LOGO_URL + item.getChannelLogo())
+                    .centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .into(channelDescLogo);
+            channelLanguage.setText((item.getChannelLanguage()==null||item.getChannelLanguage().isEmpty())?"N/A":item.getChannelLanguage());
             channelDescription.setText(item.getChannelDesc());
             channelNo.setText(String.valueOf(item.getChannelPriority()));
             txtFavUnfav.setText(item.getIs_fav() == 0 ? "SET FAV" : "UNSET FAV");

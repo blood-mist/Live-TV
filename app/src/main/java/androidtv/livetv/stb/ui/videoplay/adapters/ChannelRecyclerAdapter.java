@@ -120,9 +120,9 @@ public class ChannelRecyclerAdapter extends RecyclerView.Adapter<ChannelRecycler
 
         ChannelItem channel = channelList.get(position);
         GlideApp.with(mContext)
+                .asBitmap()
                 .load(LinkConfig.BASE_URL+LinkConfig.CHANNEL_LOGO_URL+channel.getChannelLogo())
                 .placeholder(R.drawable.placeholder_logo)
-                .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(holder.channelImage);
         holder.itemLayout.setOnClickListener(new View.OnClickListener() {

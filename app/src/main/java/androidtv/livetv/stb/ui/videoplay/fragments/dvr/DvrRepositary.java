@@ -5,16 +5,19 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import androidtv.livetv.stb.db.AndroidTvDatabase;
 import androidtv.livetv.stb.entity.ChannelItem;
 import androidtv.livetv.stb.entity.DvrStartDateTimeEntity;
+import androidtv.livetv.stb.entity.EpgMasterResponse;
 import androidtv.livetv.stb.entity.EpgResponse;
 import androidtv.livetv.stb.entity.Epgs;
 import androidtv.livetv.stb.ui.channelLoad.CatChannelDao;
@@ -23,6 +26,7 @@ import androidtv.livetv.stb.utils.ApiManager;
 import androidtv.livetv.stb.utils.DataUtils;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
@@ -39,12 +43,11 @@ public class DvrRepositary {
     public DvrRepositary(Application application) {
         Retrofit retrofitInstance = ApiManager.getAdapter();
         AndroidTvDatabase db = AndroidTvDatabase.getDatabase(application);
-        dvrApiInterface =  retrofitInstance.create(DvrApiInterface.class);
+        dvrApiInterface = retrofitInstance.create(DvrApiInterface.class);
         catChannelDao = db.catChannelDao();
         channelList = new MediatorLiveData<>();
         dvrStartDateTimeEntityMediatorLiveData = new MediatorLiveData<>();
         channelList.addSource(catChannelDao.getChannels(), channelItems -> channelList.postValue(channelItems));
-
 
 
     }
@@ -65,45 +68,44 @@ public class DvrRepositary {
         return channelList;
     }
 
-    public LiveData<List<Epgs>> getEpgs(String token, long utc, String userId, String hashValue, String channelId) {
+    public LiveData<List<Epgs>> getEpgs(String url, String token, String channelId, String date) {
         MediatorLiveData<List<Epgs>> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        List<Epgs> epgsList = new ArrayList<>();
-        io.reactivex.Observable<Response<EpgResponse>> call = dvrApiInterface.getEpgs(channelId, token, utc, userId, hashValue);
+        String timeZone=TimeZone.getDefault().getID();
+        Log.d("timezone",timeZone);
+        io.reactivex.Observable<Response<List<EpgMasterResponse>>> call = dvrApiInterface.getEpgs(url, token, date, "5", "");
         call.subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread()).
+                .observeOn(AndroidSchedulers.mainThread()).
                 unsubscribeOn(Schedulers.io()).
-                subscribe(new io.reactivex.Observer<Response<EpgResponse>>() {
+                subscribe(new io.reactivex.Observer<Response<List<EpgMasterResponse>>>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(Response<EpgResponse> epgResponseResponse) {
+                    public void onNext(Response<List<EpgMasterResponse>> epgResponseResponse) {
                         if (epgResponseResponse.code() == 200) {
-                            EpgResponse response = epgResponseResponse.body();
+                            List<EpgMasterResponse> response = epgResponseResponse.body();
+                            List<Epgs> epgs = new ArrayList<>();
                             if (response != null) {
-                                List<Epgs> epgs = DataUtils.getEpgsListFrom(response.getEpg(), channelId);
+                                for (EpgMasterResponse epgMasterResponse : response) {
+                                    epgs.addAll(DataUtils.getEpgsListFrom(epgMasterResponse.getEpgTokenList(), channelId));
+                                }
                                 if (epgs.size() > 0) {
                                     deleteEpg(Integer.parseInt(channelId));
                                 }
 
                                 responseMediatorLiveData.postValue(epgs);
-                                if(epgs.size()>0){
+                                if (epgs.size() > 0) {
                                     insertToDb(epgs);
 
                                 }
 
-
                             }
-
+                        }else{
+                            onError(new HttpException(epgResponseResponse));
                         }
-
-
-
-
-
                     }
 
                     @Override
@@ -132,9 +134,9 @@ public class DvrRepositary {
         Completable.fromRunnable(() -> catChannelDao.insertEpgs(epgs)).subscribeOn(Schedulers.io()).subscribe();
     }
 
-    public LiveData<DvrStartDateTimeEntity> getStartTime(String token, long utc, String userId, String hashValue, int hasDvr, String channelId){
+    public LiveData<DvrStartDateTimeEntity> getStartTime(String token, long utc, String userId, String hashValue, int hasDvr, String channelId) {
         MediatorLiveData<DvrStartDateTimeEntity> dvrStartDate = new MediatorLiveData<>();
-        Observable<Response<DvrStartDateTimeEntity>> call = dvrApiInterface.getStartTime(token,utc,userId,hashValue,hasDvr,Integer.parseInt(channelId));
+        Observable<Response<DvrStartDateTimeEntity>> call = dvrApiInterface.getStartTime(token, utc, userId, hashValue, hasDvr, Integer.parseInt(channelId));
         call.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread()).
                 unsubscribeOn(Schedulers.io()).
@@ -146,14 +148,14 @@ public class DvrRepositary {
 
                     @Override
                     public void onNext(Response<DvrStartDateTimeEntity> dvrStartDateTimeEntityResponse) {
-                       if(dvrStartDateTimeEntityResponse.code() == 200){
-                           dvrStartDate.postValue(dvrStartDateTimeEntityResponse.body());
-                       }
+                        if (dvrStartDateTimeEntityResponse.code() == 200) {
+                            dvrStartDate.postValue(dvrStartDateTimeEntityResponse.body());
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                      dvrStartDate.postValue(new DvrStartDateTimeEntity());
+                        dvrStartDate.postValue(new DvrStartDateTimeEntity());
                     }
 
                     @Override

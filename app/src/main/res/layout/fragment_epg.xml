@@ -32,8 +32,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/channel_list"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:focusedByDefault="true"
+                android:layout_height="105dp"
                 android:overScrollMode="always"
                 android:background="@color/transp"
                 />
@@ -50,54 +49,58 @@
                     android:layout_weight="4"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingTop="40dp">
-                    <TextView
-                        android:id="@+id/txt_channel_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                   >
+                    <ImageView
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:id="@+id/img_epg_channel_onAir"
+                        android:layout_width="@dimen/epg_channel_on_air_width"
+                        android:layout_height="@dimen/epg_channel_on_air_height"
+                        android:scaleType="fitXY"
+                        android:adjustViewBounds="true"
+                        android:padding="@dimen/margin_medium"
                         android:gravity="center"
-                        android:text="@string/txt_empty"
-                        android:textColor="#fff"
-                        style="@style/Base.TextAppearance.AppCompat.Large"/>
+                       />
 
-                    <TextView
+                    <androidtv.livetv.stb.ui.custom_views.CustomTextView
                         android:id="@+id/txt_on_air"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:background="#d01e1e"
                         android:gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="@dimen/margin_small"
                         android:paddingLeft="10dp"
+                        app:fontAssetName="@string/font_helvetica_regular"
                         android:paddingRight="10dp"
                         android:text="ON AIR"
                         android:textColor="#fff"
-                        android:textSize="40sp"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:gravity="center"
+                       android:padding="@dimen/margin_small"
+                        android:layout_marginTop="@dimen/margin_high"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
                             android:id="@+id/txt_day"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/txt_empty"
+                            app:fontAssetName="@string/font_helvetica_regular"
                             android:textColor="#fff"
-                            android:visibility="gone"
                             style="@style/Base.TextAppearance.AppCompat.Medium"/>
 
-                        <TextView
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
                             android:id="@+id/txt_date"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            app:fontAssetName="@string/font_helvetica_regular"
                             android:text="@string/txt_empty"
                             android:textColor="@color/date_defocused"
                             style="@style/Base.TextAppearance.AppCompat.Medium"/>
@@ -106,25 +109,29 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:gravity="center"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:padding="@dimen/margin_small"
                         android:orientation="vertical">
 
-                        <TextView
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
                             android:id="@+id/txt_on_air_prgm_time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/txt_empty"
+                            app:fontAssetName="@string/font_helvetica_regular"
                             android:textColor="@color/date_defocused"
                             style="@style/Base.TextAppearance.AppCompat.Medium"/>
 
-                        <TextView
+                        <androidtv.livetv.stb.ui.custom_views.CustomTextView
                             android:id="@+id/txt_on_air_prgm_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/txt_empty"
+                            app:fontAssetName="@string/font_helvetica_regular"
+                            android:layout_marginTop="@dimen/margin_small"
                             android:maxLines="2"
                             android:ellipsize="end"
                             android:textColor="#fff"
@@ -154,6 +161,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="3.5"
                             android:focusable="true"
+                            android:background="@color/transp"
                             android:nextFocusUp="@id/channel_list"
 
                             />
@@ -204,7 +212,6 @@
                                     android:visibility="gone"
                                     android:textColor="@color/color_white"
                                     style="@style/Base.TextAppearance.AppCompat.Large"
-                                    android:layout_centerInParent="true"
                                     app:fontAssetName="@string/font_exo_semi_bold"
                                     android:text="Loading..."/>
 

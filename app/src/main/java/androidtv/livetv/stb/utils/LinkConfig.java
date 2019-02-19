@@ -1,6 +1,7 @@
 package androidtv.livetv.stb.utils;
 
 import android.content.Context;
+import android.view.ViewConfiguration;
 
 import org.json.JSONObject;
 
@@ -14,8 +15,11 @@ public class LinkConfig {
     public static final String TOKEN_CONFIG_FILE_NAME ="authCode" ;
     public static final String ACCOUNT_PACKAGE="androidtv.myaccount.stb";
 //    public static final String BASE_URL ="https://middleware.yourman.info/" ;
-    public static final String BASE_URL ="http://192.168.1.220/" ;
-//public static final String BASE_URL ="http://192.168.2.212/" ;
+   public static final String BASE_URL ="http://192.168.1.220/" ;
+
+//    public static final String BASE_URL ="https://demo.newitventure.com/" ;
+
+    //public static final String BASE_URL ="http://192.168.2.212/" ;
     public static final String CHECK_IF_SERVER_RECHABLE = "https://middleware.yourman.info";
     public static final String CHANNEL_LOGO_URL = "uploads/channel/";
     public static final String CHANNEL_LINK_URL = "api/v1/livetv/getchannels";
@@ -37,7 +41,8 @@ public class LinkConfig {
     public static final String PREVIEW_LINK_LOADER = "api/v1/livetv/channel/preview";
     public static final String EPG_URL ="api/v1/epg";
     public static final String FAV_UNFAV_URL = "api/v1/livetv/favorite/addfavorite";
-    public static final String DVR_VIDEO_URL = "api/v1/dvr/getdvr";
+//    public static final String DVR_VIDEO_URL = "api/v1/dvr/getdvr";
+    public static final String DVR_VIDEO_URL = "api/v1/dvr";
     public static final String FAV_CHANNELS_ID_URL = "api/v1/livetv/favorite/list";
     public static final String CHANNEL_CHANGE_OBSERVABLE="channel_change";
 

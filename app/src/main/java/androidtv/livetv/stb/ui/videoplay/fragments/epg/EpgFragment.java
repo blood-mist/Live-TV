@@ -15,15 +15,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import androidtv.livetv.stb.R;
 import androidtv.livetv.stb.entity.ChannelItem;
@@ -39,6 +42,7 @@ import androidtv.livetv.stb.ui.videoplay.fragments.menu.FragmentMenu;
 import androidtv.livetv.stb.utils.DataUtils;
 import androidtv.livetv.stb.utils.DateUtils;
 import androidtv.livetv.stb.utils.DisposableManager;
+import androidtv.livetv.stb.utils.GlideApp;
 import androidtv.livetv.stb.utils.LinkConfig;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -100,8 +104,8 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     RecyclerView gvDate;
     @BindView(R.id.layout_date_epg)
     LinearLayout layoutDateEpg;
-    @BindView(R.id.txt_channel_name)
-    TextView txtChannelName;
+    @BindView(R.id.img_epg_channel_onAir)
+    ImageView onAirChlogo;
     @BindView(R.id.txt_on_air)
     TextView txtOnAir;
     @BindView(R.id.txt_day)
@@ -147,8 +151,11 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         currentEpgDate = Calendar.getInstance().getTime();
-        String currentDate = androidtv.livetv.stb.utils.DateUtils.dateAndTime.format(Calendar.getInstance().getTime());
-        txtDateView.setText(currentDate);
+        Date currentDate=Calendar.getInstance().getTime();
+        String currentDay=DateUtils.fullDayFormat.format(currentDate);
+        String currentExpectedDate = DateUtils.daymonthFormat.format(currentDate);
+        txtDayView.setText(currentDay);
+        txtDateView.setText(currentExpectedDate);
         adapter = new ChannelRecyclerAdapter(getContext(), this);
         adapter.setSelectedChannelId(selectedChannelId);
         gvChannelList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
@@ -201,7 +208,12 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         }
         cuurentEpgList = null;
         epgListAdapter.clear();
-        txtChannelName.setText(channel.getName());
+        GlideApp.with(Objects.requireNonNull(getActivity()))
+                .asBitmap()
+                .load(LinkConfig.BASE_URL+LinkConfig.CHANNEL_LOGO_URL+channel.getChannelLogo())
+                .placeholder(R.drawable.placeholder_logo)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .into(onAirChlogo);
         resetOnAir(channel);
         currentSelectedChannel = channel;
         Log.d("channel", channel.getName());
@@ -211,8 +223,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
         gvDate.setVisibility(View.GONE);
         showNoEpg("Loading");
         DisposableManager.disposeEpg();
-        LiveData<Boolean> epgFetchData = viewModel.getEpgs(login.getToken(), utc.getUtc(), String.valueOf(login.getId()), LinkConfig.getHashCode(String.valueOf(login.getId())
-                , String.valueOf(utc.getUtc()), login.getSession()), String.valueOf(channel.getId()));
+        LiveData<Boolean> epgFetchData = viewModel.getEpgs(channel.getChannelEpgName(),login.getToken(), String.valueOf(channel.getId()));
 
         epgFetchData.observe(this, aBoolean -> {
             if (aBoolean != null) {
@@ -237,7 +248,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                         showNoEpg("No epg found");
                     }
                     epgEntityLive.removeObserver(this);
-                    epgEntityLive = null;
                 }
             }
         });
@@ -280,6 +290,7 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
             if (checkDate(epg.getDate())) {
                 Calendar currentTime = Calendar.getInstance();
                 Date currentDate = currentTime.getTime();
+                Log.d("currentTime:"+currentTime.getTime(),"EndTime:"+epg.getEndTime());
                 if (epg.getEndTime().after(currentDate)) {
                     newList.add(epg);
                 }
