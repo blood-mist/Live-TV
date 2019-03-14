@@ -72,7 +72,6 @@ public class DvrRepositary {
         MediatorLiveData<List<Epgs>> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
         String timeZone=TimeZone.getDefault().getID();
-        Log.d("timezone",timeZone);
         io.reactivex.Observable<Response<List<EpgMasterResponse>>> call = dvrApiInterface.getEpgs(url, token, date, "5", "");
         call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).

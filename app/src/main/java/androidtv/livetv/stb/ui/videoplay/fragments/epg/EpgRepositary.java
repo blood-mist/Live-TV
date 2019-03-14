@@ -70,7 +70,6 @@ public class EpgRepositary {
         epLiveData=new MediatorLiveData<>();
         epLiveData.setValue(null);
         String timeZone=TimeZone.getDefault().getID();
-        Log.d("timezone",timeZone);
         io.reactivex.Observable<Response<List<EpgMasterResponse>>> call = epgApiInterface.getEpgs(epgUrl, token, getDateinRequiredFormat(),"Asia/Kolkata");
         call.subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.newThread()).

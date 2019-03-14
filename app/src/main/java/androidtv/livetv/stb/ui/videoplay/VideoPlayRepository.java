@@ -94,10 +94,10 @@ public class VideoPlayRepository {
         return channelList;
     }
 
-    public LiveData<ChannelLinkResponseWrapper> getChannelLink(String token, long utc, String userId, String hashValue, String macAddress, String channelId) {
+    public LiveData<ChannelLinkResponseWrapper> getChannelLink(String token, long utc, String userId, String hashValue, String macAddress, String channelId,Integer categoryId) {
         MediatorLiveData<ChannelLinkResponseWrapper> responseMediatorLiveData = new MediatorLiveData<>();
         responseMediatorLiveData.setValue(null);
-        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue, macAddress, channelId);
+        io.reactivex.Observable<Response<ChannelLinkResponse>> call = videoPlayApiInterface.getChannelLink(token, utc, userId, hashValue, macAddress, channelId,categoryId);
         call.subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread()).unsubscribeOn(Schedulers.io())
                 .subscribe(new io.reactivex.Observer<Response<ChannelLinkResponse>>() {
                     @Override
@@ -280,8 +280,8 @@ public class VideoPlayRepository {
 
                     @Override
                     public void onNext(List<ChannelItem> listLiveData) {
-                            if (listLiveData != null)
-                                channelsInCatList.postValue(listLiveData);
+                        if (listLiveData != null)
+                            channelsInCatList.postValue(listLiveData);
                     }
 
                     @Override

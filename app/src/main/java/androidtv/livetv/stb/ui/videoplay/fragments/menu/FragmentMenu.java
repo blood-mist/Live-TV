@@ -135,6 +135,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @BindView(R.id.layout_fav)
     LinearLayout layoutFav;
 
+    @BindView(R.id.txt_on_air)
+    TextView onAirPgm;
+
     @BindView(R.id.no_channels)
     TextView noChannels;
 
@@ -199,7 +202,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
         super.onCreate(savedInstanceState);
         menuViewModel = ViewModelProviders.of(this).get(MenuViewModel.class);
 //        playLastPlayedChannel();
-        errorFragment = null;
     }
 
     @Override
@@ -211,7 +213,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Timber.d("onCreateView");
         View v = inflater.inflate(R.layout.fragment_fragment_menu, container, false);
         ButterKnife.bind(this, v);
         this.login = GlobalVariables.login;
@@ -222,7 +223,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("frag", "view created");
         getLastPlayedChannel();
         categoryLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         categoryAdapter = new CategoryAdapter(getActivity(), FragmentMenu.this);
@@ -274,6 +274,9 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
 
             }
         });*/
+        if(errorFragment!=null){
+            showErrorFrag(errorFragment);
+        }
 
     }
 
@@ -502,7 +505,6 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                 Collections.sort(items, new Comparator<ChannelItem>() {
                     @Override
                     public int compare(ChannelItem item, ChannelItem t1) {
-                        Log.d("item priority", item.getChannelPriority() + "<===>" + t1.getChannelPriority());
                         if (item.getChannelPriority() > t1.getChannelPriority()) {
                             return 1;
                         } else {
@@ -516,8 +518,8 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     currentPlayedCategoryItems = items;
                     lastPlayedId = -1;
                 }
-                gvChannelsList.getLayoutManager().scrollToPosition(selectedChannelPosition);
-                adapter.notifyDataSetChanged();
+                Objects.requireNonNull(gvChannelsList.getLayoutManager()).scrollToPosition(selectedChannelPosition);
+//                adapter.notifyDataSetChanged();
                 gvChannelsList.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
@@ -529,7 +531,11 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                                     try {
                                         currentSelected = adapter.getmList().get(selectedChannelPosition);
                                     } catch (Exception e) {
-                                        currentSelected = adapter.getmList().get(0);
+                                        try {
+                                            currentSelected = adapter.getmList().get(0);
+                                        }catch (Exception e1){
+                                            currentSelected=items.get(0);
+                                        }
 
                                     }
                                     try {
@@ -538,7 +544,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-                                   setFocusForEpgBtn();
+                                    setFocusForEpgBtn();
                                     setFocusForDvrBtn();
                                     setFocusForFavBtn();
 
@@ -775,7 +781,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     new AdaptiveTrackSelection.Factory();
             trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             DefaultTrackSelector.Parameters trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
-            trackSelectorParameters.buildUpon().setMaxVideoSizeSd().build();
+            trackSelectorParameters.buildUpon().setMaxVideoSize(352,288).build();
             trackSelector.setParameters(trackSelectorParameters);
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
         }
@@ -871,6 +877,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
     @Override
     public void onDestroyView() {
 //        stopPreview();
+        errorFragment=null;
         super.onDestroyView();
     }
 
@@ -958,6 +965,7 @@ public class FragmentMenu extends Fragment implements CategoryAdapter.OnListClic
                     .into(channelDescLogo);
             channelLanguage.setText((item.getChannelLanguage()==null||item.getChannelLanguage().isEmpty())?"N/A":item.getChannelLanguage());
             channelDescription.setText(item.getChannelDesc());
+            onAirPgm.setText(getResources().getString(R.string.pgm_of)+" "+item.getName());
             channelNo.setText(String.valueOf(item.getChannelPriority()));
             txtFavUnfav.setText(item.getIs_fav() == 0 ? "SET FAV" : "UNSET FAV");
 

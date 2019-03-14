@@ -54,11 +54,8 @@ public class ApplicationMain extends Application {
             PrintWriter printWriter = new PrintWriter(writer);
             e.printStackTrace(printWriter);
             String s = writer.toString();
-            Log.d("CheckingErrorStatus", s);
             // String fpath = "/sdcard/.Movies_wod/"+fname+".txt";
             File file = new File(getExternalFilesDir(null), "LiveTV report");
-            Log.d("File Stored in", getExternalFilesDir(null).getPath()
-                    + "crash_report");
             file.createNewFile();
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);

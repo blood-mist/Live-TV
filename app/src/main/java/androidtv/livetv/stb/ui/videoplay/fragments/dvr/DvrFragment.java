@@ -341,7 +341,6 @@ public class DvrFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
 
     @Override
     public void clickDvr(Epgs epg, int position) {
-        Log.d("dvr", "clicked :" + epg.getProgramTitle());
         selectedDatePosition = dateListAdapter.getPositionClicked();
         currentPlayedEpg = epg;
         currentEpgSelectedPosition = position;

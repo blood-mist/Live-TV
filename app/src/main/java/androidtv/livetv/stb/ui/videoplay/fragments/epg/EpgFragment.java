@@ -216,7 +216,6 @@ public class EpgFragment extends Fragment implements ChannelRecyclerAdapter.OnCh
                 .into(onAirChlogo);
         resetOnAir(channel);
         currentSelectedChannel = channel;
-        Log.d("channel", channel.getName());
         Login login = GlobalVariables.login;
         TimeStampEntity utc = GetUtc.getInstance().getTimestamp();
         epgListAdapter.clear();

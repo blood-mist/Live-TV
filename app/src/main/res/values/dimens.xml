@@ -4,8 +4,8 @@
     <dimen name="channel_desc_logo_height">135dp</dimen>
     <dimen name="right_margin">50dp</dimen>
     <dimen name="margin_small">5dp</dimen>
-    <dimen name="preview_width">450dp</dimen>
-    <dimen name="preview_height">350dp</dimen>
+    <dimen name="preview_width">240dp</dimen>
+    <dimen name="preview_height">192dp</dimen>
     <dimen name="options_padding">8dp</dimen>
     <dimen name="options_width">150dp</dimen>
     <dimen name="margin_medium">10dp</dimen>

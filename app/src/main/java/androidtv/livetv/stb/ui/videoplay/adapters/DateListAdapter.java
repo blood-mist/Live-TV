@@ -57,7 +57,6 @@ public class DateListAdapter extends RecyclerView.Adapter<DateViewHolder> {
         Date d = dateList.get(holder.getAdapterPosition());
         String txtToSet = DateUtils.smalldateFormat.format(d);
         holder.prgmDetails.setText(txtToSet);
-        Log.d("dates",txtToSet);
         holder.layoutTxtImgHor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {

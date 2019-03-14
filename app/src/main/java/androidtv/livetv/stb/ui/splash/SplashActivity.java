@@ -566,7 +566,7 @@ public class SplashActivity extends AppCompatActivity implements PermissionUtils
             LoginFileUtils.deleteLoginFile();
             checkForValidMacAddress();
         }*/
-        LiveData<LoginResponseWrapper> loginfildeData = splashViewModel.loginFromFile("demoiptv12@nitv.com", "123456", macAddress);
+        LiveData<LoginResponseWrapper> loginfildeData = splashViewModel.loginFromFile("demoiptv12@nitv.com", "112233", macAddress);
         loginfildeData.observe(this, new Observer<LoginResponseWrapper>() {
             @Override
             public void onChanged(@Nullable LoginResponseWrapper loginResponseWrapper) {

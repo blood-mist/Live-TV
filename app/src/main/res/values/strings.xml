@@ -206,6 +206,6 @@
     <string name="genres">Genres</string>
     <string name="onair">On Air</string>
     <string name="press_back_to_exit">Press back again to exit.</string>
-
-
+    <string name="radio_cat">Radio</string>
+    <string name="pgm_of">Currently playing program of</string>
 </resources>

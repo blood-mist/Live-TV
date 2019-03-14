@@ -16,6 +16,7 @@ public class LinkConfig {
     public static final String ACCOUNT_PACKAGE="androidtv.myaccount.stb";
 //    public static final String BASE_URL ="https://middleware.yourman.info/" ;
    public static final String BASE_URL ="http://192.168.1.220/" ;
+//    public static final String BASE_URL="https://hoteldemo.newitventure.com/";
 
 //    public static final String BASE_URL ="https://demo.newitventure.com/" ;
 

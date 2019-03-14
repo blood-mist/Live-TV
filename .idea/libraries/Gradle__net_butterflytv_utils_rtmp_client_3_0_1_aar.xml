@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: net.butterflytv.utils:rtmp-client:3.0.1@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtmp-client-3.0.1.aar/69d2c8af6f85db608e31309776325b6a/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/rtmp-client-3.0.1.aar/69d2c8af6f85db608e31309776325b6a/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.butterflytv.utils/rtmp-client/3.0.1/72aa8d6c27a02e8f76fa6ba5a6117e752dfa588b/rtmp-client-3.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

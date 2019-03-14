@@ -24,7 +24,6 @@ public class DateUtils {
     public static SimpleDateFormat fullDayFormat =  new SimpleDateFormat("EEE", Locale.US);
 
     public static Date convertTimeTo24hrs(String time) throws ParseException {
-        Log.d("CheckingConvertTime",time);
         if(time.length() > 12 || time.length()< 12){
             Date date = _12HrsTimeFormat.parse(time);
             return date;

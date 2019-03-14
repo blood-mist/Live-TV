@@ -58,7 +58,7 @@ public interface ApiInterface {
     @GET(LinkConfig.GET_UTC)
     Observable<Response<TimeStampEntity>> getTimestamp();
     @GET(LinkConfig.NEW_CHANNEL_LINK)
-    Observable<Response<ChannelLinkResponse>> getChannelLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash,@Query("mac_id")String macAddress, @Query("channelID") String id);
+    Observable<Response<ChannelLinkResponse>> getChannelLink(@Header("Authorization") String token, @Query("utc") long utc, @Query("userId") String userId, @Query("hash")String hash,@Query("mac_id")String macAddress, @Query("channelID") String id,@Query("category_id")Integer catId);
 
     @GET(LinkConfig.FAV_UNFAV_URL)
     Observable<Response<FavoriteResponse>> addToFavorite(@Header("Authorization") String token, @Query("utc")long utc, @Query("userId")String userId, @Query("hash")String hash, @Query("channelId") String channelId);
