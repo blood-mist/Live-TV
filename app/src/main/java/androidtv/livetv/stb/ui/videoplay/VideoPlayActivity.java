@@ -927,6 +927,8 @@ public class VideoPlayActivity extends AppCompatActivity implements FragmentMenu
         super.onDestroy();
     }
 
+
+
     private void playVideo(String channelLink, boolean isDvr) {
         Log.d("media", channelLink);
         startAutoPlay = true;
